@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - GST Invoice System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-receipt"></i>
+            </div>
+            GST Invoice System
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </a>
+            <a href="invoice.html" class="nav-link">
+                <i class="fas fa-file-invoice"></i> Create Invoice
+            </a>
+            <a href="view-invoice.html" class="nav-link">
+                <i class="fas fa-eye"></i> View Invoices
+            </a>
+            <a href="inventory.html" class="nav-link">
+                <i class="fas fa-boxes"></i> Inventory
+            </a>
+            <a href="profile.html" class="nav-link active">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <button class="btn btn-danger btn-sm" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">
+                U
+            </div>
+            <h1 id="profileUserName">User Name</h1>
+            <p id="profileUserEmail">user@example.com</p>
+            <p class="text-light">Business Owner</p>
+        </div>
+
+        <!-- User Stats -->
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <div class="profile-stat-value" id="invoiceCount">0</div>
+                <div class="profile-stat-label">Invoices Created</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-value" id="revenueTotal">₹0</div>
+                <div class="profile-stat-label">Total Revenue</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-value" id="customerCount">0</div>
+                <div class="profile-stat-label">Active Customers</div>
+            </div>
+            <div class="profile-stat">
+                <div class="profile-stat-value" id="memberSince">2024</div>
+                <div class="profile-stat-label">Member Since</div>
+            </div>
+        </div>
+
+        <!-- Profile Settings -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-user-cog"></i>
+                    Profile Settings
+                </h2>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="profileName" class="form-control" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Business Name</label>
+                        <input type="text" id="profileBusiness" class="form-control" placeholder="Enter your business name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="profileEmail" class="form-control" placeholder="Enter your email">
+                </div>
+
+                <div class="card-header" style="border: none; padding: 0; margin: 30px 0 20px;">
+                    <h3 class="card-title">
+                        <i class="fas fa-lock"></i>
+                        Change Password
+                    </h3>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" class="form-control" placeholder="Confirm new password">
+                    </div>
+                </div>
+
+                <div class="action-buttons mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Application Settings -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-cog"></i>
+                    Application Settings
+                </h2>
+            </div>
+
+            <div class="settings-section">
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-moon"></i> Dark Mode
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="darkModeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-bell"></i> Notifications
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notificationsToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-save"></i> Auto Save
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoSaveToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-row" style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">Default GST Rate (%)</label>
+                        <select class="form-control" id="taxRate">
+                            <option value="0">0%</option>
+                            <option value="5">5%</option>
+                            <option value="12">12%</option>
+                            <option value="18" selected>18%</option>
+                            <option value="28">28%</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Currency</label>
+                        <select class="form-control" id="currency">
+                            <option value="INR" selected>Indian Rupee (₹)</option>
+                            <option value="USD">US Dollar ($)</option>
+                            <option value="EUR">Euro (€)</option>
+                            <option value="GBP">British Pound (£)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-buttons mt-3">
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="danger-zone">
+            <h3>
+                <i class="fas fa-exclamation-triangle"></i>
+                Danger Zone
+            </h3>
+            <p>Once you delete your account, there is no going back. Please be certain.</p>
+            
+            <div class="form-row" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Enter your email to confirm</label>
+                    <input type="email" id="deleteEmail" class="form-control" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm email</label>
+                    <input type="email" id="deleteConfirmEmail" class="form-control" placeholder="Re-enter your email">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Enter your password</label>
+                <input type="password" id="deletePassword" class="form-control" placeholder="Enter your password">
+            </div>
+
+            <button class="btn btn-danger" id="deleteAccountBtn">
+                <i class="fas fa-trash"></i> Delete Account Permanently
+            </button>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal hidden" id="deleteModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title text-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Delete Account
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone!
+                    </div>
+                    
+                    <p>You are about to permanently delete your account. This will:</p>
+                    <ul style="margin: 15px 0 15px 20px; color: var(--text-secondary);">
+                        <li>Delete all your invoices</li>
+                        <li>Delete your inventory data</li>
+                        <li>Remove your customer records</li>
+                        <li>Delete all your settings</li>
+                    </ul>
+                    
+                    <p><strong>Are you absolutely sure?</strong></p>
+                    
+                    <div class="action-buttons mt-3">
+                        <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                            <i class="fas fa-trash"></i> Yes, Delete My Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2024 GST Invoice System. All rights reserved.</p>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // Load profile data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfileData();
+            
+            // Update member since year
+            const memberSince = document.getElementById('memberSince');
+            if (auth.currentUser && auth.currentUser.createdAt) {
+                const year = new Date(auth.currentUser.createdAt).getFullYear();
+                memberSince.textContent = year;
+            }
+        });
+    </script>
+</body>
+</html><nav class="navbar">
+    <a href="dashboard.html" class="logo">
+        <div class="logo-icon">
+            <i class="fas fa-receipt"></i>
+        </div>
+        GST Invoice System
+    </a>
+    <div class="nav-links">
+        <!-- Navigation will be dynamically loaded by script.js -->
+    </div>
+</nav>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Returns - GST Invoice System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .returns-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .returns-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .return-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--border-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 15px;
+        }
+        
+        .return-stat .label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .return-stat .value {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .return-reason {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .return-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .invoice-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .invoice-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="dashboard.html" class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <span>GST Invoice System</span>
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </a>
+            <a href="shop.html" class="nav-link">
+                <i class="fas fa-store"></i> Shop Profile
+            </a>
+            <a href="inventory.html" class="nav-link">
+                <i class="fas fa-boxes"></i> Inventory
+            </a>
+            <a href="create_invoice.html" class="nav-link">
+                <i class="fas fa-file-invoice"></i> Create Invoice
+            </a>
+            <a href="invoices.html" class="nav-link">
+                <i class="fas fa-list"></i> Invoices
+            </a>
+            <a href="add_purchase.html" class="nav-link">
+                <i class="fas fa-cart-plus"></i> Add Purchase
+            </a>
+            <a href="returns.html" class="nav-link active">
+                <i class="fas fa-exchange-alt"></i> Returns
+            </a>
+            <a href="pinned.html" class="nav-link">
+                <i class="fas fa-thumbtack"></i> Pinned
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1><i class="fas fa-exchange-alt"></i> Returns Management</h1>
+            <div class="page-header-actions">
+                <a href="invoices.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Invoices
+                </a>
+                <a href="dashboard.html" class="btn">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Returns Summary -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="stat-value" id="totalReturns">0</div>
+                <div class="stat-label">Total Returns</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="stat-value" id="totalReturnedQty">0</div>
+                <div class="stat-label">Items Returned</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="stat-value" id="monthReturns">0</div>
+                <div class="stat-label">This Month</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stat-value" id="stockValue">₹ 0</div>
+                <div class="stat-label">Stock Restored</div>
+            </div>
+        </div>
+
+        <div class="returns-container">
+            <!-- Recent Returns -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-history"></i> Recent Returns</h2>
+                    <div class="action-buttons">
+                        <button class="btn-icon" onclick="loadReturns()" title="Refresh">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn-icon" title="Export">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="table" id="returnsTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Invoice</th>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="noReturnsMessage" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>No Returns Yet</h3>
+                    <p>Process returns from invoices using the Return button</p>
+                    <a href="invoices.html" class="btn btn-primary mt-2">
+                        <i class="fas fa-list"></i> Go to Invoices
+                    </a>
+                </div>
+            </div>
+
+            <!-- Return Insights -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-chart-pie"></i> Return Insights</h2>
+                </div>
+                
+                <div style="padding: 20px;">
+                    <div class="return-stat">
+                        <span class="label">Most Returned Item</span>
+                        <span class="value" id="mostReturnedItem">-</span>
+                    </div>
+                    
+                    <div class="return-stat">
+                        <span class="label">Most Common Reason</span>
+                        <span class="value" id="commonReason">-</span>
+                    </div>
+                    
+                    <div class="return-stat">
+                        <span class="label">Last Return</span>
+                        <span class="value" id="lastReturnDate">-</span>
+                    </div>
+                    
+                    <div class="return-stat">
+                        <span class="label">Monthly Average</span>
+                        <span class="value" id="monthlyAverage">0</span>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h4 style="margin-bottom: 15px;">Return Reasons Distribution</h4>
+                        <div id="reasonChart">
+                            <!-- Will be populated by JavaScript -->
+                            <div class="empty-state" style="padding: 20px;">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>No return data available</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 action-buttons">
+                        <button class="btn btn-sm btn-secondary" onclick="generateReturnReport()">
+                            <i class="fas fa-file-pdf"></i> Generate Report
+                        </button>
+                        <button class="btn btn-sm" onclick="analyzeReturns()">
+                            <i class="fas fa-chart-line"></i> Analyze Trends
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>GST Invoice Management System © 2024 | All data is stored locally in your browser</p>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadReturns();
+            loadReturnInsights();
+        });
+        
+        function loadReturns() {
+            try {
+                const returns = JSON.parse(localStorage.getItem('gst_returns') || '[]');
+                const tbody = document.querySelector('#returnsTable tbody');
+                const emptyState = document.getElementById('noReturnsMessage');
+                
+                if (!tbody) return;
+                
+                tbody.innerHTML = '';
+                
+                if (returns.length === 0) {
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                emptyState.style.display = 'none';
+                
+                // Sort by date (newest first)
+                returns.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                returns.forEach(r => {
+                    const tr = document.createElement('tr');
+                    
+                    tr.innerHTML = `
+                        <td>${new Date(r.date).toLocaleDateString('en-IN')}</td>
+                        <td>
+                            <a href="view_invoice.html?id=${r.invoiceId}" class="invoice-link" title="View Invoice">
+                                ${r.invoiceId}
+                            </a>
+                        </td>
+                        <td>${r.itemName}</td>
+                        <td>${r.qtyReturned}</td>
+                        <td>
+                            ${r.reason || 'N/A'}
+                            ${r.reason ? '<div class="return-reason">' + r.reason + '</div>' : ''}
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+                
+                // Update summary stats
+                document.getElementById('totalReturns').textContent = returns.length;
+                document.getElementById('totalReturnedQty').textContent = 
+                    returns.reduce((sum, r) => sum + r.qtyReturned, 0);
+                    
+                // Current month returns
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                const monthReturns = returns.filter(r => {
+                    const returnDate = new Date(r.date);
+                    return returnDate.getMonth() === currentMonth && 
+                           returnDate.getFullYear() === currentYear;
+                });
+                
+                document.getElementById('monthReturns').textContent = monthReturns.length;
+                
+                // Stock value restored (approximate)
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                let stockValue = 0;
+                
+                returns.forEach(r => {
+                    const product = inventory.find(p => p.name === r.itemName);
+                    if (product && product.price) {
+                        stockValue += r.qtyReturned * product.price;
+                    }
+                });
+                
+                document.getElementById('stockValue').textContent = '₹ ' + stockValue.toFixed(2);
+                
+            } catch (error) {
+                console.error('Error loading returns:', error);
+            }
+        }
+        
+        function loadReturnInsights() {
+            try {
+                const returns = JSON.parse(localStorage.getItem('gst_returns') || '[]');
+                
+                if (returns.length === 0) {
+                    return;
+                }
+                
+                // Find most returned item
+                const itemCounts = {};
+                returns.forEach(r => {
+                    itemCounts[r.itemName] = (itemCounts[r.itemName] || 0) + r.qtyReturned;
+                });
+                
+                let mostReturnedItem = '';
+                let maxQty = 0;
+                for (const [item, qty] of Object.entries(itemCounts)) {
+                    if (qty > maxQty) {
+                        maxQty = qty;
+                        mostReturnedItem = item;
+                    }
+                }
+                
+                document.getElementById('mostReturnedItem').textContent = 
+                    mostReturnedItem ? `${mostReturnedItem} (${maxQty})` : '-';
+                
+                // Find most common reason
+                const reasonCounts = {};
+                returns.forEach(r => {
+                    if (r.reason) {
+                        reasonCounts[r.reason] = (reasonCounts[r.reason] || 0) + 1;
+                    }
+                });
+                
+                let commonReason = '';
+                let maxCount = 0;
+                for (const [reason, count] of Object.entries(reasonCounts)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        commonReason = reason;
+                    }
+                }
+                
+                document.getElementById('commonReason').textContent = 
+                    commonReason ? `${commonReason} (${maxCount}x)` : '-';
+                
+                // Last return date
+                const lastReturn = returns[0];
+                if (lastReturn) {
+                    document.getElementById('lastReturnDate').textContent = 
+                        new Date(lastReturn.date).toLocaleDateString('en-IN');
+                }
+                
+                // Monthly average
+                const monthlyReturns = {};
+                returns.forEach(r => {
+                    const month = r.date.substring(0, 7); // YYYY-MM
+                    monthlyReturns[month] = (monthlyReturns[month] || 0) + 1;
+                });
+                
+                const avg = returns.length / Object.keys(monthlyReturns).length;
+                document.getElementById('monthlyAverage').textContent = avg.toFixed(1);
+                
+                // Create reason distribution chart
+                createReasonChart(reasonCounts);
+                
+            } catch (error) {
+                console.error('Error loading insights:', error);
+            }
+        }
+        
+        function createReasonChart(reasonCounts) {
+            const chartContainer = document.getElementById('reasonChart');
+            const reasons = Object.keys(reasonCounts);
+            
+            if (reasons.length === 0) {
+                return;
+            }
+            
+            const total = Object.values(reasonCounts).reduce((a, b) => a + b, 0);
+            
+            chartContainer.innerHTML = '';
+            
+            reasons.forEach(reason => {
+                const count = reasonCounts[reason];
+                const percentage = ((count / total) * 100).toFixed(1);
+                
+                const bar = document.createElement('div');
+                bar.style.marginBottom = '10px';
+                
+                bar.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="font-size: 14px;">${reason}</span>
+                        <span style="font-size: 14px; font-weight: 600;">${count} (${percentage}%)</span>
+                    </div>
+                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="background: var(--primary); height: 100%; width: ${percentage}%;"></div>
+                    </div>
+                `;
+                
+                chartContainer.appendChild(bar);
+            });
+        }
+        
+        function generateReturnReport() {
+            const returns = JSON.parse(localStorage.getItem('gst_returns') || '[]');
+            if (returns.length === 0) {
+                alert('No return data to generate report!');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(returns, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const exportFileName = `returns-report-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileName);
+            document.body.appendChild(linkElement);
+            linkElement.click();
+            document.body.removeChild(linkElement);
+            
+            alert('Return report generated successfully!');
+        }
+        
+        function analyzeReturns() {
+            const returns = JSON.parse(localStorage.getItem('gst_returns') || '[]');
+            if (returns.length === 0) {
+                alert('No return data to analyze!');
+                return;
+            }
+            
+            // Simple analysis
+            const totalReturns = returns.length;
+            const totalQty = returns.reduce((sum, r) => sum + r.qtyReturned, 0);
+            const avgReturnPerInvoice = (totalQty / totalReturns).toFixed(2);
+            
+            // Count returns by month
+            const monthlyData = {};
+            returns.forEach(r => {
+                const month = r.date.substring(0, 7); // YYYY-MM
+                monthlyData[month] = (monthlyData[month] || 0) + 1;
+            });
+            
+            let analysis = `Return Analysis Report\n`;
+            analysis += `========================\n`;
+            analysis += `Total Returns: ${totalReturns}\n`;
+            analysis += `Total Quantity Returned: ${totalQty}\n`;
+            analysis += `Average Return per Invoice: ${avgReturnPerInvoice}\n\n`;
+            analysis += `Monthly Breakdown:\n`;
+            
+            Object.entries(monthlyData).forEach(([month, count]) => {
+                analysis += `  ${month}: ${count} returns\n`;
+            });
+            
+            // Find peak month
+            let peakMonth = '';
+            let peakCount = 0;
+            Object.entries(monthlyData).forEach(([month, count]) => {
+                if (count > peakCount) {
+                    peakCount = count;
+                    peakMonth = month;
+                }
+            });
+            
+            if (peakMonth) {
+                analysis += `\nPeak Return Month: ${peakMonth} (${peakCount} returns)\n`;
+            }
+            
+            alert(analysis);
+        }
+    </script>
+</body>
+</html>

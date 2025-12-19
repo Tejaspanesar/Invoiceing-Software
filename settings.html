@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - GST Invoice System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --bg-light: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --hover-bg: #f8fafc;
+            --invoice-bg: #ffffff;
+        }
+
+        .dark-mode {
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-light: #94a3b8;
+            --border-color: #334155;
+            --bg-light: #1e293b;
+            --card-bg: #0f172a;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --hover-bg: #1e293b;
+            --invoice-bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* Simplified Navbar */
+        .navbar {
+            background: var(--card-bg);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .nav-brand i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Settings Container */
+        .settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background: var(--invoice-bg);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            color: var(--text-primary);
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 0;
+        }
+
+        .page-header h1 i {
+            color: var(--primary);
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Settings Layout */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+
+        /* Sidebar */
+        .settings-sidebar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .settings-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .settings-nav-item {
+            margin-bottom: 10px;
+        }
+
+        .settings-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            gap: 12px;
+        }
+
+        .settings-nav-link:hover {
+            background: var(--hover-bg);
+            border-color: var(--border-color);
+            transform: translateX(5px);
+        }
+
+        .settings-nav-link.active {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            border-color: rgba(79, 70, 229, 0.2);
+            font-weight: 500;
+        }
+
+        .settings-nav-link i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .settings-nav-link.text-danger {
+            color: var(--danger) !important;
+        }
+
+        .settings-nav-link.text-danger.active {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Settings Content */
+        .settings-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        /* Section Header */
+        .section-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+
+        .section-header h2 i {
+            color: var(--primary);
+        }
+
+        /* Settings Card */
+        .settings-card {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.1);
+        }
+
+        .settings-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-card h3 i {
+            color: var(--primary);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-text {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-top: 6px;
+        }
+
+        /* Row and Grid */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+
+        .col-12 { width: 100%; padding: 0 10px; }
+        .col-md-6 { width: 50%; padding: 0 10px; }
+
+        @media (max-width: 768px) {
+            .col-md-6 { width: 100%; }
+        }
+
+        /* Invoice Number Control */
+        .invoice-number-control {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex: 1;
+        }
+
+        .input-group-text {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 12px 16px;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .input-group .form-control {
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Invoice Stats Grid */
+        .invoice-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .invoice-stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .invoice-stat-card .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .invoice-stat-card .stat-label {
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        /* Theme Selector */
+        .theme-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .theme-option-card {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+        }
+
+        .theme-option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .theme-option-card.active {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .theme-option-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .theme-option-card.light i { color: #f59e0b; }
+        .theme-option-card.dark i { color: #6b7280; }
+        .theme-option-card.auto i { color: var(--primary); }
+
+        /* Security Status */
+        .security-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .security-status.secure {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .security-status i {
+            font-size: 1.5rem;
+        }
+
+        .security-status.secure i {
+            color: var(--success);
+        }
+
+        /* Export Options */
+        .export-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .export-option-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .export-option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.1);
+        }
+
+        .export-option-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 10px;
+            padding: 25px;
+            color: white;
+            margin-top: 30px;
+        }
+
+        .danger-zone h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .danger-zone .form-label {
+            color: white;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--warning);
+            color: var(--text-primary);
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: var(--info);
+            color: var(--text-primary);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: var(--danger);
+            color: var(--text-primary);
+        }
+
+        .alert i {
+            font-size: 1.2rem;
+        }
+
+        /* Checkboxes */
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-check-input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .danger-zone .form-check-label {
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-bg);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--hover-bg);
+        }
+
+        .btn-outline-light {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* File Input */
+        .custom-file {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .custom-file-input {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .custom-file-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-file-label:hover {
+            border-color: var(--primary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 20px 30px;
+        }
+
+        .footer-links {
+            margin-top: 10px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-sidebar {
+                position: static;
+                margin-bottom: 20px;
+            }
+            
+            .settings-container {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .settings-container {
+                padding: 15px;
+                margin-top: 10px;
+            }
+            
+            .invoice-number-control {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .invoice-number-control .btn {
+                width: 100%;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+            }
+            
+            .theme-selector-grid,
+            .export-options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 {
+                font-size: 24px;
+            }
+            
+            .settings-content {
+                padding: 20px;
+            }
+            
+            .section-header h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="dashboard.html" class="nav-brand">
+            <i class="fas fa-file-invoice"></i>
+            <span>GST Invoice System</span>
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="settings-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-cog"></i>
+                Account Settings
+            </h1>
+            <p>Manage your profile, security, and application preferences</p>
+        </div>
+
+        <div class="settings-layout">
+            <!-- Sidebar Navigation -->
+            <div class="settings-sidebar">
+                <ul class="settings-nav">
+                    <li class="settings-nav-item">
+                        <a href="#profile" class="settings-nav-link active" data-section="profile">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#security" class="settings-nav-link" data-section="security">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Security</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#invoice" class="settings-nav-link" data-section="invoice">
+                            <i class="fas fa-file-invoice"></i>
+                            <span>Invoice Settings</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#appearance" class="settings-nav-link" data-section="appearance">
+                            <i class="fas fa-palette"></i>
+                            <span>Appearance</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#data" class="settings-nav-link" data-section="data">
+                            <i class="fas fa-database"></i>
+                            <span>Data Management</span>
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a href="#danger" class="settings-nav-link text-danger" data-section="danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Danger Zone</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <!-- Profile Section -->
+                <div id="profile-section" class="settings-section active">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user"></i> Profile Information</h2>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-user-circle"></i> Personal Details</h3>
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" id="firstName" value="Admin" required>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" id="lastName" value="User" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" id="profileEmail" value="admin@example.com" readonly>
+                            <small class="form-text">Email address cannot be changed</small>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-briefcase"></i> Business Information</h3>
+                        <div class="form-group">
+                            <label class="form-label">Business Name *</label>
+                            <input type="text" class="form-control" id="businessName" value="ABC Technologies Pvt Ltd" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number *</label>
+                                    <input type="tel" class="form-control" id="profilePhone" value="+91 9876543210" required>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">GSTIN *</label>
+                                    <input type="text" class="form-control" id="profileGSTIN" value="27AABCU9603R1ZX" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Business Address *</label>
+                            <textarea class="form-control" id="profileAddress" rows="3" required>123 Tech Park, Bangalore</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="resetProfileForm()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button type="button" class="btn btn-primary" id="updateProfileBtn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Security Section -->
+                <div id="security-section" class="settings-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-shield-alt"></i> Security Settings</h2>
+                    </div>
+                    
+                    <div class="security-status secure">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h4 style="margin: 0 0 5px 0;">Account Security Status: Secure</h4>
+                            <p style="margin: 0;">Your account is protected with a strong password and security question.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-key"></i> Change Password</h3>
+                        <form id="changePasswordForm">
+                            <div class="form-group">
+                                <label class="form-label" for="currentPassword">Current Password *</label>
+                                <input type="password" class="form-control" id="currentPassword" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="newPassword">New Password *</label>
+                                        <input type="password" class="form-control" id="newPassword" required>
+                                        <small class="form-text">Minimum 8 characters with letters and numbers</small>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="confirmNewPassword">Confirm Password *</label>
+                                        <input type="password" class="form-control" id="confirmNewPassword" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key"></i> Update Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-shield-alt"></i> Security Question</h3>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Current Security Question:</strong>
+                                <div id="currentQuestion" style="margin-top: 5px;">What is your pet's name?</div>
+                            </div>
+                        </div>
+                        
+                        <form id="securityQuestionForm">
+                            <div class="form-group">
+                                <label class="form-label" for="securityQuestion">New Security Question *</label>
+                                <input type="text" class="form-control" id="securityQuestion" 
+                                       placeholder="e.g., What city were you born in?" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="securityAnswer">Answer *</label>
+                                        <input type="text" class="form-control" id="securityAnswer" required>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" for="confirmSecurityAnswer">Confirm Answer *</label>
+                                        <input type="text" class="form-control" id="confirmSecurityAnswer" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Update Security Question
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Invoice Settings Section -->
+                <div id="invoice-section" class="settings-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-file-invoice"></i> Invoice Settings</h2>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-hashtag"></i> Invoice Number Settings</h3>
+                        <p style="margin-bottom: 20px;">Set a custom starting number for your invoices. This will override the auto-increment behavior.</p>
+                        
+                        <div class="invoice-number-control">
+                            <div class="input-group">
+                                <span class="input-group-text">INV-</span>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    id="customInvoiceNumber" 
+                                    min="1" 
+                                    placeholder="e.g., 1001"
+                                >
+                            </div>
+                            <button class="btn btn-primary" type="button" id="setInvoiceNumberBtn">
+                                <i class="fas fa-check"></i> Set Number
+                            </button>
+                            <button class="btn btn-outline-secondary" type="button" id="clearInvoiceNumberBtn">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                        
+                        <small class="form-text">
+                            <i class="fas fa-info-circle"></i> Leave empty to use auto-increment based on existing invoices.
+                        </small>
+                        
+                        <div class="invoice-stats-grid" id="invoiceSettingsInfo">
+                            <!-- Invoice settings info will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-sliders-h"></i> Invoice Defaults</h3>
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Default Payment Terms</label>
+                                    <select class="form-control" id="defaultPaymentTerms">
+                                        <option value="7">7 Days</option>
+                                        <option value="15" selected>15 Days</option>
+                                        <option value="30">30 Days</option>
+                                        <option value="45">45 Days</option>
+                                        <option value="60">60 Days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Default Currency</label>
+                                    <select class="form-control" id="defaultCurrency">
+                                        <option value="INR" selected>Indian Rupee (₹)</option>
+                                        <option value="USD">US Dollar ($)</option>
+                                        <option value="EUR">Euro (€)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-primary" id="saveInvoiceDefaultsBtn">
+                                <i class="fas fa-save"></i> Save Defaults
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance Section -->
+                <div id="appearance-section" class="settings-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-palette"></i> Appearance Settings</h2>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-adjust"></i> Theme Selection</h3>
+                        <p style="margin-bottom: 20px;">Choose your preferred theme for the application.</p>
+                        
+                        <div class="theme-selector-grid">
+                            <div class="theme-option-card light active" data-theme="light">
+                                <i class="fas fa-sun"></i>
+                                <h4 style="margin: 10px 0 5px 0;">Light Theme</h4>
+                                <p style="margin: 0; color: var(--text-secondary);">Clean and bright interface</p>
+                            </div>
+                            <div class="theme-option-card dark" data-theme="dark">
+                                <i class="fas fa-moon"></i>
+                                <h4 style="margin: 10px 0 5px 0;">Dark Theme</h4>
+                                <p style="margin: 0; color: var(--text-secondary);">Easy on the eyes</p>
+                            </div>
+                            <div class="theme-option-card auto" data-theme="auto">
+                                <i class="fas fa-adjust"></i>
+                                <h4 style="margin: 10px 0 5px 0;">Auto</h4>
+                                <p style="margin: 0; color: var(--text-secondary);">Follows system preference</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions" style="margin-top: 30px;">
+                            <button type="button" class="btn btn-primary" id="applyThemeBtn">
+                                <i class="fas fa-check"></i> Apply Theme
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management Section -->
+                <div id="data-section" class="settings-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-database"></i> Data Management</h2>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Important:</strong> Regularly export your data for backup purposes.
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-download"></i> Data Export</h3>
+                        <p style="margin-bottom: 20px;">Export your data in JSON format for backup or migration.</p>
+                        
+                        <div class="export-options-grid">
+                            <div class="export-option-card">
+                                <i class="fas fa-file-invoice"></i>
+                                <h4 style="margin: 10px 0 5px 0;">Export Invoices</h4>
+                                <p style="margin-bottom: 15px; color: var(--text-secondary);">Download all your invoices</p>
+                                <button class="btn btn-outline-primary" id="exportInvoices" style="width: 100%;">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                            
+                            <div class="export-option-card">
+                                <i class="fas fa-boxes"></i>
+                                <h4 style="margin: 10px 0 5px 0;">Export Inventory</h4>
+                                <p style="margin-bottom: 15px; color: var(--text-secondary);">Download inventory data</p>
+                                <button class="btn btn-outline-primary" id="exportInventory" style="width: 100%;">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                            
+                            <div class="export-option-card">
+                                <i class="fas fa-archive"></i>
+                                <h4 style="margin: 10px 0 5px 0;">Export All Data</h4>
+                                <p style="margin-bottom: 15px; color: var(--text-secondary);">Complete backup</p>
+                                <button class="btn btn-outline-primary" id="exportAllData" style="width: 100%;">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-upload"></i> Data Import</h3>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Warning:</strong> Importing data will overwrite existing records.
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Data Type</label>
+                            <select class="form-control" id="importDataType">
+                                <option value="">Select data type...</option>
+                                <option value="invoices">Invoices</option>
+                                <option value="inventory">Inventory</option>
+                                <option value="all">All Data</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Upload JSON File</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="dataImport" accept=".json">
+                                <label class="custom-file-label" for="dataImport">
+                                    <i class="fas fa-file"></i> Choose file...
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="importDataBtn" disabled>
+                                <i class="fas fa-upload"></i> Import Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone Section -->
+                <div id="danger-section" class="settings-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Danger Zone</h2>
+                    </div>
+                    
+                    <div class="danger-zone">
+                        <h3 style="color: white;"><i class="fas fa-trash"></i> Delete Account</h3>
+                        <p>Once you delete your account, there is no going back. This action is permanent.</p>
+                        
+                        <ul class="warning-list" style="margin: 20px 0; padding-left: 20px;">
+                            <li>All your invoices will be permanently deleted</li>
+                            <li>Your inventory data will be cleared</li>
+                            <li>Your profile and settings will be removed</li>
+                            <li>This action cannot be reversed</li>
+                        </ul>
+                        
+                        <form id="deletionForm">
+                            <div class="form-group">
+                                <label class="form-label" for="currentPasswordVerify">Current Password *</label>
+                                <input type="password" class="form-control" id="currentPasswordVerify" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="confirmEmail">Confirm Email Address *</label>
+                                <input type="email" class="form-control" id="confirmEmail" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="confirmText">
+                                    Type <code style="background: rgba(255, 255, 255, 0.2); padding: 2px 6px; border-radius: 4px;">DELETE</code> to confirm *
+                                </label>
+                                <input type="text" class="form-control" id="confirmText" placeholder="DELETE" required>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="understandConsequences" required>
+                                <label class="form-check-label" for="understandConsequences">
+                                    I understand that this action is permanent and all my data will be deleted
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="confirmDeletion" required>
+                                <label class="form-check-label" for="confirmDeletion">
+                                    I confirm that I want to delete my account and all associated data
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline-light" id="cancelDeletion">
+                                    Cancel
+                                </button>
+                                <button type="button" class="btn btn-danger" id="initiateDeletion" disabled>
+                                    <i class="fas fa-trash"></i> Delete My Account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>GST Invoice Management System © 2024 | All data is stored locally in your browser</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> | 
+                <a href="#">Support</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup dark mode - SYNC WITH DASHBOARD
+            setupDarkModeSync();
+            
+            // Setup navigation
+            setupSettingsNavigation();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load invoice settings
+            initInvoiceSettings();
+            
+            // Check if user is logged in
+            checkAuth();
+        });
+        
+        // Check authentication
+        function checkAuth() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+        }
+        
+        // Dark mode sync with dashboard
+        function setupDarkModeSync() {
+            // Check localStorage for dark mode setting (synced across all pages)
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            const themePreference = localStorage.getItem('themePreference');
+            
+            // Apply dark mode if enabled
+            if (darkMode || themePreference === 'dark') {
+                document.body.classList.add('dark-mode');
+                // Ensure the dark theme option is selected
+                setTimeout(() => {
+                    const darkThemeCard = document.querySelector('.theme-option-card[data-theme="dark"]');
+                    if (darkThemeCard) {
+                        document.querySelectorAll('.theme-option-card').forEach(card => card.classList.remove('active'));
+                        darkThemeCard.classList.add('active');
+                    }
+                }, 100);
+            } else if (themePreference === 'auto') {
+                // Auto mode - check system preference
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+        }
+        
+        // Settings navigation
+        function setupSettingsNavigation() {
+            const navLinks = document.querySelectorAll('.settings-nav-link');
+            const sections = document.querySelectorAll('.settings-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetSection = this.getAttribute('data-section');
+                    
+                    // Update active nav link
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target section
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetSection + '-section') {
+                            section.classList.add('active');
+                        }
+                    });
+                    
+                    // Update URL hash
+                    window.location.hash = targetSection;
+                });
+            });
+            
+            // Handle initial hash
+            if (window.location.hash) {
+                const section = window.location.hash.substring(1);
+                const navLink = document.querySelector(`.settings-nav-link[data-section="${section}"]`);
+                if (navLink) {
+                    navLink.click();
+                }
+            }
+        }
+        
+        // Initialize invoice settings
+        function initInvoiceSettings() {
+            // Load invoice stats
+            loadInvoiceStats();
+            
+            // Set current custom invoice number if exists
+            const nextNumber = localStorage.getItem('nextInvoiceNumber');
+            if (nextNumber) {
+                document.getElementById('customInvoiceNumber').value = nextNumber;
+            }
+            
+            // Set up invoice number controls
+            document.getElementById('setInvoiceNumberBtn')?.addEventListener('click', function() {
+                const customNumber = document.getElementById('customInvoiceNumber').value;
+                if (customNumber) {
+                    const num = parseInt(customNumber);
+                    if (!isNaN(num) && num > 0) {
+                        // Store the actual next number
+                        localStorage.setItem('nextInvoiceNumber', num.toString());
+                        showAlert(`Next invoice number set to INV-${customNumber}`, 'success');
+                        loadInvoiceStats();
+                    } else {
+                        showAlert('Please enter a valid number greater than 0', 'warning');
+                    }
+                }
+            });
+            
+            // Clear invoice number
+            document.getElementById('clearInvoiceNumberBtn')?.addEventListener('click', function() {
+                document.getElementById('customInvoiceNumber').value = '';
+                localStorage.removeItem('nextInvoiceNumber');
+                showAlert('Invoice number reset to auto-increment', 'info');
+                loadInvoiceStats();
+            });
+        }
+        
+        // Load invoice statistics
+        function loadInvoiceStats() {
+            try {
+                const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+                const nextInvoiceNumber = localStorage.getItem('nextInvoiceNumber') || 
+                    (invoices.length > 0 ? getNextInvoiceNumberFromInvoices(invoices) : 1);
+                
+                const statsContainer = document.getElementById('invoiceSettingsInfo');
+                if (statsContainer) {
+                    statsContainer.innerHTML = `
+                        <div class="invoice-stat-card">
+                            <div class="stat-value">${invoices.length}</div>
+                            <div class="stat-label">Total Invoices</div>
+                        </div>
+                        <div class="invoice-stat-card">
+                            <div class="stat-value">${nextInvoiceNumber}</div>
+                            <div class="stat-label">Next Invoice Number</div>
+                        </div>
+                    `;
+                }
+                
+            } catch (e) {
+                console.error('Error loading invoice stats:', e);
+            }
+        }
+        
+        // Helper function to get next invoice number from existing invoices
+        function getNextInvoiceNumberFromInvoices(invoices) {
+            let maxNumber = 0;
+            
+            invoices.forEach(invoice => {
+                if (invoice.invoiceNumber) {
+                    const num = extractNumberFromInvoiceString(invoice.invoiceNumber);
+                    if (num > maxNumber) {
+                        maxNumber = num;
+                    }
+                }
+            });
+            
+            return maxNumber + 1;
+        }
+        
+        // Helper function to extract number from invoice string
+        function extractNumberFromInvoiceString(invoiceString) {
+            // Try multiple patterns to extract number
+            const patterns = [
+                /INV-(\d+)/i,
+                /INV(\d+)/i,
+                /(\d+)$/,
+                /-(\d+)$/i
+            ];
+            
+            for (const pattern of patterns) {
+                const match = invoiceString.match(pattern);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (!isNaN(num)) {
+                        return num;
+                    }
+                }
+            }
+            
+            // If no pattern matches, try to extract the last number
+            const lastPart = invoiceString.split('-').pop();
+            const num = parseInt(lastPart, 10);
+            return isNaN(num) ? 0 : num;
+        }
+        
+        // Show alert message
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                 type === 'warning' ? 'exclamation-triangle' : 
+                                 type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <div>${message}</div>
+            `;
+            
+            // Insert at the beginning of settings content
+            const settingsContent = document.querySelector('.settings-content');
+            if (settingsContent) {
+                settingsContent.insertBefore(alertDiv, settingsContent.firstChild);
+                
+                // Remove alert after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Profile update
+            document.getElementById('updateProfileBtn')?.addEventListener('click', function() {
+                const firstName = document.getElementById('firstName')?.value;
+                const lastName = document.getElementById('lastName')?.value;
+                const businessName = document.getElementById('businessName')?.value;
+                const phone = document.getElementById('profilePhone')?.value;
+                const gstin = document.getElementById('profileGSTIN')?.value;
+                const address = document.getElementById('profileAddress')?.value;
+                
+                if (!firstName || !lastName || !businessName || !phone || !gstin || !address) {
+                    showAlert('Please fill in all required fields', 'warning');
+                    return;
+                }
+                
+                // Update user profile in session storage
+                try {
+                    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                    currentUser.firstName = firstName;
+                    currentUser.lastName = lastName;
+                    currentUser.businessName = businessName;
+                    currentUser.phone = phone;
+                    currentUser.gstin = gstin;
+                    currentUser.address = address;
+                    
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    // Also update in localStorage users array
+                    const users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                    const userIndex = users.findIndex(u => u.email === currentUser.email);
+                    if (userIndex !== -1) {
+                        users[userIndex] = { ...users[userIndex], ...currentUser };
+                        localStorage.setItem('gstInvoiceUsers', JSON.stringify(users));
+                    }
+                    
+                    showAlert('Profile updated successfully!', 'success');
+                } catch (e) {
+                    console.error('Error updating profile:', e);
+                    showAlert('Error updating profile. Please try again.', 'danger');
+                }
+            });
+            
+            // Reset profile form
+            window.resetProfileForm = function() {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                
+                document.getElementById('firstName').value = currentUser.firstName || 'Admin';
+                document.getElementById('lastName').value = currentUser.lastName || 'User';
+                document.getElementById('businessName').value = currentUser.businessName || 'ABC Technologies Pvt Ltd';
+                document.getElementById('profilePhone').value = currentUser.phone || '+91 9876543210';
+                document.getElementById('profileGSTIN').value = currentUser.gstin || '27AABCU9603R1ZX';
+                document.getElementById('profileAddress').value = currentUser.address || '123 Tech Park, Bangalore';
+                
+                showAlert('Profile form reset to saved values', 'info');
+            };
+            
+            // Load current user data
+            function loadUserData() {
+                try {
+                    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                    if (currentUser.email) {
+                        document.getElementById('profileEmail').value = currentUser.email;
+                        document.getElementById('firstName').value = currentUser.firstName || 'Admin';
+                        document.getElementById('lastName').value = currentUser.lastName || 'User';
+                        document.getElementById('businessName').value = currentUser.businessName || 'ABC Technologies Pvt Ltd';
+                        document.getElementById('profilePhone').value = currentUser.phone || '+91 9876543210';
+                        document.getElementById('profileGSTIN').value = currentUser.gstin || '27AABCU9603R1ZX';
+                        document.getElementById('profileAddress').value = currentUser.address || '123 Tech Park, Bangalore';
+                    }
+                } catch (e) {
+                    console.error('Error loading user data:', e);
+                }
+            }
+            
+            // Load user data on page load
+            loadUserData();
+            
+            // Theme selection
+            const themeCards = document.querySelectorAll('.theme-option-card');
+            themeCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    themeCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Apply theme - SYNC WITH DASHBOARD
+            document.getElementById('applyThemeBtn')?.addEventListener('click', function() {
+                const selectedTheme = document.querySelector('.theme-option-card.active').getAttribute('data-theme');
+                
+                // Save theme preference
+                localStorage.setItem('themePreference', selectedTheme);
+                
+                if (selectedTheme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else if (selectedTheme === 'light') {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'false');
+                } else {
+                    // Auto mode
+                    localStorage.removeItem('themePreference');
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.body.classList.add('dark-mode');
+                        localStorage.setItem('darkMode', 'true');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                        localStorage.setItem('darkMode', 'false');
+                    }
+                }
+                
+                showAlert('Theme applied successfully! This will apply to all pages.', 'success');
+            });
+            
+            // Load saved theme - SYNC WITH DASHBOARD
+            const savedTheme = localStorage.getItem('themePreference') || 'auto';
+            const themeCard = document.querySelector(`.theme-option-card[data-theme="${savedTheme}"]`);
+            if (themeCard) {
+                themeCards.forEach(c => c.classList.remove('active'));
+                themeCard.classList.add('active');
+            }
+            
+            // Invoice defaults
+            document.getElementById('saveInvoiceDefaultsBtn')?.addEventListener('click', function() {
+                const paymentTerms = document.getElementById('defaultPaymentTerms')?.value;
+                const currency = document.getElementById('defaultCurrency')?.value;
+                
+                localStorage.setItem('invoiceDefaults', JSON.stringify({
+                    paymentTerms,
+                    currency,
+                    savedAt: new Date().toISOString()
+                }));
+                
+                showAlert('Invoice defaults saved successfully!', 'success');
+            });
+            
+            // Load invoice defaults
+            const savedDefaults = JSON.parse(localStorage.getItem('invoiceDefaults') || '{}');
+            if (savedDefaults.paymentTerms) {
+                document.getElementById('defaultPaymentTerms').value = savedDefaults.paymentTerms;
+            }
+            if (savedDefaults.currency) {
+                document.getElementById('defaultCurrency').value = savedDefaults.currency;
+            }
+            
+            // Data import button
+            const importDataBtn = document.getElementById('importDataBtn');
+            const importDataType = document.getElementById('importDataType');
+            const dataImport = document.getElementById('dataImport');
+            
+            function checkImportReady() {
+                if (importDataType?.value && dataImport?.files.length > 0) {
+                    importDataBtn.disabled = false;
+                } else {
+                    importDataBtn.disabled = true;
+                }
+            }
+            
+            importDataType?.addEventListener('change', checkImportReady);
+            dataImport?.addEventListener('change', checkImportReady);
+            
+            // Export buttons
+            document.getElementById('exportInvoices')?.addEventListener('click', function() {
+                const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+                downloadJSON(invoices, 'invoices-backup.json');
+                showAlert('Invoices exported successfully!', 'success');
+            });
+            
+            document.getElementById('exportInventory')?.addEventListener('click', function() {
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                downloadJSON(inventory, 'inventory-backup.json');
+                showAlert('Inventory exported successfully!', 'success');
+            });
+            
+            document.getElementById('exportAllData')?.addEventListener('click', function() {
+                const allData = {
+                    invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
+                    inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
+                    shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
+                    users: JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]'),
+                    settings: {
+                        theme: localStorage.getItem('themePreference'),
+                        invoiceDefaults: JSON.parse(localStorage.getItem('invoiceDefaults') || '{}'),
+                        nextInvoiceNumber: localStorage.getItem('nextInvoiceNumber'),
+                        darkMode: localStorage.getItem('darkMode')
+                    }
+                };
+                downloadJSON(allData, 'gst-invoice-system-backup.json');
+                showAlert('All data exported successfully!', 'success');
+            });
+            
+            // Danger zone
+            const initiateDeletionBtn = document.getElementById('initiateDeletion');
+            const deletionCheckboxes = [
+                document.getElementById('understandConsequences'),
+                document.getElementById('confirmDeletion')
+            ];
+            
+            const deletionInputs = [
+                document.getElementById('currentPasswordVerify'),
+                document.getElementById('confirmEmail'),
+                document.getElementById('confirmText')
+            ];
+            
+            function updateDeleteButton() {
+                const allChecked = deletionCheckboxes.every(cb => cb?.checked);
+                const allFilled = deletionInputs.every(input => input?.value.trim() !== '');
+                const confirmText = document.getElementById('confirmText')?.value;
+                
+                if (initiateDeletionBtn) {
+                    initiateDeletionBtn.disabled = !(allChecked && allFilled && confirmText === 'DELETE');
+                }
+            }
+            
+            deletionCheckboxes.forEach(cb => {
+                if (cb) cb.addEventListener('change', updateDeleteButton);
+            });
+            
+            deletionInputs.forEach(input => {
+                if (input) input.addEventListener('input', updateDeleteButton);
+            });
+            
+            // Cancel deletion
+            document.getElementById('cancelDeletion')?.addEventListener('click', function() {
+                // Reset form
+                deletionCheckboxes.forEach(cb => cb.checked = false);
+                deletionInputs.forEach(input => input.value = '');
+                updateDeleteButton();
+                showAlert('Account deletion cancelled', 'info');
+            });
+            
+            // Initiate deletion
+            document.getElementById('initiateDeletion')?.addEventListener('click', function() {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                const confirmEmail = document.getElementById('confirmEmail')?.value;
+                
+                if (confirmEmail !== currentUser.email) {
+                    showAlert('Email does not match current user', 'danger');
+                    return;
+                }
+                
+                if (confirm('Are you absolutely sure? This will delete ALL your data permanently and cannot be undone!')) {
+                    // Clear all data
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    
+                    showAlert('All data deleted. Redirecting to login...', 'danger');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                }
+            });
+        }
+        
+        // Download JSON file
+        function downloadJSON(data, filename) {
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
