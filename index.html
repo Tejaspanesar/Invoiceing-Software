@@ -129,19 +129,19 @@
             <span>GST Invoice System</span>
         </a>
         <div class="nav-links">
-            <a href="dashboard.html" class="nav-link">
+            <a href="#" class="nav-link dashboard-link">
                 <i class="fas fa-chart-bar"></i> Dashboard
             </a>
-            <a href="shop.html" class="nav-link">
+            <a href="#" class="nav-link shop-link">
                 <i class="fas fa-store"></i> Shop Profile
             </a>
-            <a href="inventory.html" class="nav-link">
+            <a href="#" class="nav-link inventory-link">
                 <i class="fas fa-boxes"></i> Inventory
             </a>
-            <a href="create_invoice.html" class="nav-link">
+            <a href="#" class="nav-link create-invoice-link">
                 <i class="fas fa-file-invoice"></i> Create Invoice
             </a>
-            <a href="invoices.html" class="nav-link">
+            <a href="#" class="nav-link invoices-link">
                 <i class="fas fa-list"></i> Invoices
             </a>
         </div>
@@ -153,10 +153,10 @@
             <h1>Professional GST Invoice System</h1>
             <p>Create, manage, and track GST invoices with ease. Perfect for small businesses and freelancers. All data stored locally in your browser.</p>
             <div class="action-buttons">
-                <a href="dashboard.html" class="btn btn-primary" style="background: white; color: var(--primary);">
+                <a href="#" class="btn btn-primary get-started-btn" style="background: white; color: var(--primary);">
                     <i class="fas fa-rocket"></i> Get Started
                 </a>
-                <a href="create_invoice.html" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">
+                <a href="#" class="btn create-invoice-btn" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">
                     <i class="fas fa-file-invoice"></i> Create Invoice
                 </a>
             </div>
@@ -217,7 +217,7 @@
                 </div>
             </div>
             
-            <a href="dashboard.html" class="btn btn-primary">
+            <a href="#" class="btn btn-primary quick-start-btn">
                 <i class="fas fa-play-circle"></i> Start Now
             </a>
         </section>
@@ -226,24 +226,105 @@
         <div class="footer">
             <p>GST Invoice Management System © 2024 | All data is stored locally in your browser</p>
             <div class="mt-2">
-                <a href="dashboard.html" class="btn btn-sm btn-secondary">Dashboard</a>
-                <a href="shop.html" class="btn btn-sm">Shop Setup</a>
-                <a href="create_invoice.html" class="btn btn-sm btn-primary">Create Invoice</a>
+                <a href="#" class="btn btn-sm btn-secondary footer-dashboard-btn">Dashboard</a>
+                <a href="#" class="btn btn-sm footer-shop-btn">Shop Setup</a>
+                <a href="#" class="btn btn-sm btn-primary footer-invoice-btn">Create Invoice</a>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Authentication check function
+        function checkAuthAndRedirect(targetPage) {
+            // Check if user is logged in
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+            
+            if (isLoggedIn && currentUser) {
+                // User is logged in, redirect to target page
+                window.location.href = targetPage;
+            } else {
+                // User is not logged in, redirect to login page
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Set up all button event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get Started button
+            document.querySelector('.get-started-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('dashboard.html');
+            });
+            
+            // Create Invoice button in hero
+            document.querySelector('.create-invoice-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('create_invoice.html');
+            });
+            
+            // Quick Start button
+            document.querySelector('.quick-start-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('dashboard.html');
+            });
+            
+            // Navigation links
+            document.querySelector('.dashboard-link')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('dashboard.html');
+            });
+            
+            document.querySelector('.shop-link')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('shop.html');
+            });
+            
+            document.querySelector('.inventory-link')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('inventory.html');
+            });
+            
+            document.querySelector('.create-invoice-link')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('create_invoice.html');
+            });
+            
+            document.querySelector('.invoices-link')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('invoices.html');
+            });
+            
+            // Footer buttons
+            document.querySelector('.footer-dashboard-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('dashboard.html');
+            });
+            
+            document.querySelector('.footer-shop-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('shop.html');
+            });
+            
+            document.querySelector('.footer-invoice-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAuthAndRedirect('create_invoice.html');
+            });
+            
+            // Logo link should always work
+            document.querySelector('.navbar .logo')?.addEventListener('click', function(e) {
+                // Allow normal navigation to index.html
+                // No need to prevent default or check auth
+            });
+            
+            // If user is already logged in, update navigation
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) {
+                // You can optionally change button text or show logged-in state
+                console.log('User is logged in');
+            }
+        });
+    </script>
 </body>
 </html>
-<nav class="navbar">
-    <a href="dashboard.html" class="logo">
-        <div class="logo-icon">
-            <i class="fas fa-receipt"></i>
-        </div>
-        GST Invoice System
-    </a>
-    <div class="nav-links">
-        <!-- Navigation will be dynamically loaded by script.js -->
-    </div>
-</nav>
