@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - GST Invoice System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .register-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .register-logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .register-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .name-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .name-fields {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="card register-card">
+            <div class="register-header">
+                <div class="register-logo">
+                    <i class="fas fa-receipt"></i>
+                    GST Invoice System
+                </div>
+                <p class="register-subtitle">Create your account</p>
+            </div>
+
+            <form id="registerForm">
+                <div class="name-fields">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="Enter first name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Enter last name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Create a password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <div class="form-footer">
+                    <p>Already have an account? <a href="login.html" class="text-primary">Sign in</a></p>
+                </div>
+            </form>
+            
+            <!-- Demo credentials alert -->
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle"></i>
+                <strong>Demo Note:</strong> This is a frontend demo. All data is stored locally in your browser.
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Simple registration form handler
+        document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Basic validation
+            if (!firstName || !lastName || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            // Create user object
+            const user = {
+                id: Date.now(),
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password,
+                businessName: '',
+                phone: '',
+                gstin: '',
+                address: '',
+                role: 'user',
+                createdAt: new Date().toISOString(),
+                isActive: true,
+                theme: 'light'
+            };
+            
+            // Get existing users from localStorage
+            let users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+            
+            // Check if user already exists
+            const existingUser = users.find(u => u.email === email);
+            if (existingUser) {
+                alert('An account with this email already exists!');
+                return;
+            }
+            
+            // Add new user
+            users.push(user);
+            localStorage.setItem('gstInvoiceUsers', JSON.stringify(users));
+            
+            // Auto-login
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            sessionStorage.setItem('isLoggedIn', 'true');
+            
+            // Redirect to dashboard
+            alert('Account created successfully! Redirecting...');
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>
