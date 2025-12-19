@@ -1766,4 +1766,102 @@
         }
     </script>
 </body>
+
 </html>
+<!-- GitHub Sync Section -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fab fa-github"></i> Cloud Sync (GitHub)
+        </h3>
+    </div>
+    <div class="card-body">
+        <p class="mb-3">Sync your data across devices using GitHub. Your data will be stored privately in your GitHub repository.</p>
+        
+        <!-- Configuration Form -->
+        <div class="form-group">
+            <label class="form-label">GitHub Username</label>
+            <input type="text" class="form-control" id="githubUsername" 
+                   placeholder="e.g., yourusername" 
+                   value="">
+            <small class="text-light">Your GitHub username (not email)</small>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Repository Name</label>
+            <input type="text" class="form-control" id="githubRepo" 
+                   placeholder="e.g., gst-invoice-system" 
+                   value="">
+            <small class="text-light">The repository where this app is hosted</small>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">GitHub Personal Access Token</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="githubToken" 
+                       placeholder="Enter your token">
+                <button class="btn btn-outline-secondary" type="button" 
+                        onclick="toggleTokenVisibility()">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <small class="text-light">
+                <a href="https://github.com/settings/tokens" target="_blank" 
+                   class="text-primary">
+                    <i class="fas fa-external-link-alt"></i> Get token from GitHub Settings
+                </a>
+            </small>
+            <div class="mt-1">
+                <small class="text-warning">
+                    Token needs: <code>repo</code>, <code>write:packages</code>, 
+                    <code>delete:packages</code> permissions
+                </small>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 flex-wrap mt-4">
+            <button class="btn btn-primary" onclick="saveGitHubConfig()">
+                <i class="fas fa-save"></i> Save Configuration
+            </button>
+            
+            <button class="btn btn-success" onclick="testGitHubConnection()">
+                <i class="fas fa-plug"></i> Test Connection
+            </button>
+            
+            <button class="btn btn-info" onclick="syncToGitHub()">
+                <i class="fas fa-cloud-upload-alt"></i> Sync to Cloud
+            </button>
+            
+            <button class="btn btn-secondary" onclick="loadFromGitHub()">
+                <i class="fas fa-cloud-download-alt"></i> Load from Cloud
+            </button>
+        </div>
+        
+        <!-- Status Display -->
+        <div class="mt-4">
+            <div class="alert alert-info" id="githubStatus" style="display: none;">
+                <i class="fas fa-info-circle"></i>
+                <span id="githubStatusText">Status will appear here</span>
+            </div>
+            
+            <div class="mt-2">
+                <small class="text-light">
+                    Last sync: <span id="lastSyncTime">Never</span>
+                </small>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="alert alert-warning mt-4">
+            <h6><i class="fas fa-info-circle"></i> How to set up:</h6>
+            <ol class="mb-0">
+                <li>Go to GitHub → Settings → Developer Settings → Personal Access Tokens</li>
+                <li>Create new token with <code>repo</code>, <code>write:packages</code>, <code>delete:packages</code> permissions</li>
+                <li>Copy the token and paste above</li>
+                <li>Enter your GitHub username and repository name</li>
+                <li>Click "Save Configuration" then "Test Connection"</li>
+            </ol>
+        </div>
+    </div>
+</div>
