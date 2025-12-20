@@ -6,8 +6,25 @@
     <title>Dashboard - GST Invoice System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* PERMANENT DARK MODE OVERRIDE */
+        body {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+        }
+        
+        .dark-mode {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Remove theme switch */
+        .theme-switch {
+            display: none !important;
+        }
+    </style>
 </head>
-<body>
+<body class="dark-mode">
     <!-- Navigation - SIMPLIFIED: No dropdown, no PANESAR SANITARY -->
     <nav class="navbar">
         <a href="dashboard.html" class="logo">
@@ -38,10 +55,7 @@
             <a href="settings.html" class="nav-link">
                 <i class="fas fa-cog"></i> Settings
             </a>
-            <label class="theme-switch">
-                <input type="checkbox" id="darkModeToggle">
-                <span class="slider"></span>
-            </label>
+            <!-- Theme switch removed -->
         </div>
     </nav>
 
@@ -284,32 +298,31 @@
     <script src="script.js"></script>
     <script src="github-storage.js"></script>
 
-    <!-- Prevent script.js from modifying the navigation -->
+    <!-- Modified script to remove dark mode toggle functionality -->
     <script>
-        // Override the updateNavigation function to keep the static navigation
-        window.updateNavigation = function() {
-            // Just initialize dark mode, don't modify navigation
+        // Override any dark mode toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Force dark mode on body
+            document.body.classList.add('dark-mode');
+            
+            // Remove dark mode toggle if it exists
             const darkModeToggle = document.getElementById('darkModeToggle');
-            if (!darkModeToggle) return;
-            
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-            const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (isDarkMode || (!isDarkMode && userPrefersDark && localStorage.getItem('darkMode') === null)) {
-                document.body.classList.add('dark-mode');
-                darkModeToggle.checked = true;
+            if (darkModeToggle) {
+                darkModeToggle.parentElement.style.display = 'none';
             }
             
-            darkModeToggle.addEventListener('change', function() {
-                if (this.checked) {
+            // Override localStorage settings to force dark mode
+            localStorage.setItem('darkMode', 'true');
+            
+            // Disable any existing dark mode toggle listeners
+            if (typeof window.updateNavigation === 'function') {
+                window.updateNavigation = function() {
+                    // Do nothing - dark mode is permanent
                     document.body.classList.add('dark-mode');
                     localStorage.setItem('darkMode', 'true');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                    localStorage.setItem('darkMode', 'false');
-                }
-            });
-        };
+                };
+            }
+        });
     </script>
 </body>
 </html>
