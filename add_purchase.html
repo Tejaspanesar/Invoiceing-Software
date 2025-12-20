@@ -6,7 +6,6 @@
     <title>Add Purchase - GST Invoice System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Import Engry Font for PDF -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* Invoice matching styles - single page design */
@@ -53,7 +52,7 @@
           transition: background 0.3s ease;
         }
         
-        /* Simplified Navbar */
+        /* Simplified Navbar - Just like invoice page */
         .navbar {
           background: var(--card-bg);
           padding: 15px 30px;
@@ -69,7 +68,7 @@
         }
         
         .logo {
-          display: none; /* Hide the logo */
+          display: none;
         }
         
         .nav-links {
@@ -139,7 +138,7 @@
           padding: 0;
         }
         
-        /* Card styles */
+        /* Card styles - matching invoice page */
         .card {
           background: var(--card-bg);
           border-radius: 12px;
@@ -169,7 +168,7 @@
           transition: color 0.3s ease;
         }
         
-        /* Form styles */
+        /* Form styles - matching invoice page */
         .form-row {
           display: flex;
           gap: 1rem;
@@ -249,7 +248,7 @@
           color: var(--text-primary);
         }
         
-        /* Action buttons */
+        /* Action buttons - matching invoice page */
         .action-buttons {
           display: flex;
           gap: 12px;
@@ -341,7 +340,7 @@
           background: rgba(239, 68, 68, 0.1);
         }
         
-        /* Table styles */
+        /* Table styles - matching invoice page */
         .table-container {
           border: 1px solid var(--border-color);
           border-radius: 8px;
@@ -624,7 +623,7 @@
     </style>
 </head>
 <body>
-  <!-- Simple Navbar with Back Button Only -->
+  <!-- Simple Navbar with Back Button Only - Just like invoice page -->
   <nav class="navbar">
     <div class="nav-links">
       <a href="dashboard.html" class="back-nav-btn">
@@ -801,7 +800,7 @@
       
       <!-- Footer -->
       <div class="footer">
-        <p>GST Invoice Management System © 2024 | All data is stored locally in your browser</p>
+        <p>GST Invoice Management System © 2024 | All data is stored in GitHub</p>
       </div>
     </div>
   </div>
@@ -810,26 +809,42 @@
   <script src="github-storage.js"></script>
   
   <script>
-    // Main JavaScript - All functions properly defined
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Page loaded, initializing...');
+    // Main JavaScript with GitHub Storage Integration
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('Purchase page loaded, initializing with GitHub storage...');
+        
+        // Check authentication
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
         
         // Set today's date
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('purchaseDate').value = today;
         
-        // Initialize functions
-        loadPurchaseSummary();
-        loadRecentPurchases();
-        
-        // Add initial item row
-        addItemRow();
-        
-        // Setup event listeners
-        setupEventListeners();
-        
-        // Setup dark mode
-        setupDarkMode();
+        try {
+            // Initialize GitHub storage
+            await initializeGitHubStorage();
+            
+            // Initialize functions
+            await loadPurchaseSummary();
+            await loadRecentPurchases();
+            
+            // Add initial item row
+            addItemRow();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Setup dark mode
+            setupDarkMode();
+            
+        } catch (error) {
+            console.error('Error initializing purchase page:', error);
+            alert('Error loading purchase data. Please check your GitHub connection.');
+        }
     });
     
     // Setup dark mode
@@ -853,10 +868,10 @@
         // Form submission
         const purchaseForm = document.getElementById('purchaseForm');
         if (purchaseForm) {
-            purchaseForm.addEventListener('submit', function(e) {
+            purchaseForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 console.log('Form submitted');
-                savePurchase();
+                await savePurchase();
             });
         }
         
@@ -897,9 +912,9 @@
         // Refresh purchases button
         const refreshBtn = document.getElementById('refreshPurchasesBtn');
         if (refreshBtn) {
-            refreshBtn.addEventListener('click', function() {
-                loadRecentPurchases();
-                loadPurchaseSummary();
+            refreshBtn.addEventListener('click', async function() {
+                await loadRecentPurchases();
+                await loadPurchaseSummary();
             });
         }
     }
@@ -962,7 +977,7 @@
         });
         
         // Product autocomplete
-        productInput.addEventListener('input', function() {
+        productInput.addEventListener('input', async function() {
             const query = this.value.toLowerCase();
             
             if (query.length < 2) {
@@ -970,42 +985,41 @@
                 return;
             }
             
-            // Get products from localStorage
-            let products = [];
             try {
-                products = JSON.parse(localStorage.getItem('inventory') || '[]');
-            } catch (e) {
-                console.error('Error loading inventory:', e);
-                products = [];
-            }
-            
-            const filtered = products.filter(p => 
-                p.name && p.name.toLowerCase().includes(query)
-            ).slice(0, 10);
-            
-            if (filtered.length > 0) {
-                suggestions.innerHTML = filtered.map(p => `
-                    <div class="suggestion-item" data-name="${p.name}" data-gst="${p.gstRate || 0}" data-price="${p.price || ''}">
-                        <strong>${p.name}</strong>
-                        ${p.description ? `<br><small>${p.description.substring(0, 50)}...</small>` : ''}
-                        <br><small>Stock: ${p.stock || 0} | GST: ${p.gstRate || 0}% | Price: ₹${p.price || 0}</small>
-                    </div>
-                `).join('');
+                // Get products from GitHub storage
+                const inventory = await getFromGitHub('inventory') || [];
                 
-                suggestions.style.display = 'block';
+                const filtered = inventory.filter(p => 
+                    p && p.name && p.name.toLowerCase().includes(query)
+                ).slice(0, 10);
                 
-                // Add click handlers
-                suggestions.querySelectorAll('.suggestion-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        productInput.value = this.dataset.name;
-                        gstInput.value = this.dataset.gst;
-                        priceInput.value = this.dataset.price || '';
-                        suggestions.style.display = 'none';
-                        calculateItemTotal(row);
-                        updatePurchaseSummary();
+                if (filtered.length > 0) {
+                    suggestions.innerHTML = filtered.map(p => `
+                        <div class="suggestion-item" data-name="${p.name}" data-gst="${p.gstRate || 0}" data-price="${p.price || ''}">
+                            <strong>${p.name}</strong>
+                            ${p.description ? `<br><small>${p.description.substring(0, 50)}...</small>` : ''}
+                            <br><small>Stock: ${p.stock || 0} | GST: ${p.gstRate || 0}% | Price: ₹${p.price || 0}</small>
+                        </div>
+                    `).join('');
+                    
+                    suggestions.style.display = 'block';
+                    
+                    // Add click handlers
+                    suggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            productInput.value = this.dataset.name;
+                            gstInput.value = this.dataset.gst;
+                            priceInput.value = this.dataset.price || '';
+                            suggestions.style.display = 'none';
+                            calculateItemTotal(row);
+                            updatePurchaseSummary();
+                        });
                     });
-                });
-            } else {
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading inventory for autocomplete:', error);
                 suggestions.style.display = 'none';
             }
         });
@@ -1096,13 +1110,13 @@
         }
     }
     
-    // Load purchase summary
-    function loadPurchaseSummary() {
-        console.log('Loading purchase summary...');
+    // Load purchase summary from GitHub
+    async function loadPurchaseSummary() {
+        console.log('Loading purchase summary from GitHub...');
         
         try {
-            const purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
-            const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+            const purchases = await getFromGitHub('gst_purchases') || [];
+            const inventory = await getFromGitHub('inventory') || [];
             
             // Current month calculations
             const now = new Date();
@@ -1153,12 +1167,12 @@
         }
     }
     
-    // Load recent purchases
-    function loadRecentPurchases() {
-        console.log('Loading recent purchases...');
+    // Load recent purchases from GitHub
+    async function loadRecentPurchases() {
+        console.log('Loading recent purchases from GitHub...');
         
         try {
-            const purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
+            const purchases = await getFromGitHub('gst_purchases') || [];
             const tbody = document.getElementById('purchasesTableBody');
             const emptyState = document.getElementById('noPurchasesMessage');
             
@@ -1249,9 +1263,9 @@
         }
     }
     
-    // Save purchase with multiple items
-    function savePurchase() {
-        console.log('Saving purchase...');
+    // Save purchase with GitHub storage
+    async function savePurchase() {
+        console.log('Saving purchase to GitHub...');
         
         const supplier = document.getElementById('supplierName').value.trim();
         const date = document.getElementById('purchaseDate').value;
@@ -1292,13 +1306,8 @@
         }
         
         try {
-            // Load existing purchases
-            let purchases = [];
-            try {
-                purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
-            } catch (e) {
-                console.log('No existing purchases or error loading, starting fresh');
-            }
+            // Load existing purchases from GitHub
+            let purchases = await getFromGitHub('gst_purchases') || [];
             
             // Create new purchase object
             const newPurchase = {
@@ -1308,30 +1317,31 @@
                 billNumber: billNo || undefined,
                 notes: notes || undefined,
                 items: items,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                createdBy: JSON.parse(sessionStorage.getItem('currentUser')).email
             };
             
             // Add to purchases array
             purchases.push(newPurchase);
             
-            // Save back to localStorage
-            localStorage.setItem('gst_purchases', JSON.stringify(purchases));
-            console.log('Purchase saved to localStorage');
+            // Save to GitHub
+            await saveToGitHub('gst_purchases', purchases);
+            console.log('Purchase saved to GitHub');
             
             // Update inventory for each item
             let inventoryUpdateSuccess = true;
             let inventoryUpdateMessage = '';
             
-            items.forEach(item => {
+            for (const item of items) {
                 try {
-                    updateInventory(item.product, item.qty, item.price, item.gst, notes);
+                    await updateInventory(item.product, item.qty, item.price, item.gst, notes);
                     inventoryUpdateMessage += `✓ ${item.product}: Added ${item.qty} units\n`;
                 } catch (error) {
                     console.error(`Error updating inventory for ${item.product}:`, error);
                     inventoryUpdateSuccess = false;
                     inventoryUpdateMessage += `✗ ${item.product}: Failed to update inventory\n`;
                 }
-            });
+            }
             
             // Show success message
             let successMessage = `Purchase recorded successfully!\n\nItems:\n`;
@@ -1350,35 +1360,22 @@
             
             // Clear form and reload data
             clearForm();
-            loadRecentPurchases();
-            loadPurchaseSummary();
+            await loadRecentPurchases();
+            await loadPurchaseSummary();
             
         } catch (error) {
             console.error('Error saving purchase:', error);
-            alert('Error saving purchase. Please check console for details.');
+            alert('Error saving purchase. Please check your GitHub connection.');
         }
     }
     
-    // Update inventory after purchase
-    function updateInventory(productName, qty, price, gst, notes) {
+    // Update inventory after purchase (GitHub version)
+    async function updateInventory(productName, qty, price, gst, notes) {
         console.log('Updating inventory for:', productName, 'Quantity:', qty);
         
         try {
-            // Load current inventory
-            let inventory = [];
-            try {
-                const inventoryStr = localStorage.getItem('inventory');
-                
-                if (inventoryStr) {
-                    inventory = JSON.parse(inventoryStr);
-                } else {
-                    console.log('No inventory found in localStorage, creating new array');
-                    inventory = [];
-                }
-            } catch (e) {
-                console.error('Error loading inventory:', e);
-                inventory = [];
-            }
+            // Load current inventory from GitHub
+            let inventory = await getFromGitHub('inventory') || [];
             
             // Check if product already exists
             const existingIndex = inventory.findIndex(p => {
@@ -1427,30 +1424,24 @@
                 inventory.push(newProduct);
             }
             
-            // Save updated inventory back to localStorage
-            const inventoryJSON = JSON.stringify(inventory);
-            console.log('Saving inventory to localStorage:', inventoryJSON);
-            localStorage.setItem('inventory', inventoryJSON);
-            
-            // Verify it was saved
-            const verifyInventory = JSON.parse(localStorage.getItem('inventory') || '[]');
-            console.log('Verified inventory after save:', verifyInventory);
+            // Save updated inventory back to GitHub
+            await saveToGitHub('inventory', inventory);
             
         } catch (error) {
             console.error('Error updating inventory:', error);
-            throw error; // Re-throw to be handled by caller
+            throw error;
         }
     }
     
-    // Delete purchase
-    function deletePurchase(purchaseId) {
+    // Delete purchase from GitHub
+    async function deletePurchase(purchaseId) {
         if (!confirm('Are you sure you want to delete this purchase? This action cannot be undone.')) {
             return;
         }
         
         try {
-            // Load purchases
-            let purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
+            // Load purchases from GitHub
+            let purchases = await getFromGitHub('gst_purchases') || [];
             
             // Find the purchase to delete
             const purchaseIndex = purchases.findIndex(p => p.id === purchaseId);
@@ -1470,36 +1461,36 @@
             
             // Remove stock from inventory if requested
             if (removeStock && purchaseToDelete.items) {
-                purchaseToDelete.items.forEach(item => {
+                for (const item of purchaseToDelete.items) {
                     try {
-                        removeStockFromInventory(item.product, item.qty);
+                        await removeStockFromInventory(item.product, item.qty);
                     } catch (error) {
                         console.error(`Error removing stock for ${item.product}:`, error);
                     }
-                });
+                }
             }
             
             // Remove the purchase
             purchases.splice(purchaseIndex, 1);
-            localStorage.setItem('gst_purchases', JSON.stringify(purchases));
+            await saveToGitHub('gst_purchases', purchases);
             
             // Reload data
-            loadRecentPurchases();
-            loadPurchaseSummary();
+            await loadRecentPurchases();
+            await loadPurchaseSummary();
             
             alert('Purchase deleted successfully' + (removeStock ? ' and stock removed from inventory' : ''));
             
         } catch (error) {
             console.error('Error deleting purchase:', error);
-            alert('Error deleting purchase. Please check console for details.');
+            alert('Error deleting purchase. Please check your GitHub connection.');
         }
     }
     
-    // Remove stock from inventory
-    function removeStockFromInventory(productName, qty) {
+    // Remove stock from inventory (GitHub version)
+    async function removeStockFromInventory(productName, qty) {
         try {
-            // Load current inventory
-            let inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+            // Load current inventory from GitHub
+            let inventory = await getFromGitHub('inventory') || [];
             
             // Find the product
             const productIndex = inventory.findIndex(p => 
@@ -1520,8 +1511,8 @@
             inventory[productIndex].stock = newStock.toFixed(3);
             inventory[productIndex].lastUpdated = new Date().toISOString().split('T')[0];
             
-            // Save updated inventory
-            localStorage.setItem('inventory', JSON.stringify(inventory));
+            // Save updated inventory to GitHub
+            await saveToGitHub('inventory', inventory);
             
         } catch (error) {
             console.error('Error removing stock from inventory:', error);
