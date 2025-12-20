@@ -20,18 +20,6 @@
       --info: #3b82f6;
       --light: #f8fafc;
       --dark: #1e293b;
-      --text-primary: #1e293b;
-      --text-secondary: #64748b;
-      --text-light: #94a3b8;
-      --border-color: #e2e8f0;
-      --bg-light: #f1f5f9;
-      --card-bg: #ffffff;
-      --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      --hover-bg: #f8fafc;
-      --invoice-bg: #ffffff;
-    }
-    
-    .dark-mode {
       --text-primary: #f1f5f9;
       --text-secondary: #cbd5e1;
       --text-light: #94a3b8;
@@ -50,7 +38,6 @@
       margin: 0;
       padding: 0;
       min-height: 100vh;
-      transition: background 0.3s ease;
     }
     
     /* Simplified Navbar */
@@ -58,7 +45,7 @@
       background: var(--card-bg);
       padding: 15px 30px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       box-shadow: var(--card-shadow);
       border-bottom: 1px solid var(--border-color);
@@ -70,12 +57,6 @@
     
     .logo {
       display: none; /* Hide the logo */
-    }
-    
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 15px;
     }
     
     .back-nav-btn {
@@ -100,25 +81,6 @@
       box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
     
-    /* Dark Mode Toggle Button */
-    .dark-mode-toggle {
-      background: var(--bg-light);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px 15px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s ease;
-    }
-    
-    .dark-mode-toggle:hover {
-      background: var(--hover-bg);
-    }
-    
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -128,7 +90,6 @@
       padding: 30px;
       margin-top: 20px;
       margin-bottom: 30px;
-      transition: all 0.3s ease;
     }
     
     /* Page Title */
@@ -165,7 +126,6 @@
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
     }
     
     .card-header {
@@ -184,7 +144,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      transition: color 0.3s ease;
     }
     
     /* Invoice header */
@@ -718,33 +677,16 @@
       .table-container {
         max-height: 300px;
       }
-      
-      .nav-links {
-        flex-direction: column;
-        width: 100%;
-      }
-      
-      .dark-mode-toggle {
-        width: 100%;
-        justify-content: center;
-      }
     }
   </style>
 </head>
 <body>
-  <!-- Simple Navbar with Back Button Only -->
+  <!-- Simple Navbar with Centered Back Button -->
   <nav class="navbar">
-    <div class="nav-links">
-      <a href="dashboard.html" class="back-nav-btn">
-        <i class="fas fa-arrow-left"></i>
-        Back to Dashboard
-      </a>
-    </div>
-    <!-- Dark Mode Toggle Button -->
-    <button id="darkModeToggle" class="dark-mode-toggle">
-      <i class="fas fa-moon"></i>
-      Dark Mode
-    </button>
+    <a href="dashboard.html" class="back-nav-btn">
+      <i class="fas fa-arrow-left"></i>
+      Back to Dashboard
+    </a>
   </nav>
 
   <div class="container">
@@ -1097,9 +1039,6 @@
         // Setup GST Type Selector
         setupGstTypeSelector();
         
-        // Setup Dark Mode Toggle
-        setupDarkMode();
-        
         // Setup event listeners
         setupEventListeners();
         
@@ -1195,36 +1134,6 @@
         document.getElementById('invoiceLabel').textContent = invoiceNumber;
         
         console.log('Generated invoice number:', invoiceNumber, 'from nextInvoiceNumber:', nextInvoiceNumber);
-    }
-    
-    // Dark Mode Toggle Functionality
-    function setupDarkMode() {
-        const body = document.body;
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const darkModeIcon = darkModeToggle.querySelector('i');
-        
-        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-        const savedTheme = localStorage.getItem('theme');
-        
-        if (savedTheme === 'dark' || (!savedTheme && prefersDarkScheme.matches)) {
-            body.classList.add('dark-mode');
-            darkModeIcon.className = 'fas fa-sun';
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-        }
-        
-        darkModeToggle.addEventListener('click', function() {
-            body.classList.toggle('dark-mode');
-            
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                darkModeIcon.className = 'fas fa-sun';
-                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-            } else {
-                localStorage.setItem('theme', 'light');
-                darkModeIcon.className = 'fas fa-moon';
-                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
-            }
-        });
     }
     
     // Load shop profile
