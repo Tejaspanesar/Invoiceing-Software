@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Invoice matching styles - single page design */
+        /* Same CSS as before - matching invoice page */
         :root {
           --primary: #4f46e5;
           --primary-dark: #4338ca;
@@ -620,6 +620,21 @@
         .mb-2 {
           margin-bottom: 0.5rem;
         }
+        
+        /* Loading indicator */
+        .loading {
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          border: 2px solid var(--border-color);
+          border-top-color: var(--primary);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -749,7 +764,7 @@
           </div>
           
           <div class="action-buttons">
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-success" id="savePurchaseBtn">
               <i class="fas fa-save"></i> Save Purchase
             </button>
             <button type="button" id="clearFormBtn2" class="btn btn-secondary">
@@ -806,9 +821,124 @@
   </div>
 
   <script src="script.js"></script>
-  <script src="github-storage.js"></script>
-  
   <script>
+    // Include GitHub storage functions directly since there might be issues with external file
+    const GitHubStorage = {
+        async initialize() {
+            // Check if user is authenticated
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                throw new Error('User not authenticated');
+            }
+            
+            // Check if GitHub token exists
+            const githubToken = currentUser.githubToken;
+            if (!githubToken) {
+                throw new Error('GitHub token not found');
+            }
+            
+            this.token = githubToken;
+            this.username = currentUser.username || currentUser.email.split('@')[0];
+            this.repo = 'gst-invoice-data';
+            this.branch = 'main';
+            
+            console.log('GitHub Storage initialized for user:', this.username);
+            return true;
+        },
+        
+        async getFromGitHub(key) {
+            try {
+                const url = `https://api.github.com/repos/${this.username}/${this.repo}/contents/${key}.json`;
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${this.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.status === 404) {
+                    // File doesn't exist yet, return empty array
+                    return [];
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const content = atob(data.content);
+                return JSON.parse(content);
+            } catch (error) {
+                console.error(`Error loading ${key} from GitHub:`, error);
+                // Fallback to localStorage if GitHub fails
+                const localData = localStorage.getItem(key);
+                return localData ? JSON.parse(localData) : [];
+            }
+        },
+        
+        async saveToGitHub(key, data) {
+            try {
+                const url = `https://api.github.com/repos/${this.username}/${this.repo}/contents/${key}.json`;
+                
+                // First, try to get the existing file to get its SHA
+                let sha = null;
+                try {
+                    const getResponse = await fetch(url, {
+                        headers: {
+                            'Authorization': `token ${this.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (getResponse.ok) {
+                        const existingFile = await getResponse.json();
+                        sha = existingFile.sha;
+                    }
+                } catch (e) {
+                    // File doesn't exist yet, that's fine
+                }
+                
+                // Prepare the content
+                const content = btoa(JSON.stringify(data, null, 2));
+                const message = `Update ${key} - ${new Date().toISOString()}`;
+                
+                const body = {
+                    message: message,
+                    content: content,
+                    branch: this.branch
+                };
+                
+                if (sha) {
+                    body.sha = sha;
+                }
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${this.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+                
+                // Also save to localStorage as backup
+                localStorage.setItem(key, JSON.stringify(data));
+                
+                return true;
+            } catch (error) {
+                console.error(`Error saving ${key} to GitHub:`, error);
+                // Fallback to localStorage
+                localStorage.setItem(key, JSON.stringify(data));
+                throw error;
+            }
+        }
+    };
+    
     // Main JavaScript with GitHub Storage Integration
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('Purchase page loaded, initializing with GitHub storage...');
@@ -826,7 +956,8 @@
         
         try {
             // Initialize GitHub storage
-            await initializeGitHubStorage();
+            await GitHubStorage.initialize();
+            console.log('GitHub storage initialized successfully');
             
             // Initialize functions
             await loadPurchaseSummary();
@@ -843,9 +974,52 @@
             
         } catch (error) {
             console.error('Error initializing purchase page:', error);
-            alert('Error loading purchase data. Please check your GitHub connection.');
+            showNotification('Using local storage mode. Some features may be limited.', 'warning');
+            
+            // Try to load from localStorage as fallback
+            try {
+                await loadPurchaseSummary();
+                await loadRecentPurchases();
+                addItemRow();
+                setupEventListeners();
+                setupDarkMode();
+            } catch (fallbackError) {
+                console.error('Fallback initialization failed:', fallbackError);
+                alert('Error loading purchase data. Please check your connection.');
+            }
         }
     });
+    
+    // Show notification
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.padding = '15px 20px';
+        notification.style.borderRadius = '8px';
+        notification.style.color = 'white';
+        notification.style.fontWeight = '500';
+        notification.style.zIndex = '9999';
+        notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        
+        if (type === 'success') {
+            notification.style.background = 'var(--success)';
+        } else if (type === 'warning') {
+            notification.style.background = 'var(--warning)';
+        } else if (type === 'error') {
+            notification.style.background = 'var(--danger)';
+        } else {
+            notification.style.background = 'var(--info)';
+        }
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
     
     // Setup dark mode
     function setupDarkMode() {
@@ -987,7 +1161,7 @@
             
             try {
                 // Get products from GitHub storage
-                const inventory = await getFromGitHub('inventory') || [];
+                const inventory = await GitHubStorage.getFromGitHub('inventory');
                 
                 const filtered = inventory.filter(p => 
                     p && p.name && p.name.toLowerCase().includes(query)
@@ -1112,11 +1286,11 @@
     
     // Load purchase summary from GitHub
     async function loadPurchaseSummary() {
-        console.log('Loading purchase summary from GitHub...');
+        console.log('Loading purchase summary...');
         
         try {
-            const purchases = await getFromGitHub('gst_purchases') || [];
-            const inventory = await getFromGitHub('inventory') || [];
+            const purchases = await GitHubStorage.getFromGitHub('gst_purchases');
+            const inventory = await GitHubStorage.getFromGitHub('inventory');
             
             // Current month calculations
             const now = new Date();
@@ -1169,10 +1343,10 @@
     
     // Load recent purchases from GitHub
     async function loadRecentPurchases() {
-        console.log('Loading recent purchases from GitHub...');
+        console.log('Loading recent purchases...');
         
         try {
-            const purchases = await getFromGitHub('gst_purchases') || [];
+            const purchases = await GitHubStorage.getFromGitHub('gst_purchases');
             const tbody = document.getElementById('purchasesTableBody');
             const emptyState = document.getElementById('noPurchasesMessage');
             
@@ -1265,7 +1439,7 @@
     
     // Save purchase with GitHub storage
     async function savePurchase() {
-        console.log('Saving purchase to GitHub...');
+        console.log('Saving purchase...');
         
         const supplier = document.getElementById('supplierName').value.trim();
         const date = document.getElementById('purchaseDate').value;
@@ -1305,9 +1479,14 @@
             return;
         }
         
+        const saveBtn = document.getElementById('savePurchaseBtn');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<span class="loading"></span> Saving...';
+        saveBtn.disabled = true;
+        
         try {
             // Load existing purchases from GitHub
-            let purchases = await getFromGitHub('gst_purchases') || [];
+            let purchases = await GitHubStorage.getFromGitHub('gst_purchases');
             
             // Create new purchase object
             const newPurchase = {
@@ -1325,7 +1504,7 @@
             purchases.push(newPurchase);
             
             // Save to GitHub
-            await saveToGitHub('gst_purchases', purchases);
+            await GitHubStorage.saveToGitHub('gst_purchases', purchases);
             console.log('Purchase saved to GitHub');
             
             // Update inventory for each item
@@ -1356,7 +1535,7 @@
                 successMessage += '\n⚠ Some inventory updates failed. Please check inventory manually.';
             }
             
-            alert(successMessage);
+            showNotification('Purchase saved successfully!', 'success');
             
             // Clear form and reload data
             clearForm();
@@ -1365,7 +1544,39 @@
             
         } catch (error) {
             console.error('Error saving purchase:', error);
-            alert('Error saving purchase. Please check your GitHub connection.');
+            showNotification('Error saving purchase. Using local storage.', 'error');
+            
+            // Try to save locally as fallback
+            try {
+                let purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
+                const newPurchase = {
+                    id: 'purchase_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                    supplier: supplier || undefined,
+                    date: date,
+                    billNumber: billNo || undefined,
+                    notes: notes || undefined,
+                    items: items,
+                    timestamp: Date.now(),
+                    createdBy: JSON.parse(sessionStorage.getItem('currentUser')).email
+                };
+                purchases.push(newPurchase);
+                localStorage.setItem('gst_purchases', JSON.stringify(purchases));
+                
+                // Update inventory locally
+                for (const item of items) {
+                    updateInventoryLocally(item.product, item.qty, item.price, item.gst, notes);
+                }
+                
+                showNotification('Purchase saved locally (offline mode).', 'warning');
+                clearForm();
+                await loadRecentPurchases();
+                await loadPurchaseSummary();
+            } catch (localError) {
+                showNotification('Failed to save purchase. Please try again.', 'error');
+            }
+        } finally {
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
         }
     }
     
@@ -1375,7 +1586,7 @@
         
         try {
             // Load current inventory from GitHub
-            let inventory = await getFromGitHub('inventory') || [];
+            let inventory = await GitHubStorage.getFromGitHub('inventory');
             
             // Check if product already exists
             const existingIndex = inventory.findIndex(p => {
@@ -1425,11 +1636,54 @@
             }
             
             // Save updated inventory back to GitHub
-            await saveToGitHub('inventory', inventory);
+            await GitHubStorage.saveToGitHub('inventory', inventory);
             
         } catch (error) {
             console.error('Error updating inventory:', error);
             throw error;
+        }
+    }
+    
+    // Local fallback for inventory update
+    function updateInventoryLocally(productName, qty, price, gst, notes) {
+        try {
+            let inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+            const existingIndex = inventory.findIndex(p => 
+                p.name && p.name.toLowerCase() === productName.toLowerCase()
+            );
+            
+            if (existingIndex !== -1) {
+                const existingProduct = inventory[existingIndex];
+                const currentStock = parseFloat(existingProduct.stock) || 0;
+                const newStock = currentStock + qty;
+                
+                inventory[existingIndex].stock = newStock.toFixed(3);
+                inventory[existingIndex].price = price;
+                inventory[existingIndex].gstRate = gst;
+                inventory[existingIndex].lastUpdated = new Date().toISOString().split('T')[0];
+                
+                if (notes) {
+                    inventory[existingIndex].description = notes;
+                }
+            } else {
+                const newProduct = {
+                    id: Date.now(),
+                    code: `PROD-${String(inventory.length + 1).padStart(3, '0')}`,
+                    name: productName,
+                    category: 'General',
+                    stock: qty.toFixed(3),
+                    price: price,
+                    gstRate: gst,
+                    description: notes || 'Added via purchase',
+                    lowStockThreshold: 10,
+                    lastUpdated: new Date().toISOString().split('T')[0]
+                };
+                inventory.push(newProduct);
+            }
+            
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+        } catch (error) {
+            console.error('Error updating local inventory:', error);
         }
     }
     
@@ -1441,7 +1695,7 @@
         
         try {
             // Load purchases from GitHub
-            let purchases = await getFromGitHub('gst_purchases') || [];
+            let purchases = await GitHubStorage.getFromGitHub('gst_purchases');
             
             // Find the purchase to delete
             const purchaseIndex = purchases.findIndex(p => p.id === purchaseId);
@@ -1472,17 +1726,17 @@
             
             // Remove the purchase
             purchases.splice(purchaseIndex, 1);
-            await saveToGitHub('gst_purchases', purchases);
+            await GitHubStorage.saveToGitHub('gst_purchases', purchases);
             
             // Reload data
             await loadRecentPurchases();
             await loadPurchaseSummary();
             
-            alert('Purchase deleted successfully' + (removeStock ? ' and stock removed from inventory' : ''));
+            showNotification('Purchase deleted successfully', 'success');
             
         } catch (error) {
             console.error('Error deleting purchase:', error);
-            alert('Error deleting purchase. Please check your GitHub connection.');
+            showNotification('Error deleting purchase. Please try again.', 'error');
         }
     }
     
@@ -1490,7 +1744,7 @@
     async function removeStockFromInventory(productName, qty) {
         try {
             // Load current inventory from GitHub
-            let inventory = await getFromGitHub('inventory') || [];
+            let inventory = await GitHubStorage.getFromGitHub('inventory');
             
             // Find the product
             const productIndex = inventory.findIndex(p => 
@@ -1512,7 +1766,7 @@
             inventory[productIndex].lastUpdated = new Date().toISOString().split('T')[0];
             
             // Save updated inventory to GitHub
-            await saveToGitHub('inventory', inventory);
+            await GitHubStorage.saveToGitHub('inventory', inventory);
             
         } catch (error) {
             console.error('Error removing stock from inventory:', error);
