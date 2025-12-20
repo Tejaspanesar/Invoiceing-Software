@@ -6,26 +6,9 @@
     <title>Dashboard - GST Invoice System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* PERMANENT DARK MODE OVERRIDE */
-        body {
-            background-color: #121212 !important;
-            color: #ffffff !important;
-        }
-        
-        .dark-mode {
-            background-color: #121212 !important;
-            color: #ffffff !important;
-        }
-        
-        /* Remove theme switch */
-        .theme-switch {
-            display: none !important;
-        }
-    </style>
 </head>
-<body class="dark-mode">
-    <!-- Navigation - SIMPLIFIED: No dropdown, no PANESAR SANITARY -->
+<body>
+    <!-- Navigation -->
     <nav class="navbar">
         <a href="dashboard.html" class="logo">
             <div class="logo-icon">
@@ -55,7 +38,7 @@
             <a href="settings.html" class="nav-link">
                 <i class="fas fa-cog"></i> Settings
             </a>
-            <!-- Theme switch removed -->
+            <!-- Theme switch removed as requested -->
         </div>
     </nav>
 
@@ -298,31 +281,47 @@
     <script src="script.js"></script>
     <script src="github-storage.js"></script>
 
-    <!-- Modified script to remove dark mode toggle functionality -->
+    <!-- Script to enforce permanent dark mode -->
     <script>
-        // Override any dark mode toggle functionality
+        // Force dark mode permanently
         document.addEventListener('DOMContentLoaded', function() {
-            // Force dark mode on body
+            // Force dark mode class on body
             document.body.classList.add('dark-mode');
             
-            // Remove dark mode toggle if it exists
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (darkModeToggle) {
-                darkModeToggle.parentElement.style.display = 'none';
-            }
-            
-            // Override localStorage settings to force dark mode
+            // Set localStorage to dark mode
             localStorage.setItem('darkMode', 'true');
             
-            // Disable any existing dark mode toggle listeners
+            // Override the updateNavigation function to prevent light mode
             if (typeof window.updateNavigation === 'function') {
                 window.updateNavigation = function() {
-                    // Do nothing - dark mode is permanent
                     document.body.classList.add('dark-mode');
                     localStorage.setItem('darkMode', 'true');
                 };
             }
+            
+            // Initialize Chart.js with dark mode
+            if (typeof Chart !== 'undefined') {
+                // You might need to adjust chart colors for dark mode
+                Chart.defaults.color = '#ffffff';
+                Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }
         });
     </script>
+    
+    <!-- Style to ensure dark mode is applied -->
+    <style>
+        /* Ensure dark mode is applied even if CSS loads slowly */
+        body {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+            transition: none !important;
+        }
+        
+        /* Hide any remaining theme toggle elements */
+        .theme-switch,
+        input[type="checkbox"][id*="darkModeToggle"] {
+            display: none !important;
+        }
+    </style>
 </body>
 </html>
