@@ -11,7 +11,7 @@
     <!-- Import Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Invoice matching styles - single page design */
+        /* Invoice matching styles - single page design - PERMANENTLY DARK */
         :root {
           --primary: #4f46e5;
           --primary-dark: #4338ca;
@@ -22,31 +22,19 @@
           --info: #3b82f6;
           --light: #f8fafc;
           --dark: #1e293b;
-          --text-primary: #1e293b;
-          --text-secondary: #64748b;
-          --text-light: #94a3b8;
-          --border-color: #e2e8f0;
-          --bg-light: #f1f5f9;
-          --card-bg: #ffffff;
-          --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          --hover-bg: #f8fafc;
-          --invoice-bg: #ffffff;
+          --text-primary: #f1f5f9; /* Always light text */
+          --text-secondary: #cbd5e1; /* Always light secondary */
+          --text-light: #94a3b8; /* Always light muted */
+          --border-color: #334155; /* Always dark border */
+          --bg-light: #1e293b; /* Always dark background */
+          --card-bg: #0f172a; /* Always dark card */
+          --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Dark shadow */
+          --hover-bg: #1e293b; /* Always dark hover */
+          --invoice-bg: #0f172a; /* Always dark container */
         }
         
-        .dark-mode {
-          --text-primary: #f1f5f9;
-          --text-secondary: #cbd5e1;
-          --text-light: #94a3b8;
-          --border-color: #334155;
-          --bg-light: #1e293b;
-          --card-bg: #0f172a;
-          --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-          --hover-bg: #1e293b;
-          --invoice-bg: #0f172a;
-        }
-        
-        body {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        /* Remove dark-mode class, as it's permanently dark */
+        body.dark-mode, body {
           background: var(--bg-light);
           color: var(--text-primary);
           margin: 0;
@@ -625,7 +613,7 @@
         }
     </style>
 </head>
-<body>
+<body class="dark-mode">
   <!-- Simple Navbar with Back Button Only -->
   <nav class="navbar">
     <div class="nav-links">
@@ -820,8 +808,8 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('purchaseDate').value = today;
         
-        // Initialize dark mode sync with dashboard
-        initializeDarkMode();
+        // Page is permanently dark, no initialization needed for dark mode
+        document.body.classList.add('dark-mode');
         
         // Initialize functions
         loadPurchaseSummary();
@@ -833,31 +821,6 @@
         // Setup event listeners
         setupEventListeners();
     });
-    
-    // Initialize dark mode sync with dashboard
-    function initializeDarkMode() {
-        const body = document.body;
-        
-        // Check localStorage for theme setting (same key as dashboard)
-        const storedTheme = localStorage.getItem('theme') || 'light';
-        
-        if (storedTheme === 'dark') {
-            body.classList.add('dark-mode');
-        } else {
-            body.classList.remove('dark-mode');
-        }
-        
-        // Listen for theme changes (in case dashboard changes it while this page is open)
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'theme') {
-                if (e.newValue === 'dark') {
-                    body.classList.add('dark-mode');
-                } else {
-                    body.classList.remove('dark-mode');
-                }
-            }
-        });
-    }
     
     // Current purchase items
     let purchaseItems = [];
