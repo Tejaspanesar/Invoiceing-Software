@@ -672,6 +672,84 @@
             border-color: var(--primary);
         }
 
+        /* GitHub Sync Specific Styles */
+        .github-sync-card {
+            margin-top: 30px;
+        }
+
+        .github-sync-card .card-header {
+            background: rgba(36, 41, 46, 0.9);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .github-sync-card .card-body {
+            background: var(--card-bg);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .github-sync-card .card-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .text-light {
+            color: var(--text-secondary) !important;
+        }
+
+        .text-warning {
+            color: var(--warning) !important;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .d-flex {
+            display: flex !important;
+        }
+
+        .gap-2 {
+            gap: 8px !important;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap !important;
+        }
+
+        .mt-4 {
+            margin-top: 1.5rem !important;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem !important;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem !important;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+
+        .mb-0 {
+            margin-bottom: 0 !important;
+        }
+
+        .code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -763,6 +841,14 @@
             .theme-selector-grid,
             .export-options-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .d-flex {
+                flex-direction: column;
+            }
+            
+            .gap-2 {
+                gap: 10px !important;
             }
         }
 
@@ -1198,6 +1284,98 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- GitHub Sync Section -->
+                    <div class="settings-card github-sync-card">
+                        <h3><i class="fab fa-github"></i> Cloud Sync (GitHub)</h3>
+                        <p class="mb-3">Sync your data across devices using GitHub. Your data will be stored privately in your GitHub repository.</p>
+                        
+                        <!-- Configuration Form -->
+                        <div class="form-group">
+                            <label class="form-label">GitHub Username</label>
+                            <input type="text" class="form-control" id="githubUsername" 
+                                   placeholder="e.g., yourusername" 
+                                   value="">
+                            <small class="text-light">Your GitHub username (not email)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Repository Name</label>
+                            <input type="text" class="form-control" id="githubRepo" 
+                                   placeholder="e.g., gst-invoice-system" 
+                                   value="">
+                            <small class="text-light">The repository where this app is hosted</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">GitHub Personal Access Token</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="githubToken" 
+                                       placeholder="Enter your token">
+                                <button class="btn btn-outline-secondary" type="button" 
+                                        onclick="toggleTokenVisibility()">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-light">
+                                <a href="https://github.com/settings/tokens" target="_blank" 
+                                   class="text-primary">
+                                    <i class="fas fa-external-link-alt"></i> Get token from GitHub Settings
+                                </a>
+                            </small>
+                            <div class="mt-1">
+                                <small class="text-warning">
+                                    Token needs: <code>repo</code>, <code>write:packages</code>, 
+                                    <code>delete:packages</code> permissions
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 flex-wrap mt-4">
+                            <button class="btn btn-primary" onclick="saveGitHubConfig()">
+                                <i class="fas fa-save"></i> Save Configuration
+                            </button>
+                            
+                            <button class="btn btn-success" onclick="testGitHubConnection()">
+                                <i class="fas fa-plug"></i> Test Connection
+                            </button>
+                            
+                            <button class="btn btn-info" onclick="syncToGitHub()">
+                                <i class="fas fa-cloud-upload-alt"></i> Sync to Cloud
+                            </button>
+                            
+                            <button class="btn btn-secondary" onclick="loadFromGitHub()">
+                                <i class="fas fa-cloud-download-alt"></i> Load from Cloud
+                            </button>
+                        </div>
+                        
+                        <!-- Status Display -->
+                        <div class="mt-4">
+                            <div class="alert alert-info" id="githubStatus" style="display: none;">
+                                <i class="fas fa-info-circle"></i>
+                                <span id="githubStatusText">Status will appear here</span>
+                            </div>
+                            
+                            <div class="mt-2">
+                                <small class="text-light">
+                                    Last sync: <span id="lastSyncTime">Never</span>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Instructions -->
+                        <div class="alert alert-warning mt-4">
+                            <h6><i class="fas fa-info-circle"></i> How to set up:</h6>
+                            <ol class="mb-0">
+                                <li>Go to GitHub → Settings → Developer Settings → Personal Access Tokens</li>
+                                <li>Create new token with <code>repo</code>, <code>write:packages</code>, <code>delete:packages</code> permissions</li>
+                                <li>Copy the token and paste above</li>
+                                <li>Enter your GitHub username and repository name</li>
+                                <li>Click "Save Configuration" then "Test Connection"</li>
+                            </ol>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Danger Zone Section -->
@@ -1290,6 +1468,9 @@
             // Load invoice settings
             initInvoiceSettings();
             
+            // Load user data
+            loadUserData();
+            
             // Check if user is logged in
             checkAuth();
         });
@@ -1299,8 +1480,9 @@
             const currentUser = sessionStorage.getItem('currentUser');
             if (!currentUser) {
                 window.location.href = 'login.html';
-                return;
+                return false;
             }
+            return true;
         }
         
         // Dark mode sync with dashboard
@@ -1363,6 +1545,24 @@
                 if (navLink) {
                     navLink.click();
                 }
+            }
+        }
+        
+        // Load user data
+        function loadUserData() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                if (currentUser.email) {
+                    document.getElementById('profileEmail').value = currentUser.email;
+                    document.getElementById('firstName').value = currentUser.firstName || 'Admin';
+                    document.getElementById('lastName').value = currentUser.lastName || 'User';
+                    document.getElementById('businessName').value = currentUser.businessName || 'ABC Technologies Pvt Ltd';
+                    document.getElementById('profilePhone').value = currentUser.phone || '+91 9876543210';
+                    document.getElementById('profileGSTIN').value = currentUser.gstin || '27AABCU9603R1ZX';
+                    document.getElementById('profileAddress').value = currentUser.address || '123 Tech Park, Bangalore';
+                }
+            } catch (e) {
+                console.error('Error loading user data:', e);
             }
         }
         
@@ -1430,6 +1630,10 @@
         
         // Helper function to get next invoice number from existing invoices
         function getNextInvoiceNumberFromInvoices(invoices) {
+            if (!invoices || invoices.length === 0) {
+                return 1;
+            }
+            
             let maxNumber = 0;
             
             invoices.forEach(invoice => {
@@ -1446,6 +1650,8 @@
         
         // Helper function to extract number from invoice string
         function extractNumberFromInvoiceString(invoiceString) {
+            if (!invoiceString) return 0;
+            
             // Try multiple patterns to extract number
             const patterns = [
                 /INV-(\d+)/i,
@@ -1551,27 +1757,6 @@
                 
                 showAlert('Profile form reset to saved values', 'info');
             };
-            
-            // Load current user data
-            function loadUserData() {
-                try {
-                    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-                    if (currentUser.email) {
-                        document.getElementById('profileEmail').value = currentUser.email;
-                        document.getElementById('firstName').value = currentUser.firstName || 'Admin';
-                        document.getElementById('lastName').value = currentUser.lastName || 'User';
-                        document.getElementById('businessName').value = currentUser.businessName || 'ABC Technologies Pvt Ltd';
-                        document.getElementById('profilePhone').value = currentUser.phone || '+91 9876543210';
-                        document.getElementById('profileGSTIN').value = currentUser.gstin || '27AABCU9603R1ZX';
-                        document.getElementById('profileAddress').value = currentUser.address || '123 Tech Park, Bangalore';
-                    }
-                } catch (e) {
-                    console.error('Error loading user data:', e);
-                }
-            }
-            
-            // Load user data on page load
-            loadUserData();
             
             // Theme selection
             const themeCards = document.querySelectorAll('.theme-option-card');
@@ -1764,108 +1949,35 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
+        
+        // GitHub sync functions (stubs - implement in github-storage.js)
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('githubToken');
+            if (tokenInput.type === 'password') {
+                tokenInput.type = 'text';
+                setTimeout(() => { tokenInput.type = 'password'; }, 3000);
+            } else {
+                tokenInput.type = 'password';
+            }
+        }
+        
+        function saveGitHubConfig() {
+            showAlert('GitHub configuration saved locally. Test connection to verify.', 'info');
+        }
+        
+        function testGitHubConnection() {
+            showAlert('GitHub connection test would be implemented in github-storage.js', 'info');
+        }
+        
+        function syncToGitHub() {
+            showAlert('Sync to GitHub would be implemented in github-storage.js', 'info');
+        }
+        
+        function loadFromGitHub() {
+            showAlert('Load from GitHub would be implemented in github-storage.js', 'info');
+        }
     </script>
-</body>
-
-</html>
-<!-- GitHub Sync Section -->
-<div class="card mt-4">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fab fa-github"></i> Cloud Sync (GitHub)
-        </h3>
-    </div>
-    <div class="card-body">
-        <p class="mb-3">Sync your data across devices using GitHub. Your data will be stored privately in your GitHub repository.</p>
-        
-        <!-- Configuration Form -->
-        <div class="form-group">
-            <label class="form-label">GitHub Username</label>
-            <input type="text" class="form-control" id="githubUsername" 
-                   placeholder="e.g., yourusername" 
-                   value="">
-            <small class="text-light">Your GitHub username (not email)</small>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">Repository Name</label>
-            <input type="text" class="form-control" id="githubRepo" 
-                   placeholder="e.g., gst-invoice-system" 
-                   value="">
-            <small class="text-light">The repository where this app is hosted</small>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">GitHub Personal Access Token</label>
-            <div class="input-group">
-                <input type="password" class="form-control" id="githubToken" 
-                       placeholder="Enter your token">
-                <button class="btn btn-outline-secondary" type="button" 
-                        onclick="toggleTokenVisibility()">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-            <small class="text-light">
-                <a href="https://github.com/settings/tokens" target="_blank" 
-                   class="text-primary">
-                    <i class="fas fa-external-link-alt"></i> Get token from GitHub Settings
-                </a>
-            </small>
-            <div class="mt-1">
-                <small class="text-warning">
-                    Token needs: <code>repo</code>, <code>write:packages</code>, 
-                    <code>delete:packages</code> permissions
-                </small>
-            </div>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="d-flex gap-2 flex-wrap mt-4">
-            <button class="btn btn-primary" onclick="saveGitHubConfig()">
-                <i class="fas fa-save"></i> Save Configuration
-            </button>
-            
-            <button class="btn btn-success" onclick="testGitHubConnection()">
-                <i class="fas fa-plug"></i> Test Connection
-            </button>
-            
-            <button class="btn btn-info" onclick="syncToGitHub()">
-                <i class="fas fa-cloud-upload-alt"></i> Sync to Cloud
-            </button>
-            
-            <button class="btn btn-secondary" onclick="loadFromGitHub()">
-                <i class="fas fa-cloud-download-alt"></i> Load from Cloud
-            </button>
-        </div>
-        
-        <!-- Status Display -->
-        <div class="mt-4">
-            <div class="alert alert-info" id="githubStatus" style="display: none;">
-                <i class="fas fa-info-circle"></i>
-                <span id="githubStatusText">Status will appear here</span>
-            </div>
-            
-            <div class="mt-2">
-                <small class="text-light">
-                    Last sync: <span id="lastSyncTime">Never</span>
-                </small>
-            </div>
-        </div>
-        
-        <!-- Instructions -->
-        <div class="alert alert-warning mt-4">
-            <h6><i class="fas fa-info-circle"></i> How to set up:</h6>
-            <ol class="mb-0">
-                <li>Go to GitHub → Settings → Developer Settings → Personal Access Tokens</li>
-                <li>Create new token with <code>repo</code>, <code>write:packages</code>, <code>delete:packages</code> permissions</li>
-                <li>Copy the token and paste above</li>
-                <li>Enter your GitHub username and repository name</li>
-                <li>Click "Save Configuration" then "Test Connection"</li>
-            </ol>
-        </div>
-    </div>
-</div>
-    <script src="script.js"></script>
+    <!-- External JavaScript files -->
     <script src="github-storage.js"></script>
 </body>
 </html>
