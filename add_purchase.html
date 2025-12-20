@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Same CSS as before - matching invoice page */
+        /* Invoice matching styles - single page design */
         :root {
           --primary: #4f46e5;
           --primary-dark: #4338ca;
@@ -52,7 +52,7 @@
           transition: background 0.3s ease;
         }
         
-        /* Simplified Navbar - Just like invoice page */
+        /* Simplified Navbar */
         .navbar {
           background: var(--card-bg);
           padding: 15px 30px;
@@ -68,7 +68,7 @@
         }
         
         .logo {
-          display: none;
+          display: none; /* Hide the logo */
         }
         
         .nav-links {
@@ -138,7 +138,7 @@
           padding: 0;
         }
         
-        /* Card styles - matching invoice page */
+        /* Card styles */
         .card {
           background: var(--card-bg);
           border-radius: 12px;
@@ -168,7 +168,7 @@
           transition: color 0.3s ease;
         }
         
-        /* Form styles - matching invoice page */
+        /* Form styles */
         .form-row {
           display: flex;
           gap: 1rem;
@@ -248,7 +248,7 @@
           color: var(--text-primary);
         }
         
-        /* Action buttons - matching invoice page */
+        /* Action buttons */
         .action-buttons {
           display: flex;
           gap: 12px;
@@ -340,7 +340,7 @@
           background: rgba(239, 68, 68, 0.1);
         }
         
-        /* Table styles - matching invoice page */
+        /* Table styles */
         .table-container {
           border: 1px solid var(--border-color);
           border-radius: 8px;
@@ -623,7 +623,7 @@
     </style>
 </head>
 <body>
-  <!-- Simple Navbar with Back Button Only - Just like invoice page -->
+  <!-- Simple Navbar with Back Button Only -->
   <nav class="navbar">
     <div class="nav-links">
       <a href="dashboard.html" class="back-nav-btn">
@@ -805,21 +805,13 @@
     </div>
   </div>
 
-  <!-- We're NOT including script.js since it's causing the error -->
-  <!-- <script src="script.js"></script> -->
+  <script src="script.js"></script>
   <script src="github-storage.js"></script>
   
   <script>
     // Main JavaScript - All functions properly defined
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Page loaded, initializing...');
-        
-        // Check authentication manually (without script.js)
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-        if (!currentUser) {
-            window.location.href = 'index.html';
-            return;
-        }
         
         // Set today's date
         const today = new Date().toISOString().split('T')[0];
@@ -835,37 +827,65 @@
         // Setup event listeners
         setupEventListeners();
         
-        // Setup dark mode
+        // Setup dark mode - SYNCHRONIZED WITH DASHBOARD
         setupDarkMode();
         
-        // Check if GitHub is configured
-        checkGitHubConfig();
+        // Check for GitHub storage
+        checkGitHubStorage();
     });
     
-    // Check GitHub configuration
-    function checkGitHubConfig() {
+    // Check GitHub storage
+    function checkGitHubStorage() {
         try {
-            if (githubStorage && githubStorage.isValidConfig()) {
-                console.log('GitHub storage is configured');
-                document.querySelector('.footer p').textContent = 
-                    'GST Invoice Management System © 2024 | Data stored in GitHub';
-            } else {
-                console.log('GitHub storage not configured');
+            // Check if user has GitHub configured
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (currentUser) {
+                const userSettings = JSON.parse(localStorage.getItem(`settings_${currentUser.email}`) || '{}');
+                if (userSettings.githubToken && userSettings.githubUsername && userSettings.githubRepo) {
+                    // Configure GitHub storage
+                    githubStorage.token = userSettings.githubToken;
+                    githubStorage.username = userSettings.githubUsername;
+                    githubStorage.repo = userSettings.githubRepo;
+                    githubStorage.branch = userSettings.githubBranch || 'main';
+                    
+                    console.log('GitHub storage configured from user settings');
+                    document.querySelector('.footer p').textContent = 
+                        'GST Invoice Management System © 2024 | Data synced with GitHub';
+                }
             }
         } catch (error) {
-            console.log('GitHub storage not available');
+            console.log('Error checking GitHub storage:', error);
         }
     }
     
-    // Setup dark mode
+    // Setup dark mode - SYNCHRONIZED WITH DASHBOARD
     function setupDarkMode() {
         const body = document.body;
-        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Check localStorage for theme preference (same as dashboard)
         const savedTheme = localStorage.getItem('theme');
         
+        // Check system preference
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Apply theme based on saved preference or system preference
         if (savedTheme === 'dark' || (!savedTheme && prefersDarkScheme.matches)) {
             body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
         }
+        
+        // Listen for changes in system preference
+        prefersDarkScheme.addEventListener('change', (e) => {
+            // Only apply system preference if user hasn't manually set a theme
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    body.classList.add('dark-mode');
+                } else {
+                    body.classList.remove('dark-mode');
+                }
+            }
+        });
     }
     
     // Current purchase items
@@ -1126,32 +1146,8 @@
         console.log('Loading purchase summary...');
         
         try {
-            // Try to load from GitHub first if configured
-            let purchases = [];
-            let inventory = [];
-            
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-            if (currentUser && githubStorage && githubStorage.isValidConfig()) {
-                // Try GitHub
-                try {
-                    const userData = githubStorage.loadUserData(currentUser.email);
-                    if (userData) {
-                        purchases = userData.purchases || [];
-                        inventory = userData.inventory || [];
-                    }
-                } catch (githubError) {
-                    console.log('GitHub load failed, falling back to localStorage');
-                }
-            }
-            
-            // If GitHub failed or not configured, use localStorage
-            if (purchases.length === 0) {
-                purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
-            }
-            
-            if (inventory.length === 0) {
-                inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
-            }
+            const purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
+            const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
             
             // Current month calculations
             const now = new Date();
@@ -1207,27 +1203,7 @@
         console.log('Loading recent purchases...');
         
         try {
-            // Try to load from GitHub first if configured
-            let purchases = [];
-            
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-            if (currentUser && githubStorage && githubStorage.isValidConfig()) {
-                // Try GitHub
-                try {
-                    const userData = githubStorage.loadUserData(currentUser.email);
-                    if (userData) {
-                        purchases = userData.purchases || [];
-                    }
-                } catch (githubError) {
-                    console.log('GitHub load failed, falling back to localStorage');
-                }
-            }
-            
-            // If GitHub failed or not configured, use localStorage
-            if (purchases.length === 0) {
-                purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
-            }
-            
+            const purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
             const tbody = document.getElementById('purchasesTableBody');
             const emptyState = document.getElementById('noPurchasesMessage');
             
@@ -1361,31 +1337,12 @@
         }
         
         try {
-            // Get current user
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-            
-            // Load existing purchases - try GitHub first if configured
+            // Load existing purchases
             let purchases = [];
-            let userData = null;
-            
-            if (currentUser && githubStorage && githubStorage.isValidConfig()) {
-                // Try to load from GitHub
-                try {
-                    userData = await githubStorage.loadUserData(currentUser.email);
-                    if (userData) {
-                        purchases = userData.purchases || [];
-                        console.log('Loaded purchases from GitHub:', purchases.length);
-                    } else {
-                        userData = { purchases: [], inventory: [] };
-                        purchases = [];
-                    }
-                } catch (githubError) {
-                    console.log('GitHub load failed, using localStorage');
-                    purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
-                }
-            } else {
-                // GitHub not configured, use localStorage
+            try {
                 purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
+            } catch (e) {
+                console.log('No existing purchases or error loading, starting fresh');
             }
             
             // Create new purchase object
@@ -1396,15 +1353,36 @@
                 billNumber: billNo || undefined,
                 notes: notes || undefined,
                 items: items,
-                timestamp: Date.now(),
-                createdBy: currentUser ? currentUser.email : 'anonymous'
+                timestamp: Date.now()
             };
             
             // Add to purchases array
             purchases.push(newPurchase);
             
-            // Save to both localStorage and GitHub if configured
+            // Save back to localStorage
             localStorage.setItem('gst_purchases', JSON.stringify(purchases));
+            console.log('Purchase saved to localStorage');
+            
+            // Try to save to GitHub if configured
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                if (currentUser && githubStorage.isValidConfig()) {
+                    // Prepare user data
+                    const userData = {
+                        purchases: purchases,
+                        inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
+                        shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
+                        invoices: JSON.parse(localStorage.getItem('invoices') || '[]')
+                    };
+                    
+                    const result = await githubStorage.saveUserData(currentUser.email, userData);
+                    if (result.success) {
+                        console.log('Purchase saved to GitHub');
+                    }
+                }
+            } catch (githubError) {
+                console.log('GitHub save failed, using localStorage only:', githubError);
+            }
             
             // Update inventory for each item
             let inventoryUpdateSuccess = true;
@@ -1420,32 +1398,6 @@
                     inventoryUpdateMessage += `✗ ${item.product}: Failed to update inventory\n`;
                 }
             });
-            
-            // Try to save to GitHub if configured
-            if (currentUser && githubStorage && githubStorage.isValidConfig()) {
-                try {
-                    // Prepare user data for GitHub
-                    if (!userData) {
-                        userData = {
-                            purchases: purchases,
-                            inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
-                            shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}')
-                        };
-                    } else {
-                        userData.purchases = purchases;
-                        userData.inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
-                    }
-                    
-                    const result = await githubStorage.saveUserData(currentUser.email, userData);
-                    if (result.success) {
-                        console.log('Data saved to GitHub successfully');
-                    } else {
-                        console.log('GitHub save failed:', result.message);
-                    }
-                } catch (githubSaveError) {
-                    console.error('Error saving to GitHub:', githubSaveError);
-                }
-            }
             
             // Show success message
             let successMessage = `Purchase recorded successfully!\n\nItems:\n`;
