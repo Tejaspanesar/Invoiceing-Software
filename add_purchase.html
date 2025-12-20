@@ -829,40 +829,13 @@
         
         // Setup dark mode - SYNCHRONIZED WITH DASHBOARD
         setupDarkMode();
-        
-        // Check for GitHub storage
-        checkGitHubStorage();
     });
-    
-    // Check GitHub storage
-    function checkGitHubStorage() {
-        try {
-            // Check if user has GitHub configured
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-            if (currentUser) {
-                const userSettings = JSON.parse(localStorage.getItem(`settings_${currentUser.email}`) || '{}');
-                if (userSettings.githubToken && userSettings.githubUsername && userSettings.githubRepo) {
-                    // Configure GitHub storage
-                    githubStorage.token = userSettings.githubToken;
-                    githubStorage.username = userSettings.githubUsername;
-                    githubStorage.repo = userSettings.githubRepo;
-                    githubStorage.branch = userSettings.githubBranch || 'main';
-                    
-                    console.log('GitHub storage configured from user settings');
-                    document.querySelector('.footer p').textContent = 
-                        'GST Invoice Management System © 2024 | Data synced with GitHub';
-                }
-            }
-        } catch (error) {
-            console.log('Error checking GitHub storage:', error);
-        }
-    }
     
     // Setup dark mode - SYNCHRONIZED WITH DASHBOARD
     function setupDarkMode() {
         const body = document.body;
         
-        // Check localStorage for theme preference (same as dashboard)
+        // Check localStorage for theme preference (same key as dashboard)
         const savedTheme = localStorage.getItem('theme');
         
         // Check system preference
@@ -1295,7 +1268,7 @@
     }
     
     // Save purchase with multiple items
-    async function savePurchase() {
+    function savePurchase() {
         console.log('Saving purchase...');
         
         const supplier = document.getElementById('supplierName').value.trim();
@@ -1362,27 +1335,6 @@
             // Save back to localStorage
             localStorage.setItem('gst_purchases', JSON.stringify(purchases));
             console.log('Purchase saved to localStorage');
-            
-            // Try to save to GitHub if configured
-            try {
-                const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-                if (currentUser && githubStorage.isValidConfig()) {
-                    // Prepare user data
-                    const userData = {
-                        purchases: purchases,
-                        inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
-                        shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
-                        invoices: JSON.parse(localStorage.getItem('invoices') || '[]')
-                    };
-                    
-                    const result = await githubStorage.saveUserData(currentUser.email, userData);
-                    if (result.success) {
-                        console.log('Purchase saved to GitHub');
-                    }
-                }
-            } catch (githubError) {
-                console.log('GitHub save failed, using localStorage only:', githubError);
-            }
             
             // Update inventory for each item
             let inventoryUpdateSuccess = true;
