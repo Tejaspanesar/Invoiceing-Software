@@ -58,7 +58,7 @@
       background: var(--card-bg);
       padding: 15px 30px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       box-shadow: var(--card-shadow);
       border-bottom: 1px solid var(--border-color);
@@ -75,8 +75,7 @@
     .nav-links {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 100%;
+      gap: 15px;
     }
     
     .back-nav-btn {
@@ -99,6 +98,25 @@
       background: var(--primary-dark);
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+    
+    /* Dark Mode Toggle Button */
+    .dark-mode-toggle {
+      background: var(--bg-light);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .dark-mode-toggle:hover {
+      background: var(--hover-bg);
     }
     
     .container {
@@ -700,6 +718,16 @@
       .table-container {
         max-height: 300px;
       }
+      
+      .nav-links {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .dark-mode-toggle {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -712,6 +740,11 @@
         Back to Dashboard
       </a>
     </div>
+    <!-- Dark Mode Toggle Button -->
+    <button id="darkModeToggle" class="dark-mode-toggle">
+      <i class="fas fa-moon"></i>
+      Dark Mode
+    </button>
   </nav>
 
   <div class="container">
@@ -1164,16 +1197,34 @@
         console.log('Generated invoice number:', invoiceNumber, 'from nextInvoiceNumber:', nextInvoiceNumber);
     }
     
-    // Dark Mode Toggle
+    // Dark Mode Toggle Functionality
     function setupDarkMode() {
         const body = document.body;
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = darkModeToggle.querySelector('i');
         
         const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
         const savedTheme = localStorage.getItem('theme');
         
         if (savedTheme === 'dark' || (!savedTheme && prefersDarkScheme.matches)) {
             body.classList.add('dark-mode');
+            darkModeIcon.className = 'fas fa-sun';
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
         }
+        
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                darkModeIcon.className = 'fas fa-sun';
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            } else {
+                localStorage.setItem('theme', 'light');
+                darkModeIcon.className = 'fas fa-moon';
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            }
+        });
     }
     
     // Load shop profile
@@ -1753,6 +1804,7 @@
     }
     
     // Create PDF content - Professional corner-to-corner invoice WITH LOGO and Shop Mobile/Email
+    // FIXED: Removed bottom-left authorized signature (kept only right-side authorized signatory)
     function createPDFContent(data) {
         const container = document.createElement('div');
         container.style.width = '794px'; // A4 width in pixels
@@ -2058,7 +2110,7 @@
         bottomContainer.appendChild(totalsDiv);
         container.appendChild(bottomContainer);
         
-        // Signature section - 2-column layout (removed company stamp)
+        // Signature section - 2-column layout (removed bottom-left authorized signature)
         const signatureDiv = document.createElement('div');
         signatureDiv.style.marginTop = '50px';
         signatureDiv.style.display = 'flex';
@@ -2077,7 +2129,7 @@
             </div>
         `;
         
-        // Right - Authorized Signatory
+        // Right - Authorized Signatory (ONLY this signature remains)
         const authorizedSign = document.createElement('div');
         authorizedSign.style.flex = '1';
         authorizedSign.style.textAlign = 'right';
@@ -2091,20 +2143,6 @@
         signatureDiv.appendChild(customerSign);
         signatureDiv.appendChild(authorizedSign);
         container.appendChild(signatureDiv);
-        
-        // Bottom left - Authorized Signature
-        const bottomLeftAuthSign = document.createElement('div');
-        bottomLeftAuthSign.style.marginTop = '30px';
-        bottomLeftAuthSign.style.paddingTop = '15px';
-        bottomLeftAuthSign.style.borderTop = '1px solid #ccc';
-        bottomLeftAuthSign.style.fontSize = '12px';
-        bottomLeftAuthSign.style.fontWeight = 'bold';
-        bottomLeftAuthSign.style.textAlign = 'left';
-        bottomLeftAuthSign.innerHTML = `
-            <div>______________________</div>
-            <div>Authorized Signature</div>
-        `;
-        container.appendChild(bottomLeftAuthSign);
         
         // Bottom note - simple and professional
         const bottomNote = document.createElement('div');
@@ -2194,10 +2232,5 @@
     // Make functions available globally
     window.removeItemRow = removeItemRow;
   </script>
-</body>
-
-</html>
-    <script src="script.js"></script>
-    <script src="github-storage.js"></script>
 </body>
 </html>
