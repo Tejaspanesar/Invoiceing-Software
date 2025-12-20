@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navigation - SIMPLIFIED: No dropdown, no PANESAR SANITARY -->
     <nav class="navbar">
         <a href="dashboard.html" class="logo">
             <div class="logo-icon">
@@ -166,7 +166,7 @@
                         </tr>
                     </thead>
                     <tbody id="recentInvoicesBody">
-                        <!-- Recent invoices will be loaded here by script.js -->
+                        <!-- Recent invoices will be loaded here -->
                     </tbody>
                 </table>
             </div>
@@ -283,5 +283,33 @@
     <!-- Your external scripts -->
     <script src="script.js"></script>
     <script src="github-storage.js"></script>
+
+    <!-- Prevent script.js from modifying the navigation -->
+    <script>
+        // Override the updateNavigation function to keep the static navigation
+        window.updateNavigation = function() {
+            // Just initialize dark mode, don't modify navigation
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (!darkModeToggle) return;
+            
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (isDarkMode || (!isDarkMode && userPrefersDark && localStorage.getItem('darkMode') === null)) {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.checked = true;
+            }
+            
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'false');
+                }
+            });
+        };
+    </script>
 </body>
 </html>
