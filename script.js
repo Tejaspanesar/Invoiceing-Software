@@ -1487,372 +1487,233 @@ function initInventoryPage() {
 }
 
 // ============================================
-// INVOICE MANAGEMENT SYSTEM
+// DASHBOARD SYSTEM - UPDATED WITH FIXES
 // ============================================
 
-// Generate invoice number
-function generateInvoiceNumber() {
-    const year = new Date().getFullYear();
-    const lastInvoice = invoices[invoices.length - 1];
-    let nextNumber = 1;
-    
-    if (lastInvoice && lastInvoice.invoiceNumber) {
-        const match = lastInvoice.invoiceNumber.match(/\d+/);
-        if (match) {
-            nextNumber = parseInt(match[0]) + 1;
+// Update dashboard stats - FIXED to match dashboard.html IDs
+function updateDashboardStats() {
+    // Safe update function to prevent errors
+    function safeUpdate(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        } else {
+            console.warn(`Element #${id} not found on this page`);
         }
     }
     
-    return `INV-${year}-${String(nextNumber).padStart(3, '0')}`;
-}
-
-// Calculate invoice totals
-function calculateInvoiceTotals(items) {
-    let subtotal = 0;
-    let gstTotal = 0;
-    
-    items.forEach(item => {
-        const itemTotal = item.quantity * item.price;
-        const itemGST = itemTotal * (item.gst / 100);
-        subtotal += itemTotal;
-        gstTotal += itemGST;
-    });
-    
-    return {
-        subtotal: parseFloat(subtotal.toFixed(2)),
-        gstTotal: parseFloat(gstTotal.toFixed(2)),
-        grandTotal: parseFloat((subtotal + gstTotal).toFixed(2))
-    };
-}
-
-// Add invoice item row
-function addInvoiceItem(item = {}) {
-    const table = document.getElementById('itemsTable');
-    const row = document.createElement('tr');
-    const itemId = Date.now() + Math.random();
-    
-    row.innerHTML = `
-        <td>
-            <select class="form-control item-select" data-id="${itemId}">
-                <option value="">Select Product</option>
-                ${inventory.map(product => 
-                    `<option value="${product.id}" ${item.productId == product.id ? 'selected' : ''}>
-                        ${product.name} (₹${product.price})
-                    </option>`
-                ).join('')}
-        </td>
-        <td>
-            <input type="text" class="form-control description" value="${item.description || ''}" placeholder="Description">
-        </td>
-        <td>
-            <input type="number" class="form-control quantity" value="${item.quantity || 1}" min="1" step="1">
-        </td>
-        <td>
-            <input type="number" class="form-control price" value="${item.price || 0}" min="0" step="0.01" placeholder="0.00">
-        </td>
-        <td>
-            <select class="form-control gst">
-                <option value="0" ${item.gst === 0 ? 'selected' : ''}>0%</option>
-                <option value="5" ${item.gst === 5 ? 'selected' : ''}>5%</option>
-                <option value="12" ${item.gst === 12 ? 'selected' : ''}>12%</option>
-                <option value="18" ${item.gst === 18 ? 'selected' : ''}>18%</option>
-                <option value="28" ${item.gst === 28 ? 'selected' : ''}>28%</option>
-            </select>
-        </td>
-        <td class="item-total">₹0.00</td>
-        <td>
-            <button class="btn-icon remove-item" title="Remove item">
-                <i class="fas fa-trash"></i>
-            </button>
-        </td>
-    `;
-    
-    table.appendChild(row);
-    
-    const productSelect = row.querySelector('.item-select');
-    productSelect.addEventListener('change', function() {
-        const productId = this.value;
-        const product = inventory.find(p => p.id == productId);
-        if (product) {
-            row.querySelector('.description').value = product.description || product.name;
-            row.querySelector('.price').value = product.price;
-            row.querySelector('.gst').value = product.gstRate;
-            calculateInvoiceRowTotal(row);
-        }
-    });
-    
-    row.querySelectorAll('.quantity, .price, .gst').forEach(input => {
-        input.addEventListener('input', () => calculateInvoiceRowTotal(row));
-        input.addEventListener('change', () => calculateInvoiceRowTotal(row));
-    });
-    
-    row.querySelector('.remove-item').addEventListener('click', function() {
-        row.remove();
-        updateInvoiceTotals();
-    });
-    
-    calculateInvoiceRowTotal(row);
-}
-
-// Calculate invoice row total
-function calculateInvoiceRowTotal(row) {
-    const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-    const price = parseFloat(row.querySelector('.price').value) || 0;
-    const gst = parseFloat(row.querySelector('.gst').value) || 0;
-    
-    const itemTotal = quantity * price;
-    const itemGST = itemTotal * (gst / 100);
-    const total = itemTotal + itemGST;
-    
-    row.querySelector('.item-total').textContent = `₹${total.toFixed(2)}`;
-    updateInvoiceTotals();
-}
-
-// Update invoice totals
-function updateInvoiceTotals() {
-    let subtotal = 0;
-    let gstTotal = 0;
-    
-    document.querySelectorAll('#itemsTable tr').forEach(row => {
-        const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-        const price = parseFloat(row.querySelector('.price').value) || 0;
-        const gst = parseFloat(row.querySelector('.gst').value) || 0;
+    try {
+        // Load data from localStorage
+        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+        const purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
         
-        const itemTotal = quantity * price;
-        const itemGST = itemTotal * (gst / 100);
+        // Calculate stats
+        const totalInvoices = invoices.length;
+        const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.grandTotal || inv.totalAmount || inv.amount || 0), 0);
+        const totalGST = invoices.reduce((sum, inv) => sum + (inv.gstTotal || inv.gstAmount || 0), 0);
         
-        subtotal += itemTotal;
-        gstTotal += itemGST;
-    });
-    
-    const grandTotal = subtotal + gstTotal;
-    
-    const subtotalEl = document.querySelector('tfoot tr:nth-child(1) td:nth-child(2)');
-    const gstEl = document.querySelector('tfoot tr:nth-child(2) td:nth-child(2)');
-    const totalEl = document.querySelector('tfoot tr:nth-child(3) td:nth-child(2)');
-    
-    if (subtotalEl) subtotalEl.innerHTML = `<strong>₹${subtotal.toFixed(2)}</strong>`;
-    if (gstEl) gstEl.innerHTML = `<strong>₹${gstTotal.toFixed(2)}</strong>`;
-    if (totalEl) totalEl.innerHTML = `<strong>₹${grandTotal.toFixed(2)}</strong>`;
-    
-    updateTaxBreakdown();
-}
-
-// Update tax breakdown
-function updateTaxBreakdown() {
-    const breakdown = {
-        '0%': 0,
-        '5%': 0,
-        '12%': 0,
-        '18%': 0,
-        '28%': 0
-    };
-    
-    document.querySelectorAll('#itemsTable tr').forEach(row => {
-        const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-        const price = parseFloat(row.querySelector('.price').value) || 0;
-        const gst = parseFloat(row.querySelector('.gst').value) || 0;
-        
-        const itemTotal = quantity * price;
-        const itemGST = itemTotal * (gst / 100);
-        
-        breakdown[`${gst}%`] = (breakdown[`${gst}%`] || 0) + itemGST;
-    });
-    
-    const breakdownEl = document.getElementById('taxBreakdown');
-    if (breakdownEl) {
-        let html = '';
-        Object.entries(breakdown).forEach(([rate, amount]) => {
-            if (amount > 0) {
-                html += `<div class="d-flex justify-between mb-1">
-                    <span>GST ${rate}:</span>
-                    <span>₹${amount.toFixed(2)}</span>
-                </div>`;
+        // Current month purchases
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        const monthPurchases = purchases.filter(p => {
+            try {
+                const purchaseDate = new Date(p.date);
+                return purchaseDate.getMonth() === currentMonth && 
+                       purchaseDate.getFullYear() === currentYear;
+            } catch (e) {
+                return false;
             }
         });
-        breakdownEl.innerHTML = html;
-    }
-}
-
-// Save invoice
-function saveInvoice() {
-    const items = [];
-    document.querySelectorAll('#itemsTable tr').forEach(row => {
-        const description = row.querySelector('.description').value;
-        const quantity = parseFloat(row.querySelector('.quantity').value);
-        const price = parseFloat(row.querySelector('.price').value);
-        const gst = parseFloat(row.querySelector('.gst').value);
         
-        if (description && quantity && price) {
-            items.push({
-                name: description.split(' - ')[0] || description,
-                description: description,
-                quantity: quantity,
-                price: price,
-                gst: gst
-            });
-        }
-    });
-    
-    if (items.length === 0) {
-        showAlert('Please add at least one item to the invoice', 'warning');
-        return null;
+        // Update stats using safe update
+        safeUpdate('totalInvoices', totalInvoices);
+        safeUpdate('totalRevenue', '₹' + totalRevenue.toLocaleString());
+        safeUpdate('totalGST', '₹' + totalGST.toLocaleString());
+        safeUpdate('totalProducts', inventory.length);
+        safeUpdate('monthPurchases', monthPurchases.length);
+        
+        // Update recent invoices
+        updateRecentInvoices();
+        
+    } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+        // Show zero data on error
+        safeUpdate('totalInvoices', '0');
+        safeUpdate('totalRevenue', '₹0');
+        safeUpdate('totalGST', '₹0');
+        safeUpdate('totalProducts', '0');
+        safeUpdate('monthPurchases', '0');
     }
-    
-    const totals = calculateInvoiceTotals(items);
-    
-    const invoice = {
-        id: invoices.length + 1,
-        invoiceNumber: document.getElementById('invoiceNumber')?.value || generateInvoiceNumber(),
-        date: document.getElementById('invoiceDate')?.value || new Date().toISOString().split('T')[0],
-        dueDate: document.getElementById('dueDate')?.value || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        customer: {
-            name: document.getElementById('customerName')?.value || 'Walk-in Customer',
-            gstin: document.getElementById('customerGSTIN')?.value || '',
-            email: document.getElementById('customerEmail')?.value || '',
-            phone: document.getElementById('customerPhone')?.value || '',
-            address: document.getElementById('customerAddress')?.value || ''
-        },
-        items: items,
-        subtotal: totals.subtotal,
-        gstTotal: totals.gstTotal,
-        grandTotal: totals.grandTotal,
-        status: 'pending',
-        paymentMethod: document.getElementById('paymentMethod')?.value || 'Cash',
-        notes: document.getElementById('invoiceNotes')?.value || '',
-        createdBy: currentUser?.email || 'anonymous'
-    };
-    
-    invoices.push(invoice);
-    saveInvoices();
-    
-    // AUTO-SYNC TO GITHUB IF CONFIGURED
-    autoSyncToGitHub();
-    
-    return invoice;
 }
 
-// Initialize invoice page
-function initInvoicePage() {
-    const invoiceNumberEl = document.getElementById('invoiceNumber');
-    if (invoiceNumberEl) {
-        invoiceNumberEl.value = generateInvoiceNumber();
-    }
-    
-    initializeDates();
-    
-    document.getElementById('addItem')?.addEventListener('click', function() {
-        addInvoiceItem();
-    });
-    
-    document.getElementById('generateInvoice')?.addEventListener('click', function() {
-        const invoice = saveInvoice();
-        if (invoice) {
-            showAlert(`Invoice ${invoice.invoiceNumber} created successfully!`, 'success');
-            
-            setTimeout(() => {
-                document.getElementById('itemsTable').innerHTML = '';
-                addInvoiceItem();
-                if (invoiceNumberEl) {
-                    invoiceNumberEl.value = generateInvoiceNumber();
-                }
-                initializeDates();
-            }, 1500);
-        }
-    });
-    
-    document.getElementById('printInvoice')?.addEventListener('click', function() {
-        window.print();
-    });
-    
-    document.getElementById('downloadPDF')?.addEventListener('click', function() {
-        showAlert('PDF download would be implemented in a real application', 'info');
-    });
-    
-    document.getElementById('emailInvoice')?.addEventListener('click', function() {
-        const email = prompt('Enter customer email address:');
-        if (email) {
-            showAlert(`Invoice would be emailed to ${email}`, 'info');
-        }
-    });
-    
-    setTimeout(() => {
-        if (document.getElementById('itemsTable')?.children.length === 0) {
-            addInvoiceItem();
-        }
-    }, 100);
-}
-
-// ============================================
-// DASHBOARD SYSTEM
-// ============================================
-
-// Update dashboard stats
-function updateDashboardStats() {
-    if (!document.getElementById('totalInvoices')) return;
-    
-    const totalInvoices = invoices.length;
-    const totalRevenue = invoices.reduce((sum, inv) => sum + inv.grandTotal, 0);
-    const pendingInvoices = invoices.filter(inv => inv.status === 'pending').length;
-    const pendingAmount = invoices.filter(inv => inv.status === 'pending')
-        .reduce((sum, inv) => sum + inv.grandTotal, 0);
-    
-    document.getElementById('totalInvoices').textContent = totalInvoices;
-    document.getElementById('totalRevenue').textContent = `₹${totalRevenue.toLocaleString()}`;
-    document.getElementById('pendingInvoices').textContent = pendingInvoices;
-    document.getElementById('pendingAmount').textContent = `₹${pendingAmount.toLocaleString()}`;
-    document.getElementById('totalProducts').textContent = inventory.length;
-    
-    updateRecentInvoices();
-}
-
-// Update recent invoices table
+// Update recent invoices table - FIXED to match dashboard.html structure
 function updateRecentInvoices() {
     const tbody = document.getElementById('recentInvoicesBody');
     if (!tbody) return;
     
-    tbody.innerHTML = '';
-    
-    const recentInvoices = invoices.slice(-5).reverse();
-    
-    recentInvoices.forEach(invoice => {
-        const statusBadge = invoice.status === 'paid' ? 'badge-success' : 
-                          invoice.status === 'pending' ? 'badge-warning' : 'badge-danger';
+    try {
+        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        tbody.innerHTML = '';
         
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${invoice.invoiceNumber}</td>
-            <td>${invoice.customer.name}</td>
-            <td>${invoice.date}</td>
-            <td>₹${invoice.grandTotal.toLocaleString()}</td>
-            <td><span class="badge ${statusBadge}">${invoice.status}</span></td>
-            <td>
-                <div class="action-buttons">
-                    <button class="btn-icon view-invoice" title="View" data-id="${invoice.id}">
-                        <i class="fas fa-eye"></i>
+        if (invoices.length === 0) {
+            // Show message when no invoices exist
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="6" class="text-center" style="padding: 40px; color: var(--text-secondary);">
+                    <i class="fas fa-file-invoice" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h3>No Invoices Yet</h3>
+                    <p>Create your first invoice to see it here</p>
+                    <button class="btn btn-primary" onclick="window.location.href='create_invoice.html'">
+                        <i class="fas fa-plus-circle"></i> Create First Invoice
                     </button>
-                    <button class="btn-icon print-invoice" title="Print" data-id="${invoice.id}">
-                        <i class="fas fa-print"></i>
-                    </button>
-                </div>
-            </td>
+                </td>
+            `;
+            tbody.appendChild(row);
+            return;
+        }
+        
+        // Sort invoices by date (newest first) and take the 5 most recent
+        const recentInvoices = invoices
+            .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
+            .slice(0, 5);
+        
+        recentInvoices.forEach(invoice => {
+            // Determine status
+            let status = invoice.status || 'pending';
+            let statusText = status.charAt(0).toUpperCase() + status.slice(1);
+            let statusClass = 'badge-warning'; // default for pending
+            
+            if (status === 'paid' || status === 'Paid') {
+                statusClass = 'badge-success';
+                statusText = 'Paid';
+            } else if (status === 'overdue' || status === 'Overdue') {
+                statusClass = 'badge-danger';
+                statusText = 'Overdue';
+            } else if (status === 'cancelled' || status === 'Cancelled') {
+                statusClass = 'badge-secondary';
+                statusText = 'Cancelled';
+            }
+            
+            // Format date
+            let invoiceDate = 'N/A';
+            if (invoice.date) {
+                try {
+                    invoiceDate = new Date(invoice.date).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                } catch (e) {
+                    invoiceDate = invoice.date;
+                }
+            }
+            
+            // Get customer name
+            const customerName = invoice.customer?.name || 
+                               invoice.customerName || 
+                               invoice.customer || 
+                               'Customer';
+            
+            // Get invoice number
+            const invoiceNumber = invoice.invoiceNumber || 
+                                 invoice.invoiceId || 
+                                 invoice.id || 
+                                 'INV-' + invoice.id?.slice(-6);
+            
+            // Get amount
+            const amount = invoice.grandTotal || 
+                          invoice.totalAmount || 
+                          invoice.amount || 
+                          0;
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${invoiceNumber}</td>
+                <td>${customerName}</td>
+                <td>${invoiceDate}</td>
+                <td>₹${amount.toLocaleString()}</td>
+                <td><span class="badge ${statusClass}">${statusText}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-icon" title="View" onclick="viewInvoice('${invoice.id || invoice.invoiceId}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon" title="Download" onclick="downloadInvoice('${invoice.id || invoice.invoiceId}')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+    } catch (error) {
+        console.error('Error loading recent invoices:', error);
+        // Show error message
+        const tbody = document.getElementById('recentInvoicesBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Error loading invoices
+                </td>
+            </tr>
         `;
-        tbody.appendChild(row);
-    });
+    }
 }
 
-// Initialize dashboard page
+// View Invoice Function - FIXED to go to invoices.html
+function viewInvoice(invoiceId) {
+    console.log('Viewing invoice:', invoiceId);
+    // Store the invoice ID to view in localStorage
+    localStorage.setItem('viewInvoiceId', invoiceId);
+    // Redirect to invoices page which should handle viewing
+    window.location.href = 'invoices.html';
+}
+
+// Download Invoice Function
+function downloadInvoice(invoiceId) {
+    console.log('Downloading invoice:', invoiceId);
+    alert('Download feature will be implemented soon!');
+    // In actual implementation, this would generate a PDF
+}
+
+// Initialize dashboard page - FIXED
 function initDashboardPage() {
     updateDashboardStats();
     
-    document.getElementById('refreshStats')?.addEventListener('click', function() {
-        updateDashboardStats();
-        showAlert('Dashboard stats updated!', 'success');
-    });
+    // Add refresh button event listener if it exists
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            updateDashboardStats();
+            showAlert('Dashboard stats updated!', 'success');
+        });
+    }
     
-    document.getElementById('quickInvoice')?.addEventListener('click', function() {
-        window.location.href = 'invoice.html';
-    });
+    // Update chart button listeners if they exist
+    const revenueChartBtn = document.getElementById('revenueChartBtn');
+    const quarterlyChartBtn = document.getElementById('quarterlyChartBtn');
+    const yearlyChartBtn = document.getElementById('yearlyChartBtn');
+    
+    if (revenueChartBtn) {
+        revenueChartBtn.addEventListener('click', function() {
+            updateChart('monthly');
+        });
+    }
+    
+    if (quarterlyChartBtn) {
+        quarterlyChartBtn.addEventListener('click', function() {
+            updateChart('quarterly');
+        });
+    }
+    
+    if (yearlyChartBtn) {
+        yearlyChartBtn.addEventListener('click', function() {
+            updateChart('yearly');
+        });
+    }
 }
 
 // ============================================
@@ -1873,7 +1734,7 @@ function initViewInvoicesPage() {
                             </div>
                             <h3>No Invoices Yet</h3>
                             <p>Create your first invoice to see it here.</p>
-                            <a href="invoice.html" class="btn btn-primary mt-2">
+                            <a href="create_invoice.html" class="btn btn-primary mt-2">
                                 <i class="fas fa-plus"></i> Create Invoice
                             </a>
                         </div>
@@ -2208,14 +2069,20 @@ function updateNavigation() {
             <a href="dashboard.html" class="nav-link ${window.location.pathname.includes('dashboard.html') ? 'active' : ''}">
                 <i class="fas fa-chart-bar"></i> Dashboard
             </a>
-            <a href="invoice.html" class="nav-link ${window.location.pathname.includes('invoice.html') ? 'active' : ''}">
-                <i class="fas fa-file-invoice"></i> Create Invoice
-            </a>
-            <a href="view-invoice.html" class="nav-link ${window.location.pathname.includes('view-invoice.html') ? 'active' : ''}">
-                <i class="fas fa-eye"></i> View Invoices
+            <a href="shop.html" class="nav-link ${window.location.pathname.includes('shop.html') ? 'active' : ''}">
+                <i class="fas fa-store"></i> Shop Profile
             </a>
             <a href="inventory.html" class="nav-link ${window.location.pathname.includes('inventory.html') ? 'active' : ''}">
                 <i class="fas fa-boxes"></i> Inventory
+            </a>
+            <a href="create_invoice.html" class="nav-link ${window.location.pathname.includes('create_invoice.html') ? 'active' : ''}">
+                <i class="fas fa-file-invoice"></i> Create Invoice
+            </a>
+            <a href="invoices.html" class="nav-link ${window.location.pathname.includes('invoices.html') ? 'active' : ''}">
+                <i class="fas fa-list"></i> Invoices
+            </a>
+            <a href="add_purchase.html" class="nav-link ${window.location.pathname.includes('add_purchase.html') ? 'active' : ''}">
+                <i class="fas fa-cart-plus"></i> Add Purchase
             </a>
             <a href="settings.html" class="nav-link ${window.location.pathname.includes('settings.html') ? 'active' : ''}">
                 <i class="fas fa-cog"></i> Settings
