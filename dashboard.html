@@ -712,11 +712,13 @@
             }
         }
 
-        // View Invoice Function
+        // View Invoice Function - FIXED to go to invoices.html for viewing
         function viewInvoice(invoiceId) {
             console.log('Viewing invoice:', invoiceId);
-            // Redirect to view invoice page
-            window.location.href = `view-invoice.html?id=${invoiceId}`;
+            // Store the invoice ID to view in localStorage
+            localStorage.setItem('viewInvoiceId', invoiceId);
+            // Redirect to invoices page which should handle viewing
+            window.location.href = 'invoices.html';
         }
 
         // Download Invoice Function
@@ -895,8 +897,8 @@
         `;
         document.head.appendChild(style);
     </script>
-</body>
-</html>
+    
+    <!-- Your external scripts should be loaded here -->
     <script src="script.js"></script>
     <script src="github-storage.js"></script>
 </body>
