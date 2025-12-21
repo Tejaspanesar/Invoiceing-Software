@@ -516,7 +516,7 @@ function deleteUserAccount(email, password) {
     return { success: true, message: 'Account deleted successfully.' };
 }
 
-// Check if user is logged in
+// Check if user is logged in - FIXED FUNCTION
 function isLoggedIn() {
     return sessionStorage.getItem('isLoggedIn') === 'true';
 }
@@ -2160,7 +2160,7 @@ function formatCurrency(amount) {
 // Initialize date inputs
 function initializeDates() {
     const today = new Date().toISOString().split('T')[0];
-    const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const dueDate = new Date(Date.now() + 30 * 24 * 60 * 1000).toISOString().split('T')[0];
     
     document.querySelectorAll('input[type="date"]').forEach(input => {
         if (input.id === 'invoiceDate' || input.id === 'date') {
@@ -3813,368 +3813,13 @@ function initGitHubSync() {
 }
 
 // ============================================
-// MAIN INITIALIZATION
-// ============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    requireAuth();
-    updateNavigation();
-    
-    // Initialize GitHub sync
-    initGitHubSync();
-    
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    switch (currentPage) {
-        case 'dashboard.html':
-            initDashboardPage();
-            break;
-        case 'invoice.html':
-            initInvoicePage();
-            setupInvoiceForm();
-            loadShopToPreview();
-            break;
-        case 'create_invoice.html':
-            // Enhanced invoice creation page
-            console.log('Initializing enhanced create invoice page');
-            
-            // Set default date
-            const today = new Date().toISOString().split('T')[0];
-            if (document.getElementById('invoiceDate')) {
-                document.getElementById('invoiceDate').value = today;
-            }
-            
-            // Calculate next invoice number
-            calculateNextInvoiceNumber();
-            
-            // Generate invoice number
-            generateInvoiceNumberEnhanced();
-            
-            // Load shop profile
-            loadShopProfile();
-            
-            // Load inventory data for autocomplete
-            loadInventoryData();
-            
-            // Load customers for autocomplete
-            loadCustomers();
-            
-            // Initialize 5 rows
-            for (let i = 0; i < 5; i++) {
-                addItemRowEnhanced();
-            }
-            
-            // Setup GST Type Selector
-            setupGstTypeSelector();
-            
-            // Setup event listeners
-            setupEventListenersEnhanced();
-            
-            // Add invoice number change listener
-            document.getElementById('invoiceNumber')?.addEventListener('input', function() {
-                // Update the invoice label in real-time
-                if (document.getElementById('invoiceLabel')) {
-                    document.getElementById('invoiceLabel').textContent = this.value;
-                }
-            });
-            
-            document.getElementById('invoiceNumber')?.addEventListener('change', function() {
-                updateStoredInvoiceNumber(this.value);
-            });
-            
-            console.log('Enhanced page initialization complete');
-            break;
-        case 'view-invoice.html':
-            initViewInvoicesPage();
-            break;
-        case 'inventory.html':
-            initInventoryPage();
-            break;
-        case 'settings.html':
-            initSettingsPage();
-            break;
-        case 'login.html':
-            initLoginPage();
-            break;
-        case 'register.html':
-            initRegisterPage();
-            break;
-        case 'forgot-password.html':
-            initForgotPasswordPage();
-            break;
-        case 'reset-password.html':
-            initResetPasswordPage();
-            break;
-    }
-    
-    // Auto-load from GitHub on login
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
-    
-    if (isLoggedIn && currentUser && githubStorage.isValidConfig()) {
-        // Check if we have local data, if not, try to load from GitHub
-        const hasLocalData = localStorage.getItem('invoices') && 
-                            localStorage.getItem('invoices') !== '[]';
-        
-        if (!hasLocalData) {
-            setTimeout(() => {
-                loadFromGitHub().catch(error => {
-                    console.log('Auto-load from GitHub failed:', error);
-                });
-            }, 2000);
-        }
-    }
-    
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-            e.preventDefault();
-            showAlert('Save functionality would be triggered here', 'info');
-        }
-        
-        if (e.key === 'Escape') {
-            closeProductModal();
-            closeDeleteModal();
-            document.querySelectorAll('.modal').forEach(modal => {
-                if (!modal.classList.contains('hidden')) {
-                    modal.classList.add('hidden');
-                }
-            });
-        }
-    });
-    
-    if (!localStorage.getItem('demoNoticeShown')) {
-        setTimeout(() => {
-            if (isLoggedIn() && window.location.pathname.includes('dashboard.html')) {
-                showAlert(
-                    'Welcome to the GST Invoice System! This is a demo with sample data. ' +
-                    'All data is stored in your browser\'s localStorage.',
-                    'info',
-                    10000
-                );
-                localStorage.setItem('demoNoticeShown', 'true');
-            }
-        }, 2000);
-    }
-});
-
-// ============================================
-// GLOBAL FUNCTIONS (accessible from HTML)
-// ============================================
-
-window.copyToClipboard = copyToClipboard;
-window.showAlert = showAlert;
-window.logoutUser = logoutUser;
-window.showSecurityQuestionModal = showSecurityQuestionModal;
-window.showResetTokenModal = showResetTokenModal;
-window.exportInvoices = exportInvoices;
-window.exportInventory = exportInventory;
-window.exportAllData = exportAllData;
-window.formatCurrency = formatCurrency;
-window.addItemRow = addItemRow;
-window.loadShopToPreview = loadShopToPreview;
-window.setupInvoiceForm = setupInvoiceForm;
-window.removeItemRow = removeItemRow;
-window.generatePDFEnhanced = generatePDFEnhanced;
-window.saveInvoiceEnhanced = saveInvoiceEnhanced;
-window.saveGitHubConfig = saveGitHubConfig;
-window.testGitHubConnection = testGitHubConnection;
-window.syncToGitHub = syncToGitHub;
-window.loadFromGitHub = loadFromGitHub;
-window.toggleTokenVisibility = toggleTokenVisibility;
-window.isLoggedIn = isLoggedIn;
-
-// ============================================
-// PAGE LOAD AUTHENTICATION CHECK
-// ============================================
-
-// Run authentication check on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Get current page
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    // List of pages that require authentication
-    const protectedPages = [
-        'dashboard.html',
-        'invoice.html',
-        'create_invoice.html',
-        'view-invoice.html',
-        'inventory.html',
-        'settings.html'
-    ];
-    
-    // If on a protected page, check authentication
-    if (protectedPages.includes(currentPage)) {
-        // FIX: Call the isLoggedIn() function instead of declaring a variable
-        if (!isLoggedIn()) {
-            // Redirect to login
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        // Also check if currentUser exists
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
-        if (!currentUser) {
-            window.location.href = 'login.html';
-            return;
-        }
-    }
-});
-
-// script.js - Add these functions for cross-device login
-
-// Updated login function
-async function handleLogin(email, password) {
-    try {
-        // Check local storage first
-        const users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-        const user = users.find(u => u.email === email && u.password === password);
-        
-        if (user) {
-            // Local login successful
-            sessionStorage.setItem('currentUser', JSON.stringify(user));
-            
-            // Check for GitHub sync
-            await checkGitHubForUserData(email);
-            
-            showAlert('Login successful!', 'success');
-            setTimeout(() => window.location.href = 'dashboard.html', 1000);
-            return true;
-        } else {
-            // Try loading from GitHub
-            return await loginFromGitHub(email, password);
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        showAlert('Login failed. Please try again.', 'danger');
-        return false;
-    }
-}
-
-// Check GitHub for user data
-async function checkGitHubForUserData(email) {
-    try {
-        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-        
-        if (savedConfig.username && savedConfig.repo && savedConfig.token) {
-            // Initialize GitHub storage
-            githubStorage.username = savedConfig.username;
-            githubStorage.repo = savedConfig.repo;
-            githubStorage.token = savedConfig.token;
-            
-            // Try to load user data from GitHub
-            const userData = await githubStorage.loadUserData(email);
-            
-            if (userData && userData.users) {
-                // Merge GitHub users with local users
-                const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-                const mergedUsers = [...localUsers];
-                
-                userData.users.forEach(githubUser => {
-                    if (!mergedUsers.some(localUser => localUser.email === githubUser.email)) {
-                        mergedUsers.push(githubUser);
-                    }
-                });
-                
-                localStorage.setItem('gstInvoiceUsers', JSON.stringify(mergedUsers));
-                console.log('Synced users from GitHub');
-            }
-        }
-    } catch (error) {
-        console.log('No GitHub sync or error:', error.message);
-    }
-}
-
-// Login from GitHub data
-async function loginFromGitHub(email, password) {
-    try {
-        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-        
-        if (!savedConfig.username || !savedConfig.repo || !savedConfig.token) {
-            return false; // No GitHub config
-        }
-        
-        // Initialize GitHub storage
-        githubStorage.username = savedConfig.username;
-        githubStorage.repo = savedConfig.repo;
-        githubStorage.token = savedConfig.token;
-        
-        // Load all data from GitHub
-        const allData = await githubStorage.loadUserData(email);
-        
-        if (!allData || !allData.users) {
-            return false; // No data found on GitHub
-        }
-        
-        // Find user in GitHub data
-        const user = allData.users.find(u => u.email === email && u.password === password);
-        
-        if (user) {
-            // Save user locally
-            const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-            if (!localUsers.some(u => u.email === email)) {
-                localUsers.push(user);
-                localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
-            }
-            
-            // Also save other data from GitHub if needed
-            if (allData.invoices) {
-                localStorage.setItem('invoices', JSON.stringify(allData.invoices));
-            }
-            if (allData.inventory) {
-                localStorage.setItem('inventory', JSON.stringify(allData.inventory));
-            }
-            if (allData.shopProfile) {
-                localStorage.setItem('shopProfile', JSON.stringify(allData.shopProfile));
-            }
-            
-            // Set current user
-            sessionStorage.setItem('currentUser', JSON.stringify(user));
-            
-            showAlert('Logged in from cloud data!', 'success');
-            setTimeout(() => window.location.href = 'dashboard.html', 1000);
-            return true;
-        }
-        
-        return false;
-    } catch (error) {
-        console.error('GitHub login error:', error);
-        return false;
-    }
-}
-
-// Updated login event listener (add to your existing script.js)
-document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    
-    if (!email || !password) {
-        showAlert('Please fill in all fields', 'warning');
-        return;
-    }
-    
-    const loginBtn = this.querySelector('button[type="submit"]');
-    const originalText = loginBtn.innerHTML;
-    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-    loginBtn.disabled = true;
-    
-    const success = await handleLogin(email, password);
-    
-    if (!success) {
-        showAlert('Invalid email or password', 'danger');
-        loginBtn.innerHTML = originalText;
-        loginBtn.disabled = false;
-    }
-});
-// ============================================
-// MULTI-DEVICE LOGIN & DATA SHARING SYSTEM
+// MULTI-DEVICE LOGIN & DATA SHARING SYSTEM - FIXED
 // ============================================
 
 // Shared Data Storage
 let sharedDataMap = JSON.parse(localStorage.getItem('sharedDataMap')) || {};
 
-// Initialize multi-device system
+// Initialize multi-device system - FIXED: Removed duplicate isLoggedIn declaration
 async function initMultiDeviceSystem() {
     try {
         console.log('Initializing multi-device system...');
@@ -4834,7 +4479,10 @@ saveInvoices = function() {
     autoShareData();
 };
 
-// Update main initialization
+// ============================================
+// MAIN INITIALIZATION - FIXED
+// ============================================
+
 document.addEventListener('DOMContentLoaded', function() {
     requireAuth();
     updateNavigation();
@@ -4861,7 +4509,137 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // ... rest of your existing initialization code ...
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    switch (currentPage) {
+        case 'dashboard.html':
+            initDashboardPage();
+            break;
+        case 'invoice.html':
+            setupInvoiceForm();
+            loadShopToPreview();
+            break;
+        case 'create_invoice.html':
+            // Enhanced invoice creation page
+            console.log('Initializing enhanced create invoice page');
+            
+            // Set default date
+            const today = new Date().toISOString().split('T')[0];
+            if (document.getElementById('invoiceDate')) {
+                document.getElementById('invoiceDate').value = today;
+            }
+            
+            // Calculate next invoice number
+            calculateNextInvoiceNumber();
+            
+            // Generate invoice number
+            generateInvoiceNumberEnhanced();
+            
+            // Load shop profile
+            loadShopProfile();
+            
+            // Load inventory data for autocomplete
+            loadInventoryData();
+            
+            // Load customers for autocomplete
+            loadCustomers();
+            
+            // Initialize 5 rows
+            for (let i = 0; i < 5; i++) {
+                addItemRowEnhanced();
+            }
+            
+            // Setup GST Type Selector
+            setupGstTypeSelector();
+            
+            // Setup event listeners
+            setupEventListenersEnhanced();
+            
+            // Add invoice number change listener
+            document.getElementById('invoiceNumber')?.addEventListener('input', function() {
+                // Update the invoice label in real-time
+                if (document.getElementById('invoiceLabel')) {
+                    document.getElementById('invoiceLabel').textContent = this.value;
+                }
+            });
+            
+            document.getElementById('invoiceNumber')?.addEventListener('change', function() {
+                updateStoredInvoiceNumber(this.value);
+            });
+            
+            console.log('Enhanced page initialization complete');
+            break;
+        case 'view-invoice.html':
+            initViewInvoicesPage();
+            break;
+        case 'inventory.html':
+            initInventoryPage();
+            break;
+        case 'settings.html':
+            initSettingsPage();
+            break;
+        case 'login.html':
+            initLoginPage();
+            break;
+        case 'register.html':
+            initRegisterPage();
+            break;
+        case 'forgot-password.html':
+            initForgotPasswordPage();
+            break;
+        case 'reset-password.html':
+            initResetPasswordPage();
+            break;
+    }
+    
+    // Auto-load from GitHub on login
+    const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+    
+    if (loggedIn && currentUser && githubStorage.isValidConfig()) {
+        // Check if we have local data, if not, try to load from GitHub
+        const hasLocalData = localStorage.getItem('invoices') && 
+                            localStorage.getItem('invoices') !== '[]';
+        
+        if (!hasLocalData) {
+            setTimeout(() => {
+                loadFromGitHub().catch(error => {
+                    console.log('Auto-load from GitHub failed:', error);
+                });
+            }, 2000);
+        }
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            showAlert('Save functionality would be triggered here', 'info');
+        }
+        
+        if (e.key === 'Escape') {
+            closeProductModal();
+            closeDeleteModal();
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (!modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+    });
+    
+    if (!localStorage.getItem('demoNoticeShown')) {
+        setTimeout(() => {
+            if (isLoggedIn() && window.location.pathname.includes('dashboard.html')) {
+                showAlert(
+                    'Welcome to the GST Invoice System! This is a demo with sample data. ' +
+                    'All data is stored in your browser\'s localStorage.',
+                    'info',
+                    10000
+                );
+                localStorage.setItem('demoNoticeShown', 'true');
+            }
+        }, 2000);
+    }
 });
 
 // Add sync button to navigation
@@ -4913,70 +4691,30 @@ function addSyncButtonToNav() {
 }
 
 // ============================================
-// UPDATE LOGIN PAGE
+// GLOBAL FUNCTIONS (accessible from HTML)
 // ============================================
 
-// Update login page initialization
-function initLoginPage() {
-    const loginForm = document.getElementById('loginForm');
-    if (!loginForm) return;
-    
-    const rememberedEmail = localStorage.getItem('rememberedEmail');
-    if (rememberedEmail) {
-        document.getElementById('email').value = rememberedEmail;
-        document.getElementById('rememberMe').checked = true;
-    }
-    
-    // Add cloud login info
-    const cloudInfo = document.createElement('div');
-    cloudInfo.className = 'alert alert-info mt-3';
-    cloudInfo.innerHTML = `
-        <i class="fas fa-cloud"></i>
-        <strong>Multi-Device Feature:</strong> 
-        Your data will be automatically synced across all your devices when you login.
-        Configure GitHub in Settings to enable cloud sync.
-    `;
-    loginForm.parentNode.insertBefore(cloudInfo, loginForm.nextSibling);
-    
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const rememberMe = document.getElementById('rememberMe').checked;
-        
-        const loginBtn = this.querySelector('button[type="submit"]');
-        const originalText = loginBtn.innerHTML;
-        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
-        loginBtn.disabled = true;
-        
-        // Use enhanced login with auto-share
-        const result = await loginWithAutoShare(email, password);
-        
-        if (result.success) {
-            if (rememberMe) {
-                localStorage.setItem('rememberedEmail', email);
-            } else {
-                localStorage.removeItem('rememberedEmail');
-            }
-            
-            showAlert('Login successful! Syncing data across devices...', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1500);
-        } else {
-            showAlert(result.message, 'danger');
-            loginBtn.innerHTML = originalText;
-            loginBtn.disabled = false;
-        }
-    });
-}
-
-// ============================================
-// ADD TO GLOBAL FUNCTIONS
-// ============================================
-
+window.copyToClipboard = copyToClipboard;
+window.showAlert = showAlert;
+window.logoutUser = logoutUser;
+window.showSecurityQuestionModal = showSecurityQuestionModal;
+window.showResetTokenModal = showResetTokenModal;
+window.exportInvoices = exportInvoices;
+window.exportInventory = exportInventory;
+window.exportAllData = exportAllData;
+window.formatCurrency = formatCurrency;
+window.addItemRow = addItemRow;
+window.loadShopToPreview = loadShopToPreview;
+window.setupInvoiceForm = setupInvoiceForm;
+window.removeItemRow = removeItemRow;
+window.generatePDFEnhanced = generatePDFEnhanced;
+window.saveInvoiceEnhanced = saveInvoiceEnhanced;
+window.saveGitHubConfig = saveGitHubConfig;
+window.testGitHubConnection = testGitHubConnection;
+window.syncToGitHub = syncToGitHub;
+window.loadFromGitHub = loadFromGitHub;
+window.toggleTokenVisibility = toggleTokenVisibility;
+window.isLoggedIn = isLoggedIn;
 window.initMultiDeviceSystem = initMultiDeviceSystem;
 window.loginWithAutoShare = loginWithAutoShare;
 window.shareDataAcrossDevices = shareDataAcrossDevices;
