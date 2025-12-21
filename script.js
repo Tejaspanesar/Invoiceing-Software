@@ -3813,93 +3813,796 @@ function initGitHubSync() {
 }
 
 // ============================================
-// MULTI-DEVICE LOGIN & DATA SHARING SYSTEM - FIXED
+// FIXED MULTI-DEVICE LOGIN SYSTEM
 // ============================================
 
-// Shared Data Storage
-let sharedDataMap = JSON.parse(localStorage.getItem('sharedDataMap')) || {};
+// Save GitHub configuration - FIXED VERSION
+async function saveGitHubConfig() {
+    try {
+        const username = document.getElementById('githubUsername')?.value.trim();
+        const repo = document.getElementById('githubRepo')?.value.trim();
+        const token = document.getElementById('githubToken')?.value.trim();
+        
+        if (!username || !repo || !token) {
+            showGitHubStatus('Please fill all fields', 'danger');
+            return false;
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('githubUsername', username);
+        localStorage.setItem('githubRepo', repo);
+        localStorage.setItem('githubToken', token);
+        
+        // Update storage instance
+        githubStorage.username = username;
+        githubStorage.repo = repo;
+        githubStorage.token = token;
+        
+        // Test connection
+        showGitHubStatus('Testing connection to GitHub...', 'info');
+        const testResult = await githubStorage.testConnection();
+        
+        if (testResult.success) {
+            showGitHubStatus('GitHub configuration saved successfully! Connection verified.', 'success');
+            
+            // Save config for multi-device
+            const githubConfig = { username, repo, token };
+            localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
+            
+            // Auto-sync current data
+            if (currentUser && currentUser.email) {
+                setTimeout(() => {
+                    syncToGitHub().catch(console.error);
+                }, 2000);
+            }
+            return true;
+        } else {
+            showGitHubStatus('Configuration saved but connection failed: ' + testResult.message, 'warning');
+            return false;
+        }
+    } catch (error) {
+        console.error('Save GitHub config error:', error);
+        showGitHubStatus('Error saving configuration: ' + error.message, 'danger');
+        return false;
+    }
+}
 
-// Initialize multi-device system - FIXED: Removed duplicate isLoggedIn declaration
+// Load GitHub configuration - FIXED VERSION
+function loadGitHubConfig() {
+    try {
+        // Try to get from githubConfig first
+        const configStr = localStorage.getItem('githubConfig');
+        if (configStr) {
+            const config = JSON.parse(configStr);
+            githubStorage.username = config.username || '';
+            githubStorage.repo = config.repo || '';
+            githubStorage.token = config.token || '';
+        } else {
+            // Fallback to individual keys
+            githubStorage.username = localStorage.getItem('githubUsername') || '';
+            githubStorage.repo = localStorage.getItem('githubRepo') || '';
+            githubStorage.token = localStorage.getItem('githubToken') || '';
+        }
+        
+        // Update UI if on settings page
+        if (document.getElementById('githubUsername')) {
+            document.getElementById('githubUsername').value = githubStorage.username;
+            document.getElementById('githubRepo').value = githubStorage.repo;
+            document.getElementById('githubToken').value = githubStorage.token;
+        }
+        
+        // Update last sync time
+        const lastSync = localStorage.getItem('lastGitHubSync');
+        if (lastSync && document.getElementById('lastSyncTime')) {
+            try {
+                const date = new Date(lastSync);
+                document.getElementById('lastSyncTime').textContent = 
+                    date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            } catch (e) {
+                console.error('Error parsing last sync time:', e);
+            }
+        }
+    } catch (error) {
+        console.error('Load GitHub config error:', error);
+    }
+}
+
+// Enhanced login function for multi-device - FIXED VERSION
+async function loginWithMultiDevice(email, password) {
+    try {
+        console.log('Multi-device login attempt for:', email);
+        
+        // Step 1: Try local login first
+        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+        const localUser = localUsers.find(u => 
+            u.email === email && 
+            u.password === password && 
+            u.isActive !== false
+        );
+        
+        if (localUser) {
+            console.log('Local login successful');
+            sessionStorage.setItem('currentUser', JSON.stringify(localUser));
+            sessionStorage.setItem('isLoggedIn', 'true');
+            currentUser = localUser;
+            
+            // Load any cloud data if available
+            await tryLoadFromCloud(email);
+            
+            return { success: true, user: localUser, source: 'local' };
+        }
+        
+        // Step 2: Try cloud login if local fails
+        console.log('Local login failed, trying cloud login');
+        const cloudResult = await loginFromCloud(email, password);
+        
+        if (cloudResult.success) {
+            return { success: true, user: cloudResult.user, source: 'cloud' };
+        }
+        
+        // Step 3: Check if GitHub is configured but login failed
+        if (githubStorage.isValidConfig()) {
+            console.log('Cloud login failed, but GitHub is configured');
+            showAlert('Email or password incorrect. Please check your credentials.', 'danger');
+        }
+        
+        return { success: false, message: 'Invalid email or password' };
+        
+    } catch (error) {
+        console.error('Multi-device login error:', error);
+        return { success: false, message: 'Login error: ' + error.message };
+    }
+}
+
+// Try to load data from cloud - FIXED VERSION
+async function tryLoadFromCloud(email) {
+    try {
+        if (!githubStorage.isValidConfig()) {
+            return false;
+        }
+        
+        console.log('Attempting to load cloud data for:', email);
+        const cloudData = await githubStorage.loadUserData(email);
+        
+        if (!cloudData) {
+            console.log('No cloud data found for:', email);
+            return false;
+        }
+        
+        // Merge cloud data with local data
+        await mergeCloudData(cloudData, email);
+        return true;
+        
+    } catch (error) {
+        console.log('Cloud data load failed:', error.message);
+        return false;
+    }
+}
+
+// Merge cloud data with local data - FIXED VERSION
+async function mergeCloudData(cloudData, email) {
+    try {
+        console.log('Merging cloud data for:', email);
+        
+        // Merge users
+        if (cloudData.user && cloudData.user.email === email) {
+            const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+            const userIndex = localUsers.findIndex(u => u.email === email);
+            
+            if (userIndex === -1) {
+                localUsers.push(cloudData.user);
+            } else {
+                // Update existing user but keep local password
+                const localPassword = localUsers[userIndex].password;
+                localUsers[userIndex] = { ...cloudData.user, password: localPassword };
+            }
+            localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
+        }
+        
+        // Merge inventory (cloud takes priority for conflicts)
+        if (cloudData.inventory && cloudData.inventory.length > 0) {
+            const localInventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+            const mergedInventory = mergeArraysUnique(localInventory, cloudData.inventory, 'id');
+            localStorage.setItem('inventory', JSON.stringify(mergedInventory));
+        }
+        
+        // Merge invoices (cloud takes priority for conflicts)
+        if (cloudData.invoices && cloudData.invoices.length > 0) {
+            const localInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const mergedInvoices = mergeArraysUnique(localInvoices, cloudData.invoices, 'id');
+            localStorage.setItem('invoices', JSON.stringify(mergedInvoices));
+        }
+        
+        // Merge shop profile (cloud takes priority)
+        if (cloudData.shopProfile && Object.keys(cloudData.shopProfile).length > 0) {
+            localStorage.setItem('shopProfile', JSON.stringify(cloudData.shopProfile));
+        }
+        
+        showAlert('Cloud data loaded and merged successfully!', 'success');
+        return true;
+        
+    } catch (error) {
+        console.error('Merge cloud data error:', error);
+        showAlert('Error merging cloud data: ' + error.message, 'warning');
+        return false;
+    }
+}
+
+// Login from cloud - FIXED VERSION
+async function loginFromCloud(email, password) {
+    try {
+        if (!githubStorage.isValidConfig()) {
+            return { success: false, message: 'GitHub not configured' };
+        }
+        
+        console.log('Loading user data from cloud for:', email);
+        const cloudData = await githubStorage.loadUserData(email);
+        
+        if (!cloudData) {
+            console.log('No cloud data found for:', email);
+            return { success: false, message: 'No cloud account found' };
+        }
+        
+        // Check if cloud user exists and password matches
+        if (!cloudData.user || cloudData.user.email !== email) {
+            return { success: false, message: 'User not found in cloud' };
+        }
+        
+        if (cloudData.user.password !== password) {
+            return { success: false, message: 'Incorrect password' };
+        }
+        
+        console.log('Cloud login successful for:', email);
+        
+        // Save user locally
+        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+        if (!localUsers.some(u => u.email === email)) {
+            localUsers.push(cloudData.user);
+            localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
+        }
+        
+        // Save other data
+        if (cloudData.inventory) {
+            localStorage.setItem('inventory', JSON.stringify(cloudData.inventory));
+        }
+        if (cloudData.invoices) {
+            localStorage.setItem('invoices', JSON.stringify(cloudData.invoices));
+        }
+        if (cloudData.shopProfile) {
+            localStorage.setItem('shopProfile', JSON.stringify(cloudData.shopProfile));
+        }
+        
+        // Set session
+        sessionStorage.setItem('currentUser', JSON.stringify(cloudData.user));
+        sessionStorage.setItem('isLoggedIn', 'true');
+        currentUser = cloudData.user;
+        
+        // Update sync time
+        localStorage.setItem('lastGitHubSync', new Date().toISOString());
+        
+        showAlert('Logged in from cloud successfully!', 'success');
+        return { success: true, user: cloudData.user };
+        
+    } catch (error) {
+        console.error('Cloud login error:', error);
+        return { success: false, message: 'Cloud login failed: ' + error.message };
+    }
+}
+
+// Merge arrays with unique items - FIXED VERSION
+function mergeArraysUnique(arr1, arr2, idKey = 'id') {
+    const merged = [...arr1];
+    const seen = new Set(arr1.map(item => item[idKey]));
+    
+    arr2.forEach(item => {
+        if (!seen.has(item[idKey])) {
+            merged.push(item);
+            seen.add(item[idKey]);
+        } else {
+            // Update existing item
+            const index = merged.findIndex(m => m[idKey] === item[idKey]);
+            if (index !== -1) {
+                merged[index] = { ...merged[index], ...item };
+            }
+        }
+    });
+    
+    return merged;
+}
+
+// Enhanced sync function - FIXED VERSION
+async function syncToGitHubWithRetry(maxRetries = 3) {
+    try {
+        if (!currentUser || !currentUser.email) {
+            showGitHubStatus('Please login first', 'warning');
+            return false;
+        }
+        
+        if (!githubStorage.isValidConfig()) {
+            showGitHubStatus('Please configure GitHub settings first', 'warning');
+            return false;
+        }
+        
+        showGitHubStatus('Preparing data for sync...', 'info');
+        
+        // Collect all data
+        const allData = {
+            user: currentUser,
+            inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
+            invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
+            shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
+            users: JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]'),
+            syncDate: new Date().toISOString(),
+            version: '2.0'
+        };
+        
+        // Try to sync with retries
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                showGitHubStatus(`Uploading to GitHub... (Attempt ${i + 1}/${maxRetries})`, 'info');
+                const result = await githubStorage.saveUserData(currentUser.email, allData);
+                
+                if (result.success) {
+                    // Save sync time
+                    localStorage.setItem('lastGitHubSync', new Date().toISOString());
+                    
+                    // Save GitHub config for multi-device
+                    const githubConfig = {
+                        username: githubStorage.username,
+                        repo: githubStorage.repo,
+                        token: githubStorage.token
+                    };
+                    localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
+                    
+                    // Update UI
+                    loadGitHubConfig();
+                    
+                    showGitHubStatus(result.message, 'success');
+                    showAlert('Data synced to cloud successfully!', 'success');
+                    
+                    // Trigger UI refresh if needed
+                    if (typeof updateDashboardStats === 'function') {
+                        setTimeout(updateDashboardStats, 1000);
+                    }
+                    
+                    return true;
+                } else {
+                    if (i === maxRetries - 1) {
+                        throw new Error(result.message);
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+                }
+            } catch (error) {
+                if (i === maxRetries - 1) {
+                    throw error;
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+        
+    } catch (error) {
+        console.error('Sync error:', error);
+        showGitHubStatus('Sync failed: ' + error.message, 'danger');
+        showAlert('Failed to sync data to cloud. Please check your connection.', 'warning');
+        return false;
+    }
+}
+
+// Auto-sync function - FIXED VERSION
+function autoSyncToGitHub() {
+    if (!currentUser || !currentUser.email) {
+        return;
+    }
+    
+    if (!githubStorage.isValidConfig()) {
+        return;
+    }
+    
+    // Debounce sync to avoid too many requests
+    if (window.autoSyncTimeout) {
+        clearTimeout(window.autoSyncTimeout);
+    }
+    
+    window.autoSyncTimeout = setTimeout(() => {
+        syncToGitHubWithRetry(2).catch(console.error);
+    }, 5000); // Wait 5 seconds after last change
+}
+
+// Setup GitHub sync page - NEW FUNCTION
+function initGitHubSyncPage() {
+    // Load existing config
+    loadGitHubConfig();
+    
+    // Setup save button
+    document.getElementById('saveGitHubConfig')?.addEventListener('click', async function() {
+        const button = this;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        button.disabled = true;
+        
+        const success = await saveGitHubConfig();
+        
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+        if (success && currentUser && currentUser.email) {
+            // Auto-sync after successful config
+            setTimeout(() => {
+                syncToGitHubWithRetry().catch(console.error);
+            }, 1000);
+        }
+    });
+    
+    // Setup test connection button
+    document.getElementById('testGitHubConnection')?.addEventListener('click', async function() {
+        const button = this;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+        button.disabled = true;
+        
+        await testGitHubConnection();
+        
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+    
+    // Setup sync now button
+    document.getElementById('syncNowButton')?.addEventListener('click', async function() {
+        const button = this;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+        button.disabled = true;
+        
+        await syncToGitHubWithRetry();
+        
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+    
+    // Setup load from cloud button
+    document.getElementById('loadFromCloudButton')?.addEventListener('click', async function() {
+        if (!confirm('This will replace your local data with data from the cloud. Continue?')) {
+            return;
+        }
+        
+        const button = this;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        button.disabled = true;
+        
+        await loadFromGitHub();
+        
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+    
+    // Setup token visibility toggle
+    document.getElementById('toggleTokenVisibility')?.addEventListener('click', toggleTokenVisibility);
+    
+    // Show multi-device instructions
+    showMultiDeviceInstructions();
+}
+
+// Show multi-device instructions - NEW FUNCTION
+function showMultiDeviceInstructions() {
+    const instructionsHTML = `
+        <div class="card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-mobile-alt"></i>
+                    Multi-Device Setup Instructions
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>Follow these steps to enable multi-device access:</strong>
+                </div>
+                
+                <ol>
+                    <li><strong>Step 1:</strong> On your first device, configure the GitHub settings above</li>
+                    <li><strong>Step 2:</strong> Click "Save & Test Configuration" to verify the connection</li>
+                    <li><strong>Step 3:</strong> Click "Sync Now" to upload your data to GitHub</li>
+                    <li><strong>Step 4:</strong> On your second device, open this GST Invoice System</li>
+                    <li><strong>Step 5:</strong> Go to Settings → GitHub Sync</li>
+                    <li><strong>Step 6:</strong> Enter the EXACT SAME GitHub configuration</li>
+                    <li><strong>Step 7:</strong> Save the configuration on the second device</li>
+                    <li><strong>Step 8:</strong> On the login page, use your email and password</li>
+                    <li><strong>Step 9:</strong> The system will automatically load your data from the cloud</li>
+                </ol>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Important:</strong> You must use the same email and password on all devices.
+                    Your password is encrypted and stored securely in the cloud.
+                </div>
+                
+                <div class="alert alert-success mt-3">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Note:</strong> After initial setup, your data will automatically sync across
+                    all devices whenever you make changes.
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const container = document.getElementById('multiDeviceInstructions');
+    if (container) {
+        container.innerHTML = instructionsHTML;
+    }
+}
+
+// Enhanced login page initialization - FIXED VERSION
+function initLoginPage() {
+    const loginForm = document.getElementById('loginForm');
+    if (!loginForm) return;
+    
+    // Check for remembered email
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+        document.getElementById('email').value = rememberedEmail;
+        document.getElementById('rememberMe').checked = true;
+    }
+    
+    // Check if we have GitHub config for auto-cloud login
+    const hasGitHubConfig = githubStorage.isValidConfig();
+    
+    // Add cloud login notice if GitHub is configured
+    if (hasGitHubConfig) {
+        const cloudNotice = document.createElement('div');
+        cloudNotice.className = 'alert alert-info mt-2 mb-3';
+        cloudNotice.innerHTML = `
+            <i class="fas fa-cloud"></i>
+            <strong>Multi-Device Feature Enabled:</strong> 
+            Your data can be accessed from any device with the same login.
+        `;
+        loginForm.parentNode.insertBefore(cloudNotice, loginForm);
+    }
+    
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        if (!email || !password) {
+            showAlert('Please enter email and password', 'warning');
+            return;
+        }
+        
+        const loginBtn = this.querySelector('button[type="submit"]');
+        const originalText = loginBtn.innerHTML;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+        loginBtn.disabled = true;
+        
+        // Use multi-device login
+        const result = await loginWithMultiDevice(email, password);
+        
+        if (result.success) {
+            // Save remember me
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
+            } else {
+                localStorage.removeItem('rememberedEmail');
+            }
+            
+            // Show success message based on source
+            if (result.source === 'cloud') {
+                showAlert(`Welcome back! Data loaded from cloud.`, 'success');
+            } else {
+                showAlert('Login successful!', 'success');
+            }
+            
+            // If GitHub is configured, auto-sync after login
+            if (hasGitHubConfig) {
+                setTimeout(() => {
+                    syncToGitHubWithRetry().catch(console.error);
+                }, 2000);
+            }
+            
+            // Redirect to dashboard
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+            
+        } else {
+            showAlert(result.message, 'danger');
+            loginBtn.innerHTML = originalText;
+            loginBtn.disabled = false;
+        }
+    });
+}
+
+// Initialize GitHub sync on all pages - FIXED VERSION
+function initGitHubSync() {
+    // Always load config
+    loadGitHubConfig();
+    
+    // Check if we're on a page that needs special GitHub setup
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    if (currentPage === 'settings.html' || currentPage === 'github-sync.html') {
+        initGitHubSyncPage();
+    }
+}
+
+// Add sync button to navigation - FIXED VERSION
+function addSyncButtonToNav() {
+    const navLinks = document.querySelector('.nav-links');
+    if (!navLinks) return;
+    
+    // Check if sync button already exists
+    if (document.getElementById('syncNavButton')) return;
+    
+    const syncButton = document.createElement('button');
+    syncButton.id = 'syncNavButton';
+    syncButton.className = 'btn-icon';
+    syncButton.title = 'Sync data to cloud';
+    syncButton.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>';
+    syncButton.style.marginLeft = '10px';
+    syncButton.style.color = githubStorage.isValidConfig() ? 'var(--primary)' : 'var(--text-secondary)';
+    
+    syncButton.addEventListener('click', async () => {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+        if (!currentUser) {
+            showAlert('Please login first', 'warning');
+            return;
+        }
+        
+        if (!githubStorage.isValidConfig()) {
+            showAlert('Please configure GitHub sync in Settings first', 'warning');
+            return;
+        }
+        
+        syncButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        syncButton.disabled = true;
+        
+        const result = await syncToGitHubWithRetry();
+        
+        if (result) {
+            syncButton.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                syncButton.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>';
+                syncButton.disabled = false;
+            }, 2000);
+        } else {
+            syncButton.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>';
+            syncButton.disabled = false;
+        }
+    });
+    
+    // Insert before theme switch or at the end
+    const themeSwitch = navLinks.querySelector('.theme-switch');
+    if (themeSwitch) {
+        navLinks.insertBefore(syncButton, themeSwitch);
+    } else {
+        navLinks.appendChild(syncButton);
+    }
+}
+
+// Show sync status in UI - FIXED VERSION
+function showSyncStatus() {
+    if (!isLoggedIn()) return;
+    
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+    if (!currentUser) return;
+    
+    const lastSync = localStorage.getItem('lastGitHubSync');
+    const statusText = lastSync 
+        ? `Last synced: ${new Date(lastSync).toLocaleTimeString()}`
+        : 'Not synced yet';
+    
+    // Create or update status element
+    let statusEl = document.getElementById('syncStatus');
+    if (!statusEl) {
+        statusEl = document.createElement('div');
+        statusEl.id = 'syncStatus';
+        statusEl.style.position = 'fixed';
+        statusEl.style.bottom = '10px';
+        statusEl.style.right = '10px';
+        statusEl.style.padding = '5px 10px';
+        statusEl.style.backgroundColor = githubStorage.isValidConfig() ? 'var(--primary)' : 'var(--warning)';
+        statusEl.style.color = 'white';
+        statusEl.style.borderRadius = '5px';
+        statusEl.style.fontSize = '12px';
+        statusEl.style.zIndex = '1000';
+        statusEl.style.cursor = 'pointer';
+        statusEl.title = githubStorage.isValidConfig() ? 'Click to sync now' : 'GitHub not configured';
+        document.body.appendChild(statusEl);
+        
+        statusEl.addEventListener('click', async () => {
+            if (!githubStorage.isValidConfig()) {
+                showAlert('Please configure GitHub sync in Settings', 'warning');
+                return;
+            }
+            
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+            await syncToGitHubWithRetry();
+            showSyncStatus(); // Refresh status
+        });
+    }
+    
+    statusEl.innerHTML = `🔄 ${statusText}`;
+    statusEl.style.backgroundColor = githubStorage.isValidConfig() ? 'var(--primary)' : 'var(--warning)';
+}
+
+// Initialize multi-device system - FIXED VERSION
 async function initMultiDeviceSystem() {
     try {
         console.log('Initializing multi-device system...');
         
-        // Check if GitHub is configured
-        const githubConfigured = githubStorage.isValidConfig();
-        
-        if (!githubConfigured) {
-            console.log('GitHub not configured for multi-device system');
-            return;
-        }
+        // Always load GitHub config first
+        loadGitHubConfig();
         
         const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
         
         if (!currentUser) {
-            // Try auto-login from any available cloud data
-            await tryAutoLoginFromAnyDevice();
+            // Try auto-login from cloud if GitHub is configured
+            if (githubStorage.isValidConfig()) {
+                await tryAutoLoginFromCloud();
+            }
         } else {
-            // Load latest data from cloud for this user
-            await loadLatestDataFromCloud(currentUser.email);
-            
-            // Share this user's data across their devices
-            await shareDataAcrossDevices(currentUser.email);
+            // Load latest cloud data for current user
+            if (githubStorage.isValidConfig()) {
+                await tryLoadFromCloud(currentUser.email);
+            }
         }
+        
     } catch (error) {
         console.error('Multi-device system init error:', error);
     }
 }
 
-// Try auto-login from any device (cloud data)
-async function tryAutoLoginFromAnyDevice() {
+// Try auto-login from cloud - NEW FUNCTION
+async function tryAutoLoginFromCloud() {
     try {
+        if (!githubStorage.isValidConfig()) {
+            return false;
+        }
+        
         console.log('Attempting auto-login from cloud...');
         
-        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+        // Get all user files from GitHub
+        const allUsers = await getAllUsersFromGitHub();
         
-        if (!savedConfig.username || !savedConfig.repo || !savedConfig.token) {
-            console.log('No GitHub configuration found');
+        if (allUsers.length === 0) {
+            console.log('No users found in cloud');
             return false;
         }
         
-        githubStorage.username = savedConfig.username;
-        githubStorage.repo = savedConfig.repo;
-        githubStorage.token = savedConfig.token;
+        // For demo purposes, show the most recent user
+        // In production, you would show a selection modal
+        const mostRecentUser = allUsers[0];
         
-        // Get all user data files from GitHub
-        const allUserData = await getAllUserDataFromGitHub();
-        
-        if (!allUserData || allUserData.length === 0) {
-            console.log('No user data found in cloud');
-            return false;
+        // Don't auto-login, just show a notice
+        const loginPage = document.getElementById('loginForm');
+        if (loginPage) {
+            const notice = document.createElement('div');
+            notice.className = 'alert alert-info mt-3';
+            notice.innerHTML = `
+                <i class="fas fa-cloud"></i>
+                <strong>Cloud Accounts Found:</strong> 
+                ${allUsers.length} account(s) found in cloud storage.
+                Login with your email and password to access your data.
+            `;
+            loginPage.parentNode.insertBefore(notice, loginPage);
         }
         
-        // Sort by most recent sync
-        const sortedData = allUserData.sort((a, b) => 
-            new Date(b.syncDate || 0) - new Date(a.syncDate || 0)
-        );
+        return false; // Don't auto-login, require manual login
         
-        // Show login selection modal if multiple users found
-        if (sortedData.length > 1) {
-            await showUserSelectionModal(sortedData);
-            return true;
-        }
-        
-        // Auto-login with most recent user
-        const userData = sortedData[0];
-        if (userData && userData.user) {
-            return await loginFromCloudData(userData);
-        }
-        
-        return false;
     } catch (error) {
-        console.error('Auto-login error:', error);
+        console.log('Auto-login attempt failed:', error.message);
         return false;
     }
 }
 
-// Get all user data from GitHub
-async function getAllUserDataFromGitHub() {
+// Get all users from GitHub - NEW FUNCTION
+async function getAllUsersFromGitHub() {
     try {
+        if (!githubStorage.isValidConfig()) {
+            return [];
+        }
+        
         const response = await fetch(`https://api.github.com/repos/${githubStorage.username}/${githubStorage.repo}/contents/`, {
             headers: {
                 'Authorization': `token ${githubStorage.token}`,
@@ -3916,568 +4619,172 @@ async function getAllUserDataFromGitHub() {
             file.name.startsWith('gst-invoice-') && file.name.endsWith('.json')
         );
 
-        const allData = [];
-        for (const file of userFiles) {
+        const users = [];
+        for (const file of userFiles.slice(0, 5)) { // Limit to 5 files
             try {
                 const fileData = await githubStorage.getFile(file.name);
                 if (fileData) {
                     const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
                     const data = JSON.parse(decodedContent);
-                    allData.push(data);
+                    if (data.user) {
+                        users.push(data.user);
+                    }
                 }
             } catch (error) {
-                console.error(`Error loading file ${file.name}:`, error);
+                console.error(`Error loading user from ${file.name}:`, error);
             }
         }
 
-        return allData;
+        return users;
     } catch (error) {
-        console.error('Get all user data error:', error);
+        console.error('Get all users error:', error);
         return [];
     }
 }
 
-// Show user selection modal
-async function showUserSelectionModal(userDataList) {
-    return new Promise((resolve) => {
-        const modalHTML = `
-            <div class="modal" id="userSelectionModal">
-                <div class="modal-content" style="max-width: 500px;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title text-primary">
-                                <i class="fas fa-users"></i>
-                                Select Account
-                            </h2>
-                            <button class="btn-icon close-modal">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
-                                Multiple accounts found in cloud storage. Select one to login:
-                            </div>
-                            
-                            <div class="user-list" id="userList">
-                                ${userDataList.map((data, index) => `
-                                    <div class="user-item" data-index="${index}">
-                                        <div class="user-avatar">
-                                            <i class="fas fa-user-circle"></i>
-                                        </div>
-                                        <div class="user-info">
-                                            <div class="user-name">
-                                                ${data.user?.firstName || 'User'} ${data.user?.lastName || ''}
-                                            </div>
-                                            <div class="user-email">
-                                                ${data.user?.email || 'No email'}
-                                            </div>
-                                            <div class="user-business">
-                                                ${data.user?.businessName || 'No business name'}
-                                            </div>
-                                            <div class="user-sync-time">
-                                                Last synced: ${data.syncDate ? new Date(data.syncDate).toLocaleString() : 'Unknown'}
-                                            </div>
-                                        </div>
-                                        <button class="btn btn-sm btn-primary select-user" data-index="${index}">
-                                            Select
-                                        </button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            
-                            <div class="action-buttons mt-3">
-                                <button class="btn btn-secondary" onclick="window.location.href='login.html'">
-                                    <i class="fas fa-sign-in-alt"></i> Manual Login
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <style>
-                .user-list {
-                    max-height: 300px;
-                    overflow-y: auto;
-                }
-                
-                .user-item {
-                    display: flex;
-                    align-items: center;
-                    padding: 10px;
-                    border: 1px solid var(--border-color);
-                    border-radius: 5px;
-                    margin-bottom: 10px;
-                    background: var(--card-bg);
-                }
-                
-                .user-avatar {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    background: var(--primary);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-right: 15px;
-                    color: white;
-                    font-size: 20px;
-                }
-                
-                .user-info {
-                    flex: 1;
-                }
-                
-                .user-name {
-                    font-weight: 600;
-                    color: var(--text-primary);
-                }
-                
-                .user-email {
-                    font-size: 12px;
-                    color: var(--text-secondary);
-                }
-                
-                .user-business {
-                    font-size: 11px;
-                    color: var(--text-light);
-                }
-                
-                .user-sync-time {
-                    font-size: 10px;
-                    color: var(--text-light);
-                    margin-top: 2px;
-                }
-            </style>
-        `;
-        
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
-        // Add event listeners
-        document.querySelectorAll('.select-user').forEach(button => {
-            button.addEventListener('click', async function() {
-                const index = parseInt(this.dataset.index);
-                const userData = userDataList[index];
-                
-                const result = await loginFromCloudData(userData);
-                if (result) {
-                    const modal = document.getElementById('userSelectionModal');
-                    if (modal) modal.remove();
-                    resolve(true);
-                }
-            });
-        });
-        
-        document.querySelectorAll('.close-modal').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const modal = document.getElementById('userSelectionModal');
-                if (modal) modal.remove();
-                resolve(false);
-            });
-        });
-    });
-}
+// ============================================
+// UPDATED MAIN INITIALIZATION
+// ============================================
 
-// Login from cloud data
-async function loginFromCloudData(userData) {
-    try {
-        const user = userData.user;
-        
-        if (!user || !user.email) {
-            return false;
-        }
-        
-        // Save user locally
-        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-        const existingUserIndex = localUsers.findIndex(u => u.email === user.email);
-        
-        if (existingUserIndex === -1) {
-            localUsers.push(user);
-        } else {
-            localUsers[existingUserIndex] = { ...localUsers[existingUserIndex], ...user };
-        }
-        
-        localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
-        
-        // Save other data
-        if (userData.inventory && userData.inventory.length > 0) {
-            localStorage.setItem('inventory', JSON.stringify(userData.inventory));
-        }
-        
-        if (userData.invoices && userData.invoices.length > 0) {
-            localStorage.setItem('invoices', JSON.stringify(userData.invoices));
-        }
-        
-        if (userData.shopProfile && Object.keys(userData.shopProfile).length > 0) {
-            localStorage.setItem('shopProfile', JSON.stringify(userData.shopProfile));
-        }
-        
-        // Set session
-        sessionStorage.setItem('currentUser', JSON.stringify(user));
-        sessionStorage.setItem('isLoggedIn', 'true');
-        
-        // Update currentUser variable
-        currentUser = user;
-        
-        // Update navigation
-        updateNavigation();
-        
-        showAlert(`Welcome back, ${user.firstName}! Data loaded from cloud.`, 'success');
-        
-        // Redirect to dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    requireAuth();
+    updateNavigation();
+    
+    // Initialize GitHub sync system
+    initGitHubSync();
+    
+    // Initialize multi-device system
+    setTimeout(() => {
+        initMultiDeviceSystem().catch(console.error);
+    }, 1000);
+    
+    // Show sync status if logged in
+    if (isLoggedIn()) {
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 1000);
-        
-        return true;
-    } catch (error) {
-        console.error('Login from cloud data error:', error);
-        showAlert('Failed to load data from cloud', 'danger');
-        return false;
-    }
-}
-
-// Load latest data from cloud for current user
-async function loadLatestDataFromCloud(email) {
-    try {
-        console.log('Loading latest data from cloud for:', email);
-        
-        const cloudData = await githubStorage.loadUserData(email);
-        
-        if (!cloudData) {
-            console.log('No cloud data found for:', email);
-            return;
-        }
-        
-        // Check if cloud data is newer than local
-        const lastLocalSync = localStorage.getItem(`lastSync_${email}`);
-        const lastCloudSync = cloudData.syncDate;
-        
-        if (lastLocalSync && lastCloudSync && new Date(lastCloudSync) <= new Date(lastLocalSync)) {
-            console.log('Local data is up to date');
-            return;
-        }
-        
-        // Merge data (cloud takes priority for now)
-        if (cloudData.inventory && cloudData.inventory.length > 0) {
-            const localInventory = JSON.parse(localStorage.getItem('inventory') || '[]');
-            const mergedInventory = mergeArrays(localInventory, cloudData.inventory, 'id');
-            localStorage.setItem('inventory', JSON.stringify(mergedInventory));
-        }
-        
-        if (cloudData.invoices && cloudData.invoices.length > 0) {
-            const localInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const mergedInvoices = mergeArrays(localInvoices, cloudData.invoices, 'id');
-            localStorage.setItem('invoices', JSON.stringify(mergedInvoices));
-        }
-        
-        // Update sync time
-        localStorage.setItem(`lastSync_${email}`, new Date().toISOString());
-        
-        console.log('Data loaded from cloud successfully');
-        
-        // Show notification if page is loaded
-        if (document.readyState === 'complete') {
-            showAlert('Latest data loaded from cloud', 'info', 3000);
-        }
-        
-    } catch (error) {
-        console.error('Load latest data error:', error);
-    }
-}
-
-// Share data across all devices of this user
-async function shareDataAcrossDevices(email) {
-    try {
-        console.log('Sharing data across devices for:', email);
-        
-        // Prepare data to share
-        const dataToShare = {
-            user: currentUser,
-            inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
-            invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
-            shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
-            syncDate: new Date().toISOString(),
-            deviceInfo: getDeviceInfo(),
-            version: '1.0'
-        };
-        
-        // Save to GitHub
-        const result = await githubStorage.saveUserData(email, dataToShare);
-        
-        if (result.success) {
-            console.log('Data shared to cloud successfully');
-            localStorage.setItem(`lastSync_${email}`, new Date().toISOString());
+            showSyncStatus();
+            // Update sync status every 30 seconds
+            setInterval(showSyncStatus, 30000);
             
-            // Store shared data in local map
-            if (!sharedDataMap[email]) {
-                sharedDataMap[email] = [];
+            // Add sync button to navigation
+            addSyncButtonToNav();
+        }, 2000);
+    }
+    
+    // Page-specific initializations
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    switch (currentPage) {
+        case 'dashboard.html':
+            initDashboardPage();
+            break;
+        case 'create_invoice.html':
+            // Enhanced invoice creation page
+            console.log('Initializing enhanced create invoice page');
+            
+            // Set default date
+            const today = new Date().toISOString().split('T')[0];
+            if (document.getElementById('invoiceDate')) {
+                document.getElementById('invoiceDate').value = today;
             }
             
-            sharedDataMap[email].push({
-                syncDate: new Date().toISOString(),
-                deviceInfo: getDeviceInfo(),
-                dataHash: generateDataHash(dataToShare)
+            // Calculate next invoice number
+            calculateNextInvoiceNumber();
+            
+            // Generate invoice number
+            generateInvoiceNumberEnhanced();
+            
+            // Load shop profile
+            loadShopProfile();
+            
+            // Load inventory data for autocomplete
+            loadInventoryData();
+            
+            // Load customers for autocomplete
+            loadCustomers();
+            
+            // Initialize 5 rows
+            for (let i = 0; i < 5; i++) {
+                addItemRowEnhanced();
+            }
+            
+            // Setup GST Type Selector
+            setupGstTypeSelector();
+            
+            // Setup event listeners
+            setupEventListenersEnhanced();
+            
+            // Add invoice number change listener
+            document.getElementById('invoiceNumber')?.addEventListener('input', function() {
+                if (document.getElementById('invoiceLabel')) {
+                    document.getElementById('invoiceLabel').textContent = this.value;
+                }
             });
             
-            localStorage.setItem('sharedDataMap', JSON.stringify(sharedDataMap));
+            document.getElementById('invoiceNumber')?.addEventListener('change', function() {
+                updateStoredInvoiceNumber(this.value);
+            });
             
-            return true;
-        } else {
-            console.error('Failed to share data:', result.message);
-            return false;
-        }
-        
-    } catch (error) {
-        console.error('Share data error:', error);
-        return false;
+            console.log('Enhanced page initialization complete');
+            break;
+        case 'inventory.html':
+            initInventoryPage();
+            break;
+        case 'settings.html':
+            initSettingsPage();
+            break;
+        case 'login.html':
+            initLoginPage();
+            break;
+        case 'register.html':
+            initRegisterPage();
+            break;
+        case 'forgot-password.html':
+            initForgotPasswordPage();
+            break;
+        case 'reset-password.html':
+            initResetPasswordPage();
+            break;
     }
-}
-
-// Enhanced login function with auto-share
-async function loginWithAutoShare(email, password) {
-    try {
-        console.log('Login with auto-share for:', email);
-        
-        // Check local storage first
-        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-        const localUser = localUsers.find(u => u.email === email && u.password === password && u.isActive);
-        
-        if (localUser) {
-            // Local login successful
-            sessionStorage.setItem('currentUser', JSON.stringify(localUser));
-            sessionStorage.setItem('isLoggedIn', 'true');
-            currentUser = localUser;
-            
-            // Load data from cloud
-            await loadLatestDataFromCloud(email);
-            
-            // Share current data to cloud
-            setTimeout(() => {
-                shareDataAcrossDevices(email).catch(console.error);
-            }, 2000);
-            
-            return { success: true, user: localUser };
-        }
-        
-        // Try cloud login
-        const cloudResult = await loginFromGitHubWithShare(email, password);
-        if (cloudResult.success) {
-            return cloudResult;
-        }
-        
-        return { success: false, message: 'Invalid email or password' };
-        
-    } catch (error) {
-        console.error('Login with auto-share error:', error);
-        return { success: false, message: 'Login failed' };
-    }
-}
-
-// Login from GitHub with sharing
-async function loginFromGitHubWithShare(email, password) {
-    try {
-        const cloudData = await githubStorage.loadUserData(email);
-        
-        if (!cloudData || !cloudData.user) {
-            return { success: false, message: 'No cloud account found' };
-        }
-        
-        if (cloudData.user.password !== password) {
-            return { success: false, message: 'Invalid password' };
-        }
-        
-        // Login successful
-        sessionStorage.setItem('currentUser', JSON.stringify(cloudData.user));
-        sessionStorage.setItem('isLoggedIn', 'true');
-        currentUser = cloudData.user;
-        
-        // Save user locally
-        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-        if (!localUsers.some(u => u.email === email)) {
-            localUsers.push(cloudData.user);
-            localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
-        }
-        
-        // Load data
-        if (cloudData.inventory) {
-            localStorage.setItem('inventory', JSON.stringify(cloudData.inventory));
-        }
-        if (cloudData.invoices) {
-            localStorage.setItem('invoices', JSON.stringify(cloudData.invoices));
-        }
-        if (cloudData.shopProfile) {
-            localStorage.setItem('shopProfile', JSON.stringify(cloudData.shopProfile));
-        }
-        
-        // Update sync time
-        localStorage.setItem(`lastSync_${email}`, new Date().toISOString());
-        
-        // Share current data back to cloud (in case local has newer data)
-        setTimeout(() => {
-            shareDataAcrossDevices(email).catch(console.error);
-        }, 2000);
-        
-        return { success: true, user: cloudData.user };
-        
-    } catch (error) {
-        console.error('GitHub login with share error:', error);
-        return { success: false, message: 'Cloud login failed' };
-    }
-}
-
-// Enhanced save functions with auto-share
-function saveUsersWithShare() {
-    saveUsers();
-    autoShareData();
-}
-
-function saveInventoryWithShare() {
-    saveInventory();
-    autoShareData();
-}
-
-function saveInvoicesWithShare() {
-    saveInvoices();
-    autoShareData();
-}
-
-// Auto-share data when changes are made
-async function autoShareData() {
-    try {
+    
+    // Auto-load from GitHub on login if configured
+    if (isLoggedIn() && githubStorage.isValidConfig()) {
         const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
-        
-        if (!currentUser || !currentUser.email) {
-            return;
+        if (currentUser) {
+            setTimeout(() => {
+                tryLoadFromCloud(currentUser.email).catch(console.error);
+            }, 3000);
         }
-        
-        // Debounce sharing to avoid too many requests
-        if (window.shareTimeout) {
-            clearTimeout(window.shareTimeout);
-        }
-        
-        window.shareTimeout = setTimeout(async () => {
-            await shareDataAcrossDevices(currentUser.email);
-        }, 3000); // Wait 3 seconds after last change
-        
-    } catch (error) {
-        console.error('Auto-share error:', error);
     }
-}
-
-// Get device information
-function getDeviceInfo() {
-    return {
-        userAgent: navigator.userAgent.substring(0, 100), // Limit length
-        platform: navigator.platform,
-        language: navigator.language,
-        screenSize: `${window.screen.width}x${window.screen.height}`,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        timestamp: new Date().toISOString(),
-        deviceId: localStorage.getItem('deviceId') || generateDeviceId()
-    };
-}
-
-// Generate unique device ID
-function generateDeviceId() {
-    const deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('deviceId', deviceId);
-    return deviceId;
-}
-
-// Generate data hash for change detection
-function generateDataHash(data) {
-    const str = JSON.stringify(data);
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash.toString(36);
-}
-
-// Merge two arrays, preferring new items for conflicts
-function mergeArrays(oldArray, newArray, idKey = 'id') {
-    const merged = [...oldArray];
-    const oldMap = new Map(oldArray.map(item => [item[idKey], item]));
-    
-    newArray.forEach(newItem => {
-        const existingIndex = merged.findIndex(item => item[idKey] === newItem[idKey]);
-        
-        if (existingIndex === -1) {
-            // New item, add it
-            merged.push(newItem);
-        } else {
-            // Update existing item
-            merged[existingIndex] = { ...merged[existingIndex], ...newItem };
-        }
-    });
-    
-    return merged;
-}
-
-// Show sync status
-function showSyncStatus() {
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
-    
-    if (!currentUser) return;
-    
-    const lastSync = localStorage.getItem(`lastSync_${currentUser.email}`);
-    const statusText = lastSync 
-        ? `Last synced: ${new Date(lastSync).toLocaleTimeString()}`
-        : 'Not synced yet';
-    
-    // Create or update status element
-    let statusEl = document.getElementById('syncStatus');
-    if (!statusEl) {
-        statusEl = document.createElement('div');
-        statusEl.id = 'syncStatus';
-        statusEl.style.position = 'fixed';
-        statusEl.style.bottom = '10px';
-        statusEl.style.right = '10px';
-        statusEl.style.padding = '5px 10px';
-        statusEl.style.backgroundColor = 'var(--primary)';
-        statusEl.style.color = 'white';
-        statusEl.style.borderRadius = '5px';
-        statusEl.style.fontSize = '12px';
-        statusEl.style.zIndex = '1000';
-        statusEl.style.cursor = 'pointer';
-        statusEl.title = 'Click to sync now';
-        document.body.appendChild(statusEl);
-        
-        statusEl.addEventListener('click', async () => {
-            await shareDataAcrossDevices(currentUser.email);
-            showAlert('Syncing data to cloud...', 'info');
-        });
-    }
-    
-    statusEl.textContent = `🔄 ${statusText}`;
-}
+});
 
 // ============================================
-// UPDATE EXISTING FUNCTIONS
+// GLOBAL FUNCTIONS
 // ============================================
 
-// Override existing save functions to include auto-share
-const originalSaveUsers = saveUsers;
-saveUsers = function() {
-    originalSaveUsers.apply(this, arguments);
-    autoShareData();
-};
-
-const originalSaveInventory = saveInventory;
-saveInventory = function() {
-    originalSaveInventory.apply(this, arguments);
-    autoShareData();
-};
-
-const originalSaveInvoices = saveInvoices;
-saveInvoices = function() {
-    originalSaveInvoices.apply(this, arguments);
-    autoShareData();
-};
+window.copyToClipboard = copyToClipboard;
+window.showAlert = showAlert;
+window.logoutUser = logoutUser;
+window.showSecurityQuestionModal = showSecurityQuestionModal;
+window.showResetTokenModal = showResetTokenModal;
+window.exportInvoices = exportInvoices;
+window.exportInventory = exportInventory;
+window.exportAllData = exportAllData;
+window.formatCurrency = formatCurrency;
+window.addItemRow = addItemRow;
+window.loadShopToPreview = loadShopToPreview;
+window.setupInvoiceForm = setupInvoiceForm;
+window.removeItemRow = removeItemRow;
+window.generatePDFEnhanced = generatePDFEnhanced;
+window.saveInvoiceEnhanced = saveInvoiceEnhanced;
+window.saveGitHubConfig = saveGitHubConfig;
+window.testGitHubConnection = testGitHubConnection;
+window.syncToGitHub = syncToGitHubWithRetry; // Updated to use retry version
+window.loadFromGitHub = loadFromGitHub;
+window.toggleTokenVisibility = toggleTokenVisibility;
+window.isLoggedIn = isLoggedIn;
+window.initMultiDeviceSystem = initMultiDeviceSystem;
+window.loginWithMultiDevice = loginWithMultiDevice;
+window.syncToGitHubWithRetry = syncToGitHubWithRetry;
 
 // ============================================
 // MAIN INITIALIZATION - FIXED
