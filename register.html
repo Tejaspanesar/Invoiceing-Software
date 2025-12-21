@@ -194,3 +194,81 @@
     <script src="github-storage.js"></script>
 </body>
 </html>
+// Add this to your dashboard.js or script.js
+async function initializeApp() {
+    // Check if user is logged in
+    const currentUser = sessionStorage.getItem('currentUser');
+    
+    if (!currentUser) {
+        // Check for GitHub config and try to auto-login
+        await tryAutoLoginFromGitHub();
+        return;
+    }
+    
+    // Load GitHub data if configured
+    await checkAndLoadGitHubData();
+}
+
+async function tryAutoLoginFromGitHub() {
+    try {
+        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+        
+        if (savedConfig.username && savedConfig.repo && savedConfig.token) {
+            githubStorage.username = savedConfig.username;
+            githubStorage.repo = savedConfig.repo;
+            githubStorage.token = savedConfig.token;
+            
+            // Try to load any user data
+            const allData = await githubStorage.loadAnyUserData();
+            
+            if (allData && allData.users && allData.users.length > 0) {
+                // Auto-login with first user (you might want to add a login selection)
+                const firstUser = allData.users[0];
+                sessionStorage.setItem('currentUser', JSON.stringify(firstUser));
+                
+                // Save data locally
+                if (allData.invoices) localStorage.setItem('invoices', JSON.stringify(allData.invoices));
+                if (allData.inventory) localStorage.setItem('inventory', JSON.stringify(allData.inventory));
+                if (allData.shopProfile) localStorage.setItem('shopProfile', JSON.stringify(allData.shopProfile));
+                
+                showAlert('Auto-logged in from cloud!', 'info');
+                window.location.href = 'dashboard.html';
+                return true;
+            }
+        }
+        
+        // No auto-login possible, redirect to login
+        window.location.href = 'login.html';
+        return false;
+    } catch (error) {
+        console.error('Auto-login error:', error);
+        window.location.href = 'login.html';
+        return false;
+    }
+}
+
+async function checkAndLoadGitHubData() {
+    try {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+        
+        if (currentUser.email && savedConfig.username && savedConfig.repo && savedConfig.token) {
+            githubStorage.username = savedConfig.username;
+            githubStorage.repo = savedConfig.repo;
+            githubStorage.token = savedConfig.token;
+            
+            // Check for newer data on GitHub
+            const githubData = await githubStorage.loadUserData(currentUser.email);
+            
+            if (githubData) {
+                // Compare timestamps or implement your sync logic
+                console.log('GitHub data available:', githubData);
+            }
+        }
+    } catch (error) {
+        console.log('GitHub data check error:', error);
+    }
+}
+
+// Call this on page load
+document.addEventListener('DOMContentLoaded', initializeApp);
