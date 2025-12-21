@@ -38,7 +38,6 @@
             <a href="settings.html" class="nav-link">
                 <i class="fas fa-cog"></i> Settings
             </a>
-            <!-- Theme switch removed as requested -->
         </div>
     </nav>
 
@@ -49,7 +48,7 @@
                 Dashboard Overview
             </h1>
             <div class="page-header-actions">
-                <!-- Removed the period select dropdown -->
+                <!-- REMOVED: Period select dropdown -->
                 <button class="btn btn-primary" id="refreshBtn">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
@@ -63,9 +62,6 @@
                 </div>
                 <div class="stat-value text-primary" id="totalInvoices">0</div>
                 <div class="stat-label">Total Invoices</div>
-                <div class="stat-change text-success">
-                    <i class="fas fa-arrow-up"></i> 12% from last week
-                </div>
             </div>
             
             <div class="stat-card">
@@ -74,9 +70,6 @@
                 </div>
                 <div class="stat-value text-success" id="totalRevenue">₹0</div>
                 <div class="stat-label">Total Revenue</div>
-                <div class="stat-change text-success">
-                    <i class="fas fa-arrow-up"></i> 8% from last week
-                </div>
             </div>
             
             <div class="stat-card">
@@ -85,9 +78,6 @@
                 </div>
                 <div class="stat-value text-info" id="totalGST">₹0</div>
                 <div class="stat-label">GST Collected</div>
-                <div class="stat-change text-success">
-                    <i class="fas fa-arrow-up"></i> 15% from last week
-                </div>
             </div>
         </div>
 
@@ -99,9 +89,6 @@
                 </div>
                 <div class="stat-value" id="totalProducts">0</div>
                 <div class="stat-label">Total Products</div>
-                <div class="stat-change text-success">
-                    <i class="fas fa-arrow-up"></i> 5 new this week
-                </div>
             </div>
             
             <div class="stat-card">
@@ -110,9 +97,6 @@
                 </div>
                 <div class="stat-value" id="monthPurchases">0</div>
                 <div class="stat-label">This Month Purchases</div>
-                <div class="stat-change text-info">
-                    <i class="fas fa-chart-line"></i> View in Add Purchase
-                </div>
             </div>
         </div>
 
@@ -122,11 +106,6 @@
                     <i class="fas fa-chart-bar"></i>
                     Revenue Overview
                 </h2>
-                <div class="d-flex align-center gap-3">
-                    <button class="btn btn-sm btn-secondary" id="revenueChartBtn">Monthly</button>
-                    <button class="btn btn-sm btn-secondary" id="quarterlyChartBtn">Quarterly</button>
-                    <button class="btn btn-sm btn-primary" id="yearlyChartBtn">Yearly</button>
-                </div>
             </div>
             <div class="chart-container" style="height: 300px; padding: 20px;">
                 <canvas id="revenueChart"></canvas>
@@ -225,38 +204,8 @@
                     </div>
                     <div class="activity-content">
                         <div class="activity-title">Invoice Created</div>
-                        <div class="activity-desc">New invoice INV-2024-001 created for ABC Technologies</div>
-                        <div class="activity-time">2 hours ago</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon info">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">Product Added</div>
-                        <div class="activity-desc">New product "Wireless Mouse" added to inventory</div>
-                        <div class="activity-time">4 hours ago</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon warning">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">Return Processed</div>
-                        <div class="activity-desc">Return processed for invoice INV-2023-045</div>
-                        <div class="activity-time">1 day ago</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon primary">
-                        <i class="fas fa-cart-plus"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">Purchase Recorded</div>
-                        <div class="activity-desc">Stock added for "USB-C Cable" (50 units)</div>
-                        <div class="activity-time">2 days ago</div>
+                        <div class="activity-desc">New invoice created</div>
+                        <div class="activity-time">Just now</div>
                     </div>
                 </div>
             </div>
@@ -272,49 +221,501 @@
     
     <!-- Your external scripts -->
     <script src="script.js"></script>
-    <script src="github-storage.js"></script>
-
-    <!-- Script to enforce permanent dark mode -->
-    <script>
-        // Force dark mode permanently
-        document.addEventListener('DOMContentLoaded', function() {
-            // Force dark mode class on body
-            document.body.classList.add('dark-mode');
-            
-            // Set localStorage to dark mode
-            localStorage.setItem('darkMode', 'true');
-            
-            // Override the updateNavigation function to prevent light mode
-            if (typeof window.updateNavigation === 'function') {
-                window.updateNavigation = function() {
-                    document.body.classList.add('dark-mode');
-                    localStorage.setItem('darkMode', 'true');
-                };
-            }
-            
-            // Initialize Chart.js with dark mode
-            if (typeof Chart !== 'undefined') {
-                // You might need to adjust chart colors for dark mode
-                Chart.defaults.color = '#ffffff';
-                Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-            }
-        });
-    </script>
     
-    <!-- Style to ensure dark mode is applied -->
-    <style>
-        /* Ensure dark mode is applied even if CSS loads slowly */
-        body {
-            background-color: #121212 !important;
-            color: #ffffff !important;
-            transition: none !important;
+    <!-- Dashboard-specific JavaScript -->
+    <script>
+        // Fix: Ensure isLoggedIn function exists
+        if (typeof isLoggedIn !== 'function') {
+            function isLoggedIn() {
+                return sessionStorage.getItem('isLoggedIn') === 'true';
+            }
         }
         
-        /* Hide any remaining theme toggle elements */
-        .theme-switch,
-        input[type="checkbox"][id*="darkModeToggle"] {
-            display: none !important;
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (!isLoggedIn()) {
+                    if (!window.location.href.includes('login.html')) {
+                        window.location.href = 'login.html';
+                    }
+                } else {
+                    // User is logged in, initialize dashboard
+                    initializeDashboard();
+                }
+            }, 100);
+        });
+
+        // Dashboard Data
+        const dashboardData = {
+            totalInvoices: 0,
+            totalRevenue: 0,
+            totalGST: 0
+        };
+
+        // Initialize Chart
+        let revenueChart;
+        
+        // Function to calculate real revenue data from invoices
+        function calculateRevenueData() {
+            try {
+                const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+                
+                if (invoices.length === 0) {
+                    // Return ZERO data if no invoices
+                    const now = new Date();
+                    const currentYear = now.getFullYear();
+                    const currentMonth = now.getMonth();
+                    
+                    // Generate last 6 month labels
+                    const monthLabels = [];
+                    for (let i = 5; i >= 0; i--) {
+                        const monthDate = new Date(currentYear, currentMonth - i, 1);
+                        const monthName = monthDate.toLocaleDateString('en-IN', { month: 'short' });
+                        monthLabels.push(monthName);
+                    }
+                    
+                    return {
+                        labels: monthLabels,
+                        data: [0, 0, 0, 0, 0, 0]
+                    };
+                }
+                
+                // Last 6 months data
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth();
+                const monthlyData = [0, 0, 0, 0, 0, 0];
+                const monthLabels = [];
+                
+                // Generate last 6 month labels
+                for (let i = 5; i >= 0; i--) {
+                    const monthDate = new Date(currentYear, currentMonth - i, 1);
+                    const monthName = monthDate.toLocaleDateString('en-IN', { month: 'short' });
+                    monthLabels.push(monthName);
+                }
+                
+                invoices.forEach(invoice => {
+                    if (!invoice.date) return;
+                    
+                    try {
+                        const invoiceDate = new Date(invoice.date);
+                        const invoiceAmount = invoice.grandTotal || invoice.totalAmount || invoice.amount || 0;
+                        
+                        // Check if invoice is within last 6 months
+                        const sixMonthsAgo = new Date(currentYear, currentMonth - 5, 1);
+                        
+                        if (invoiceDate >= sixMonthsAgo && invoiceDate <= now) {
+                            const monthDiff = (currentYear - invoiceDate.getFullYear()) * 12 + 
+                                            (currentMonth - invoiceDate.getMonth());
+                            
+                            if (monthDiff >= 0 && monthDiff <= 5) {
+                                monthlyData[5 - monthDiff] += invoiceAmount;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error processing invoice date:', e);
+                    }
+                });
+                
+                return {
+                    labels: monthLabels,
+                    data: monthlyData
+                };
+            } catch (error) {
+                console.error('Error calculating revenue data:', error);
+                // Return zero data on error too
+                return {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    data: [0, 0, 0, 0, 0, 0]
+                };
+            }
         }
-    </style>
+        
+        function initializeChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            // Calculate real revenue data
+            const revenueData = calculateRevenueData();
+            
+            revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: revenueData.labels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: revenueData.data,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `₹${context.parsed.y.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: revenueData.data.some(val => val > 0) ? undefined : 10000,
+                            ticks: {
+                                color: '#d1d5db',
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#d1d5db'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load Dashboard Stats
+        function loadDashboardStats() {
+            try {
+                // Load data from localStorage
+                const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+                const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                const purchases = JSON.parse(localStorage.getItem('gst_purchases') || '[]');
+                
+                // Calculate stats
+                const totalInvoices = invoices.length;
+                const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.grandTotal || inv.totalAmount || inv.amount || 0), 0);
+                const totalGST = invoices.reduce((sum, inv) => sum + (inv.gstTotal || inv.gstAmount || 0), 0);
+                
+                // Current month purchases
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                const monthPurchases = purchases.filter(p => {
+                    try {
+                        const purchaseDate = new Date(p.date);
+                        return purchaseDate.getMonth() === currentMonth && 
+                               purchaseDate.getFullYear() === currentYear;
+                    } catch (e) {
+                        return false;
+                    }
+                });
+                
+                // Update stats - ALWAYS show real data
+                document.getElementById('totalInvoices').textContent = totalInvoices;
+                document.getElementById('totalRevenue').textContent = '₹' + totalRevenue.toLocaleString();
+                document.getElementById('totalGST').textContent = '₹' + totalGST.toLocaleString();
+                
+                // New stats
+                document.getElementById('totalProducts').textContent = inventory.length;
+                document.getElementById('monthPurchases').textContent = monthPurchases.length;
+                
+                // Update the chart with real data
+                if (revenueChart) {
+                    const revenueData = calculateRevenueData();
+                    revenueChart.data.labels = revenueData.labels;
+                    revenueChart.data.datasets[0].data = revenueData.data;
+                    
+                    // Update Y-axis max if all data is zero
+                    if (revenueData.data.every(val => val === 0)) {
+                        revenueChart.options.scales.y.suggestedMax = 10000;
+                    } else {
+                        revenueChart.options.scales.y.suggestedMax = undefined;
+                    }
+                    
+                    revenueChart.update();
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                // Show zero data on error
+                document.getElementById('totalInvoices').textContent = '0';
+                document.getElementById('totalRevenue').textContent = '₹0';
+                document.getElementById('totalGST').textContent = '₹0';
+                document.getElementById('totalProducts').textContent = '0';
+                document.getElementById('monthPurchases').textContent = '0';
+            }
+        }
+
+        // Load Recent Invoices
+        function loadRecentInvoices() {
+            try {
+                const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+                const tbody = document.getElementById('recentInvoicesBody');
+                tbody.innerHTML = '';
+                
+                if (invoices.length === 0) {
+                    // Show message when no invoices exist
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="6" class="text-center" style="padding: 40px; color: #d1d5db;">
+                            <i class="fas fa-file-invoice" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <h3>No Invoices Yet</h3>
+                            <p>Create your first invoice to see it here</p>
+                            <button class="btn btn-primary" onclick="window.location.href='create_invoice.html'">
+                                <i class="fas fa-plus-circle"></i> Create First Invoice
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                    return;
+                }
+                
+                // Sort invoices by date (newest first) and take the 5 most recent
+                const recentInvoices = invoices
+                    .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
+                    .slice(0, 5);
+                
+                recentInvoices.forEach(invoice => {
+                    // Determine status
+                    let status = invoice.status || 'pending';
+                    let statusText = status.charAt(0).toUpperCase() + status.slice(1);
+                    let statusClass = 'badge-warning'; // default for pending
+                    
+                    if (status === 'paid' || status === 'Paid') {
+                        statusClass = 'badge-success';
+                        statusText = 'Paid';
+                    } else if (status === 'overdue' || status === 'Overdue') {
+                        statusClass = 'badge-danger';
+                        statusText = 'Overdue';
+                    } else if (status === 'cancelled' || status === 'Cancelled') {
+                        statusClass = 'badge-secondary';
+                        statusText = 'Cancelled';
+                    }
+                    
+                    // Format date
+                    let invoiceDate = 'N/A';
+                    if (invoice.date) {
+                        try {
+                            invoiceDate = new Date(invoice.date).toLocaleDateString('en-IN', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric'
+                            });
+                        } catch (e) {
+                            invoiceDate = invoice.date;
+                        }
+                    }
+                    
+                    // Get customer name
+                    const customerName = invoice.customer?.name || 
+                                       invoice.customerName || 
+                                       invoice.customer || 
+                                       'Customer';
+                    
+                    // Get invoice number
+                    const invoiceNumber = invoice.invoiceNumber || 
+                                         invoice.invoiceId || 
+                                         invoice.id || 
+                                         'INV-' + invoice.id?.slice(-6);
+                    
+                    // Get amount
+                    const amount = invoice.grandTotal || 
+                                  invoice.totalAmount || 
+                                  invoice.amount || 
+                                  0;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${invoiceNumber}</td>
+                        <td>${customerName}</td>
+                        <td>${invoiceDate}</td>
+                        <td>₹${amount.toLocaleString()}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon" title="View" onclick="viewInvoice('${invoice.id || invoice.invoiceId}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-icon" title="Download" onclick="downloadInvoice('${invoice.id || invoice.invoiceId}')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error('Error loading recent invoices:', error);
+                // Show error message
+                const tbody = document.getElementById('recentInvoicesBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> Error loading invoices
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // View Invoice Function
+        function viewInvoice(invoiceId) {
+            console.log('Viewing invoice:', invoiceId);
+            // Redirect to view invoice page
+            window.location.href = `view-invoice.html?id=${invoiceId}`;
+        }
+
+        // Download Invoice Function
+        function downloadInvoice(invoiceId) {
+            console.log('Downloading invoice:', invoiceId);
+            alert('Download feature will be implemented soon!');
+        }
+
+        // Refresh Button
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            loadDashboardStats();
+            loadRecentInvoices();
+            
+            // Show refresh feedback
+            const icon = this.querySelector('i');
+            icon.className = 'fas fa-check';
+            setTimeout(() => {
+                icon.className = 'fas fa-sync-alt';
+            }, 1000);
+        });
+
+        // Load Recent Activity
+        function loadRecentActivity() {
+            const activityFeed = document.getElementById('activityFeed');
+            if (!activityFeed) return;
+            
+            // Add a refresh message
+            const refreshMsg = document.createElement('div');
+            refreshMsg.className = 'activity-item';
+            refreshMsg.innerHTML = `
+                <div class="activity-icon info">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Activities Refreshed</div>
+                    <div class="activity-desc">Recent activities loaded successfully</div>
+                    <div class="activity-time">Just now</div>
+                </div>
+            `;
+            
+            activityFeed.insertBefore(refreshMsg, activityFeed.firstChild);
+            
+            // Keep only 4 items
+            const items = activityFeed.querySelectorAll('.activity-item');
+            if (items.length > 4) {
+                for (let i = 4; i < items.length; i++) {
+                    items[i].remove();
+                }
+            }
+        }
+
+        // Initialize Dashboard
+        function initializeDashboard() {
+            initializeChart();
+            loadDashboardStats();
+            loadRecentInvoices();
+        }
+
+        // Handle window resize for chart responsiveness
+        window.addEventListener('resize', function() {
+            if (revenueChart) {
+                revenueChart.resize();
+            }
+        });
+        
+        // Add some CSS for activity feed
+        const style = document.createElement('style');
+        style.textContent = `
+            .activity-feed {
+                padding: 20px;
+            }
+            
+            .activity-item {
+                display: flex;
+                align-items: flex-start;
+                padding: 15px;
+                border-bottom: 1px solid #374151;
+            }
+            
+            .activity-item:last-child {
+                border-bottom: none;
+            }
+            
+            .activity-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+                flex-shrink: 0;
+            }
+            
+            .activity-icon.success {
+                background: rgba(34, 197, 94, 0.1);
+                color: #16a34a;
+            }
+            
+            .activity-icon.info {
+                background: rgba(59, 130, 246, 0.1);
+                color: #2563eb;
+            }
+            
+            .activity-icon.warning {
+                background: rgba(245, 158, 11, 0.1);
+                color: #d97706;
+            }
+            
+            .activity-icon.primary {
+                background: rgba(79, 70, 229, 0.1);
+                color: #4f46e5;
+            }
+            
+            .activity-content {
+                flex: 1;
+            }
+            
+            .activity-title {
+                font-weight: 600;
+                color: #ffffff;
+                margin-bottom: 5px;
+            }
+            
+            .activity-desc {
+                color: #d1d5db;
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+            
+            .activity-time {
+                color: #9ca3af;
+                font-size: 12px;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Force dark mode
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'true');
+    </script>
 </body>
 </html>
