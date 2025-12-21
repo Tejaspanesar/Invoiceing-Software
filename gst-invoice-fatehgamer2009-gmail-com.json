@@ -28,6 +28,23 @@
     "logo": "",
     "lastUpdated": "2025-12-20T12:55:15.677Z"
   },
-  "syncDate": "2025-12-21T11:10:56.760Z",
-  "version": "1.0"
+  "users": [
+    {
+      "id": 1766225976420,
+      "firstName": "Panesar Sanitary",
+      "lastName": "Store",
+      "email": "fatehgamer2009@gmail.com",
+      "password": "tejas123",
+      "businessName": "",
+      "phone": "",
+      "gstin": "",
+      "address": "",
+      "role": "user",
+      "createdAt": "2025-12-20T10:19:36.420Z",
+      "isActive": true,
+      "theme": "light"
+    }
+  ],
+  "syncDate": "2025-12-21T11:11:10.921Z",
+  "version": "2.0"
 }
