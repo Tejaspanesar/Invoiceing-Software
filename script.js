@@ -10578,3 +10578,343 @@ async function syncUserDataToCloud(email) {
         return false;
     }
 }
+// ============================================
+// SHOP PROFILE FUNCTIONS
+// ============================================
+
+// Initialize shop page
+function initShopPage() {
+    console.log('Initializing shop page...');
+    
+    // Load existing shop profile
+    loadShopProfile();
+    
+    // Setup form submission
+    const shopForm = document.getElementById('shopProfileForm');
+    if (shopForm) {
+        shopForm.addEventListener('submit', saveShopProfile);
+    }
+    
+    // Setup real-time preview updates
+    setupPreviewUpdates();
+    
+    // Setup signature upload
+    const signatureUpload = document.getElementById('signatureUpload');
+    if (signatureUpload) {
+        signatureUpload.addEventListener('change', handleSignatureUpload);
+    }
+    
+    console.log('Shop page initialized');
+}
+
+// Load shop profile from localStorage
+function loadShopProfile() {
+    try {
+        // Load shop profile from localStorage
+        const savedProfile = JSON.parse(localStorage.getItem('shopProfile')) || {};
+        
+        // If no saved profile, try to get from current user
+        if (!savedProfile.name && currentUser) {
+            savedProfile.name = currentUser.businessName || '';
+            savedProfile.phone = currentUser.phone || '';
+            savedProfile.email = currentUser.email || '';
+            savedProfile.gstin = currentUser.gstin || '';
+            savedProfile.address = currentUser.address || '';
+        }
+        
+        // Fill form with saved data
+        document.getElementById('shopName').value = savedProfile.name || '';
+        document.getElementById('businessType').value = savedProfile.businessType || 'proprietorship';
+        document.getElementById('shopDescription').value = savedProfile.description || '';
+        document.getElementById('shopPhone').value = savedProfile.phone || '';
+        document.getElementById('shopEmail').value = savedProfile.email || currentUser?.email || '';
+        document.getElementById('shopGSTIN').value = savedProfile.gstin || '';
+        document.getElementById('shopPAN').value = savedProfile.pan || '';
+        document.getElementById('shopAddress').value = savedProfile.address || '';
+        document.getElementById('bankName').value = savedProfile.bankName || '';
+        document.getElementById('accountNumber').value = savedProfile.accountNumber || '';
+        document.getElementById('ifscCode').value = savedProfile.ifscCode || '';
+        document.getElementById('shopTerms').value = savedProfile.terms || '';
+        
+        // Update preview
+        updatePreview();
+        
+        // Load signature if exists
+        if (savedProfile.signature) {
+            const signaturePreview = document.getElementById('signaturePreview');
+            const signatureImg = signaturePreview.querySelector('img');
+            signatureImg.src = savedProfile.signature;
+            signaturePreview.style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.error('Error loading shop profile:', error);
+        showAlert('Error loading shop profile. Using defaults.', 'warning');
+    }
+}
+
+// Save shop profile
+function saveShopProfile(e) {
+    e.preventDefault();
+    
+    try {
+        // Get form data
+        const shopProfile = {
+            name: document.getElementById('shopName').value.trim(),
+            businessType: document.getElementById('businessType').value,
+            description: document.getElementById('shopDescription').value.trim(),
+            phone: document.getElementById('shopPhone').value.trim(),
+            email: document.getElementById('shopEmail').value.trim(),
+            gstin: document.getElementById('shopGSTIN').value.trim(),
+            pan: document.getElementById('shopPAN').value.trim(),
+            address: document.getElementById('shopAddress').value.trim(),
+            bankName: document.getElementById('bankName').value.trim(),
+            accountNumber: document.getElementById('accountNumber').value.trim(),
+            ifscCode: document.getElementById('ifscCode').value.trim(),
+            terms: document.getElementById('shopTerms').value.trim(),
+            lastUpdated: new Date().toISOString()
+        };
+        
+        // Validate required fields
+        if (!shopProfile.name || !shopProfile.phone || !shopProfile.email || !shopProfile.address) {
+            showAlert('Please fill all required fields (marked with *)', 'warning');
+            return;
+        }
+        
+        // Validate GSTIN format (if provided)
+        if (shopProfile.gstin && !isValidGSTIN(shopProfile.gstin)) {
+            showAlert('Please enter a valid 15-character GSTIN', 'warning');
+            return;
+        }
+        
+        // Validate PAN format (if provided)
+        if (shopProfile.pan && !isValidPAN(shopProfile.pan)) {
+            showAlert('Please enter a valid 10-character PAN', 'warning');
+            return;
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('shopProfile', JSON.stringify(shopProfile));
+        
+        // Also update current user if logged in
+        if (currentUser) {
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex].businessName = shopProfile.name;
+                users[userIndex].phone = shopProfile.phone;
+                users[userIndex].gstin = shopProfile.gstin;
+                users[userIndex].address = shopProfile.address;
+                saveUsers();
+                
+                // Update session storage
+                currentUser = users[userIndex];
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+        }
+        
+        // Update preview
+        updatePreview();
+        
+        // AUTO-SYNC TO GITHUB IF CONFIGURED
+        autoSyncToGitHub();
+        
+        showAlert('Shop profile saved successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error saving shop profile:', error);
+        showAlert('Error saving shop profile: ' + error.message, 'danger');
+    }
+}
+
+// Reset shop form
+function resetShopForm() {
+    if (confirm('Are you sure you want to reset all fields?')) {
+        loadShopProfile(); // Reload saved data
+        showAlert('Form reset to saved values', 'info');
+    }
+}
+
+// Handle signature upload
+function handleSignatureUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.match('image.*')) {
+        showAlert('Please upload an image file', 'warning');
+        return;
+    }
+    
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+        showAlert('File size should be less than 2MB', 'warning');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            // Save to shop profile
+            const shopProfile = JSON.parse(localStorage.getItem('shopProfile') || '{}');
+            shopProfile.signature = e.target.result;
+            localStorage.setItem('shopProfile', JSON.stringify(shopProfile));
+            
+            // Update preview
+            const signaturePreview = document.getElementById('signaturePreview');
+            const signatureImg = signaturePreview.querySelector('img');
+            signatureImg.src = e.target.result;
+            signaturePreview.style.display = 'block';
+            
+            showAlert('Signature uploaded successfully!', 'success');
+            
+            // AUTO-SYNC TO GITHUB IF CONFIGURED
+            autoSyncToGitHub();
+            
+        } catch (error) {
+            console.error('Error saving signature:', error);
+            showAlert('Error saving signature', 'danger');
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+// Setup real-time preview updates
+function setupPreviewUpdates() {
+    const fields = [
+        'shopName', 'shopDescription', 'shopPhone', 'shopEmail',
+        'shopGSTIN', 'shopPAN', 'shopAddress', 'bankName',
+        'accountNumber', 'ifscCode', 'shopTerms'
+    ];
+    
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', updatePreview);
+        }
+    });
+    
+    // Also update on select change
+    const businessType = document.getElementById('businessType');
+    if (businessType) {
+        businessType.addEventListener('change', updatePreview);
+    }
+}
+
+// Update preview display
+function updatePreview() {
+    try {
+        // Update business info
+        document.getElementById('previewShopName').textContent = 
+            document.getElementById('shopName').value || 'Your Business Name';
+        
+        document.getElementById('previewShopDesc').textContent = 
+            document.getElementById('shopDescription').value || 'Business Description';
+        
+        document.getElementById('previewShopAddress').textContent = 
+            document.getElementById('shopAddress').value || 'Address Line 1, City, State - PIN';
+        
+        // Update contact info
+        const phone = document.getElementById('shopPhone').value;
+        const gstin = document.getElementById('shopGSTIN').value;
+        const pan = document.getElementById('shopPAN').value;
+        const email = document.getElementById('shopEmail').value;
+        
+        let contactText = '';
+        if (phone) contactText += `Phone: ${phone}`;
+        if (email) contactText += ` | Email: ${email}`;
+        if (gstin) contactText += ` | GSTIN: ${gstin}`;
+        if (pan) contactText += ` | PAN: ${pan}`;
+        
+        document.getElementById('previewShopContact').textContent = contactText || 'Contact information not provided';
+        
+        // Update bank details
+        const bankName = document.getElementById('bankName').value;
+        const accountNumber = document.getElementById('accountNumber').value;
+        const ifscCode = document.getElementById('ifscCode').value;
+        
+        let bankDetails = '';
+        if (bankName && accountNumber && ifscCode) {
+            bankDetails = `${bankName}, A/C: ${accountNumber}, IFSC: ${ifscCode}`;
+        } else if (bankName || accountNumber || ifscCode) {
+            bankDetails = 'Incomplete bank details';
+        } else {
+            bankDetails = 'Not provided';
+        }
+        
+        document.getElementById('previewBankDetails').textContent = bankDetails;
+        
+        // Update terms
+        const terms = document.getElementById('shopTerms').value;
+        document.getElementById('previewTerms').textContent = terms || 'No terms & conditions set';
+        
+    } catch (error) {
+        console.error('Error updating preview:', error);
+    }
+}
+
+// Validate GSTIN
+function isValidGSTIN(gstin) {
+    // Basic GSTIN validation: 15 characters, alphanumeric
+    const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+    return gstinRegex.test(gstin.toUpperCase());
+}
+
+// Validate PAN
+function isValidPAN(pan) {
+    // Basic PAN validation: 10 characters, specific format
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    return panRegex.test(pan.toUpperCase());
+}
+
+// Export shop profile
+function exportShopProfile() {
+    try {
+        const shopProfile = JSON.parse(localStorage.getItem('shopProfile') || '{}');
+        const dataStr = JSON.stringify(shopProfile, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+        const exportFileName = `shop-profile-${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileName);
+        linkElement.click();
+        
+        showAlert('Shop profile exported successfully!', 'success');
+    } catch (error) {
+        console.error('Error exporting shop profile:', error);
+        showAlert('Error exporting shop profile', 'danger');
+    }
+}
+
+// Import shop profile
+function importShopProfile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            if (!importedData.name || !importedData.address) {
+                throw new Error('Invalid shop profile file');
+            }
+            
+            // Save imported data
+            localStorage.setItem('shopProfile', JSON.stringify(importedData));
+            
+            // Reload form
+            loadShopProfile();
+            
+            showAlert('Shop profile imported successfully!', 'success');
+            
+            // AUTO-SYNC TO GITHUB IF CONFIGURED
+            autoSyncToGitHub();
+            
+        } catch (error) {
+            console.error('Error importing shop profile:', error);
+            showAlert('Invalid shop profile file format', 'danger');
+        }
+    };
+    reader.readAsText(file);
+}
