@@ -10918,3 +10918,18 @@ function importShopProfile(event) {
     };
     reader.readAsText(file);
 }
+// ============================================
+// GLOBAL FUNCTIONS (accessible from HTML)
+// ============================================
+
+// ... existing functions ...
+
+// Shop profile functions
+window.initShopPage = initShopPage;
+window.resetShopForm = resetShopForm;
+window.exportShopProfile = exportShopProfile;
+window.importShopProfile = importShopProfile;
+
+// Helper functions
+window.isValidGSTIN = isValidGSTIN;
+window.isValidPAN = isValidPAN;
