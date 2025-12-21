@@ -117,6 +117,128 @@ let currentGstType = 'sgst-cgst';
 let shopProfile = {};
 let nextInvoiceNumber = 1;
 
+// ============================================
+// GITHUB STORAGE CLASS
+// ============================================
+
+// GitHub Storage Class
+class GitHubStorage {
+    constructor() {
+        this.token = '';
+        this.username = '';
+        this.repo = '';
+    }
+
+    // Check if configuration is valid
+    isValidConfig() {
+        return this.token && this.username && this.repo;
+    }
+
+    // Test GitHub connection
+    async testConnection() {
+        try {
+            const response = await fetch(`https://api.github.com/repos/${this.username}/${this.repo}`, {
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (response.ok) {
+                return { success: true, message: 'Connected to GitHub successfully!' };
+            } else {
+                return { success: false, message: 'Failed to connect. Please check your credentials.' };
+            }
+        } catch (error) {
+            return { success: false, message: 'Connection error: ' + error.message };
+        }
+    }
+
+    // Save user data to GitHub
+    async saveUserData(email, data) {
+        try {
+            const filename = `gst-invoice-${email.replace(/[^a-zA-Z0-9]/g, '-')}.json`;
+            const content = JSON.stringify(data, null, 2);
+            const encodedContent = btoa(unescape(encodeURIComponent(content)));
+            
+            // Check if file exists
+            const existingFile = await this.getFile(filename);
+            
+            let sha = null;
+            if (existingFile) {
+                sha = existingFile.sha;
+            }
+
+            const response = await fetch(`https://api.github.com/repos/${this.username}/${this.repo}/contents/${filename}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Auto-sync: ${email} data at ${new Date().toISOString()}`,
+                    content: encodedContent,
+                    sha: sha
+                })
+            });
+
+            if (response.ok) {
+                return { success: true, message: 'Data synced to GitHub successfully!' };
+            } else {
+                const errorData = await response.json();
+                return { success: false, message: errorData.message || 'Failed to sync data' };
+            }
+        } catch (error) {
+            return { success: false, message: 'Sync error: ' + error.message };
+        }
+    }
+
+    // Load user data from GitHub
+    async loadUserData(email) {
+        try {
+            const filename = `gst-invoice-${email.replace(/[^a-zA-Z0-9]/g, '-')}.json`;
+            const file = await this.getFile(filename);
+            
+            if (!file) {
+                return null;
+            }
+
+            const decodedContent = decodeURIComponent(escape(atob(file.content)));
+            return JSON.parse(decodedContent);
+        } catch (error) {
+            console.error('Load error:', error);
+            return null;
+        }
+    }
+
+    // Get file from GitHub
+    async getFile(filename) {
+        try {
+            const response = await fetch(`https://api.github.com/repos/${this.username}/${this.repo}/contents/${filename}`, {
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (response.ok) {
+                return await response.json();
+            } else if (response.status === 404) {
+                return null; // File doesn't exist
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Get file error:', error);
+            return null;
+        }
+    }
+}
+
+// Create global instance
+const githubStorage = new GitHubStorage();
+
 // Save data to localStorage
 function saveUsers() {
     localStorage.setItem('gstInvoiceUsers', JSON.stringify(users));
@@ -3888,6 +4010,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
 // script.js - Add these functions for cross-device login
 
 // Updated login function
