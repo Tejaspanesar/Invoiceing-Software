@@ -1294,7 +1294,7 @@
                         <div class="form-group">
                             <label class="form-label">GitHub Username</label>
                             <input type="text" class="form-control" id="githubUsername" 
-                                   placeholder="e.g., yourusername" 
+                                   placeholder="e.g., tejaspanesar" 
                                    value="">
                             <small class="text-light">Your GitHub username (not email)</small>
                         </div>
@@ -1302,7 +1302,7 @@
                         <div class="form-group">
                             <label class="form-label">Repository Name</label>
                             <input type="text" class="form-control" id="githubRepo" 
-                                   placeholder="e.g., gst-invoice-system" 
+                                   placeholder="e.g., Invoiceing-Software" 
                                    value="">
                             <small class="text-light">The repository where this app is hosted</small>
                         </div>
@@ -1347,6 +1347,10 @@
                             
                             <button class="btn btn-secondary" onclick="loadFromGitHub()">
                                 <i class="fas fa-cloud-download-alt"></i> Load from Cloud
+                            </button>
+                            
+                            <button class="btn btn-warning mt-2" onclick="diagnoseGitHubIssue()">
+                                <i class="fas fa-stethoscope"></i> Diagnose Issues
                             </button>
                         </div>
                         
@@ -1584,7 +1588,9 @@
                     githubStorage.token = savedConfig.token;
                     
                     // Update last sync time if available
-                    if (savedConfig.lastSync) {
+                    if (savedConfig.lastSyncTime) {
+                        document.getElementById('lastSyncTime').textContent = savedConfig.lastSyncTime;
+                    } else if (savedConfig.lastSync) {
                         document.getElementById('lastSyncTime').textContent = new Date(savedConfig.lastSync).toLocaleString();
                     }
                 }
@@ -2006,15 +2012,15 @@
             }
             
             // Save to GitHubStorage instance
-            githubStorage.username = username;
+            githubStorage.username = username.toLowerCase();
             githubStorage.repo = repo;
             githubStorage.token = token;
             
             // Save to localStorage for persistence
             const config = {
-                username,
-                repo,
-                token,
+                username: username,
+                repo: repo,
+                token: token,
                 savedAt: new Date().toISOString()
             };
             localStorage.setItem('githubConfig', JSON.stringify(config));
@@ -2030,18 +2036,20 @@
         }
         
         async function testGitHubConnection() {
-            // Load from localStorage first
-            const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+            // Get values from form
+            const username = document.getElementById('githubUsername').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
             
-            if (!savedConfig.username || !savedConfig.repo || !savedConfig.token) {
-                showAlert('Please save GitHub configuration first', 'warning');
+            if (!username || !repo || !token) {
+                showAlert('Please fill in all GitHub configuration fields', 'warning');
                 return;
             }
             
             // Update the global githubStorage object
-            githubStorage.username = savedConfig.username;
-            githubStorage.repo = savedConfig.repo;
-            githubStorage.token = savedConfig.token;
+            githubStorage.username = username.toLowerCase();
+            githubStorage.repo = repo;
+            githubStorage.token = token;
             
             const statusElement = document.getElementById('githubStatus');
             const statusText = document.getElementById('githubStatusText');
@@ -2055,11 +2063,15 @@
                 if (result.success) {
                     statusElement.className = 'alert alert-success';
                     statusText.textContent = result.message;
-                    showAlert('GitHub connection successful!', 'success');
+                    showAlert('✅ GitHub connection successful!', 'success');
+                    
+                    // Save the configuration
+                    saveGitHubConfig();
+                    
                 } else {
                     statusElement.className = 'alert alert-danger';
                     statusText.textContent = result.message;
-                    showAlert('GitHub connection failed: ' + result.message, 'danger');
+                    showAlert('❌ GitHub connection failed: ' + result.message, 'danger');
                 }
             } catch (error) {
                 statusElement.className = 'alert alert-danger';
@@ -2076,26 +2088,41 @@
                 return;
             }
             
-            const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+            // Get configuration from form
+            const username = document.getElementById('githubUsername').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
             
-            if (!savedConfig.username || !savedConfig.repo || !savedConfig.token) {
+            if (!username || !repo || !token) {
                 showAlert('Please configure GitHub settings first', 'warning');
                 return;
             }
             
             // Update the global githubStorage object
-            githubStorage.username = savedConfig.username;
-            githubStorage.repo = savedConfig.repo;
-            githubStorage.token = savedConfig.token;
+            githubStorage.username = username.toLowerCase();
+            githubStorage.repo = repo;
+            githubStorage.token = token;
             
             const statusElement = document.getElementById('githubStatus');
             const statusText = document.getElementById('githubStatusText');
             statusElement.style.display = 'flex';
             statusElement.className = 'alert alert-info';
-            statusText.textContent = 'Syncing data to GitHub...';
+            statusText.textContent = 'Preparing to sync...';
             
             try {
-                // Prepare all data to sync
+                // 1. Test connection first
+                statusText.textContent = 'Testing GitHub connection...';
+                const connectionTest = await githubStorage.testConnection();
+                
+                if (!connectionTest.success) {
+                    statusElement.className = 'alert alert-danger';
+                    statusText.textContent = `Connection failed: ${connectionTest.message}`;
+                    showAlert(`Connection failed: ${connectionTest.message}`, 'danger');
+                    return;
+                }
+                
+                // 2. Prepare data
+                statusText.textContent = 'Preparing your data...';
                 const allData = {
                     invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
                     inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
@@ -2105,35 +2132,78 @@
                         theme: localStorage.getItem('themePreference'),
                         invoiceDefaults: JSON.parse(localStorage.getItem('invoiceDefaults') || '{}'),
                         nextInvoiceNumber: localStorage.getItem('nextInvoiceNumber'),
-                        darkMode: localStorage.getItem('darkMode'),
-                        githubConfig: savedConfig
+                        darkMode: localStorage.getItem('darkMode')
+                    },
+                    metadata: {
+                        syncTime: new Date().toISOString(),
+                        user: currentUser.email,
+                        totalInvoices: JSON.parse(localStorage.getItem('invoices') || '[]').length,
+                        totalInventory: JSON.parse(localStorage.getItem('inventory') || '[]').length
                     }
                 };
                 
-                const result = await githubStorage.saveUserData(currentUser.email, allData);
+                // 3. Try to save
+                statusText.textContent = 'Syncing to GitHub...';
+                const saveResult = await githubStorage.saveUserData(currentUser.email, allData);
                 
-                if (result.success) {
+                if (saveResult.success) {
                     statusElement.className = 'alert alert-success';
-                    statusText.textContent = result.message;
+                    statusText.textContent = saveResult.message;
                     
-                    // Update last sync time
+                    // Update UI
                     const now = new Date();
                     document.getElementById('lastSyncTime').textContent = now.toLocaleString();
                     
-                    // Update saved config with last sync time
-                    savedConfig.lastSync = now.toISOString();
+                    // Save configuration
+                    const savedConfig = {
+                        username: username,
+                        repo: repo,
+                        token: token,
+                        lastSync: now.toISOString(),
+                        lastSyncTime: now.toLocaleString()
+                    };
                     localStorage.setItem('githubConfig', JSON.stringify(savedConfig));
                     
-                    showAlert('Data synced to GitHub successfully!', 'success');
+                    showAlert('✅ Data synced to GitHub successfully!', 'success');
+                    
+                    // List files for debugging
+                    const files = await githubStorage.listDataFiles();
+                    console.log('Files in data directory:', files);
+                    
                 } else {
-                    statusElement.className = 'alert alert-danger';
-                    statusText.textContent = result.message;
-                    showAlert('Sync failed: ' + result.message, 'danger');
+                    // If regular save fails, try force create as backup
+                    statusText.textContent = 'Regular sync failed, trying backup method...';
+                    const forceResult = await githubStorage.forceCreate(currentUser.email, allData);
+                    
+                    if (forceResult.success) {
+                        statusElement.className = 'alert alert-warning';
+                        statusText.textContent = `Created backup file: ${forceResult.fileName}`;
+                        showAlert(`⚠️ Created backup file: ${forceResult.fileName}`, 'warning');
+                        
+                        // Still update config
+                        const now = new Date();
+                        const savedConfig = {
+                            username: username,
+                            repo: repo,
+                            token: token,
+                            lastSync: now.toISOString(),
+                            lastSyncTime: now.toLocaleString(),
+                            backupFile: forceResult.fileName
+                        };
+                        localStorage.setItem('githubConfig', JSON.stringify(savedConfig));
+                        document.getElementById('lastSyncTime').textContent = now.toLocaleString();
+                    } else {
+                        statusElement.className = 'alert alert-danger';
+                        statusText.textContent = `Sync failed: ${saveResult.message}`;
+                        showAlert(`❌ Sync failed: ${saveResult.message}`, 'danger');
+                    }
                 }
+                
             } catch (error) {
                 statusElement.className = 'alert alert-danger';
-                statusText.textContent = 'Error: ' + error.message;
-                showAlert('Sync error: ' + error.message, 'danger');
+                statusText.textContent = 'Unexpected error: ' + error.message;
+                showAlert('Unexpected error: ' + error.message, 'danger');
+                console.error('Sync error:', error);
             }
         }
         
@@ -2157,7 +2227,7 @@
             }
             
             // Update the global githubStorage object
-            githubStorage.username = savedConfig.username;
+            githubStorage.username = savedConfig.username.toLowerCase();
             githubStorage.repo = savedConfig.repo;
             githubStorage.token = savedConfig.token;
             
@@ -2182,12 +2252,6 @@
                         if (data.settings.invoiceDefaults) localStorage.setItem('invoiceDefaults', JSON.stringify(data.settings.invoiceDefaults));
                         if (data.settings.nextInvoiceNumber) localStorage.setItem('nextInvoiceNumber', data.settings.nextInvoiceNumber);
                         if (data.settings.darkMode) localStorage.setItem('darkMode', data.settings.darkMode);
-                        
-                        // Restore GitHub config if it exists in the loaded data
-                        if (data.settings.githubConfig) {
-                            localStorage.setItem('githubConfig', JSON.stringify(data.settings.githubConfig));
-                            loadGitHubConfig(); // Reload the form
-                        }
                     }
                     
                     statusElement.className = 'alert alert-success';
@@ -2199,9 +2263,10 @@
                     
                     // Update saved config with last sync time
                     savedConfig.lastSync = now.toISOString();
+                    savedConfig.lastSyncTime = now.toLocaleString();
                     localStorage.setItem('githubConfig', JSON.stringify(savedConfig));
                     
-                    showAlert('Data loaded from GitHub successfully! Page will refresh...', 'success');
+                    showAlert('✅ Data loaded from GitHub successfully! Page will refresh...', 'success');
                     
                     // Refresh the page to show updated data
                     setTimeout(() => {
@@ -2218,6 +2283,159 @@
                 showAlert('Load error: ' + error.message, 'danger');
             }
         }
+        
+        // Diagnostic function
+        async function diagnoseGitHubIssue() {
+            const username = document.getElementById('githubUsername').value.trim() || 'tejaspanesar';
+            const repo = document.getElementById('githubRepo').value.trim() || 'Invoiceing-Software';
+            const token = document.getElementById('githubToken').value.trim();
+            
+            if (!token) {
+                showAlert('Please enter your GitHub token', 'warning');
+                return;
+            }
+            
+            console.clear();
+            console.log('=== GitHub Diagnosis ===');
+            
+            const statusElement = document.getElementById('githubStatus');
+            const statusText = document.getElementById('githubStatusText');
+            statusElement.style.display = 'flex';
+            statusElement.className = 'alert alert-info';
+            statusText.textContent = 'Running diagnostics...';
+            
+            // Test 1: Basic repository access
+            console.log('Test 1: Checking repository access...');
+            statusText.textContent = 'Test 1: Checking repository access...';
+            try {
+                const response = await fetch(`https://api.github.com/repos/${username}/${repo}`, {
+                    headers: { 
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                console.log(`Repository access: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const repoData = await response.json();
+                    console.log('Repository info:', {
+                        name: repoData.name,
+                        full_name: repoData.full_name,
+                        private: repoData.private,
+                        default_branch: repoData.default_branch,
+                        html_url: repoData.html_url
+                    });
+                    console.log('✅ Repository accessible');
+                    statusText.textContent = '✅ Repository accessible';
+                } else {
+                    const error = await response.json();
+                    console.log('❌ Error details:', error);
+                    statusText.textContent = `❌ Repository access failed: ${response.status} ${error.message}`;
+                }
+            } catch (error) {
+                console.log('Repository access error:', error);
+                statusText.textContent = `❌ Network error: ${error.message}`;
+            }
+            
+            // Test 2: Check data directory
+            console.log('\nTest 2: Checking data directory...');
+            statusText.textContent = 'Test 2: Checking data directory...';
+            try {
+                const response = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/user-data`, {
+                    headers: { 
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                console.log(`Data directory: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const dirData = await response.json();
+                    console.log('✅ Data directory exists with', dirData.length, 'files');
+                    statusText.textContent = '✅ Data directory exists';
+                } else if (response.status === 404) {
+                    console.log('⚠️ Data directory does not exist (this is normal for first time)');
+                    statusText.textContent = '⚠️ Data directory does not exist';
+                } else {
+                    console.log('❌ Error accessing data directory');
+                    statusText.textContent = '❌ Error accessing data directory';
+                }
+            } catch (error) {
+                console.log('Data directory error:', error);
+                statusText.textContent = `❌ Directory check error: ${error.message}`;
+            }
+            
+            // Test 3: Try to create a test file
+            console.log('\nTest 3: Creating test file...');
+            statusText.textContent = 'Test 3: Testing file creation...';
+            try {
+                const testContent = '{"test": "This is a test file from GST Invoice System"}';
+                const encodedContent = btoa(unescape(encodeURIComponent(testContent)));
+                const testFileName = `test-file-${Date.now()}.json`;
+                
+                const response = await fetch(
+                    `https://api.github.com/repos/${username}/${repo}/contents/user-data/${testFileName}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: 'Test file creation from GST Invoice System',
+                            content: encodedContent,
+                            branch: 'main'
+                        })
+                    }
+                );
+                
+                console.log(`Test file creation: ${response.status} ${response.statusText}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    console.log('✅ Test file created successfully:', result.content.html_url);
+                    statusText.textContent = '✅ All tests passed! Test file created successfully.';
+                    statusElement.className = 'alert alert-success';
+                    
+                    // Clean up the test file
+                    setTimeout(async () => {
+                        try {
+                            await fetch(
+                                `https://api.github.com/repos/${username}/${repo}/contents/user-data/${testFileName}`,
+                                {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Authorization': `token ${token}`,
+                                        'Accept': 'application/vnd.github.v3+json',
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        message: 'Clean up test file',
+                                        sha: result.content.sha,
+                                        branch: 'main'
+                                    })
+                                }
+                            );
+                            console.log('Test file cleaned up');
+                        } catch (e) {
+                            console.log('Failed to clean up test file:', e);
+                        }
+                    }, 5000);
+                } else {
+                    console.log('❌ Test file creation failed:', result);
+                    statusText.textContent = `❌ Test failed: ${result.message || 'Unknown error'}`;
+                    statusElement.className = 'alert alert-danger';
+                }
+                
+            } catch (error) {
+                console.log('Test file error:', error);
+                statusText.textContent = `❌ Test error: ${error.message}`;
+                statusElement.className = 'alert alert-danger';
+            }
+            
+            showAlert('Diagnosis complete. Check browser console for details.', 'info');
+        }
     </script>
     
     <!-- GitHub Storage JavaScript -->
@@ -2225,20 +2443,18 @@
         // github-storage.js
         class GitHubStorage {
             constructor() {
-                // These will be set by user in settings
                 this.username = '';
                 this.repo = '';
-                this.branch = 'main';  // Usually 'main' or 'master'
+                this.branch = 'main';
                 this.token = '';
-                this.dataPath = 'user-data/';  // Folder in your repo for data
+                this.dataPath = 'user-data/';
             }
             
-            // Test if configuration is valid
             isValidConfig() {
                 return this.token && this.username && this.repo;
             }
             
-            // Save user data to GitHub
+            // SIMPLIFIED: Always create file, don't check SHA first
             async saveUserData(userEmail, data) {
                 if (!this.isValidConfig()) {
                     return { 
@@ -2247,81 +2463,103 @@
                     };
                 }
                 
-                // Create filename from user email (replace @ and . with -)
-                const safeEmail = userEmail.replace(/[@.]/g, '-');
+                // Create filename
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
                 const fileName = `${safeEmail}.json`;
+                const filePath = `${this.dataPath}${fileName}`;
                 
-                // Convert data to JSON and encode for GitHub
+                // Prepare data
                 const content = JSON.stringify(data, null, 2);
                 const encodedContent = btoa(unescape(encodeURIComponent(content)));
                 
+                console.log('Saving to GitHub:', {
+                    repo: `${this.username}/${this.repo}`,
+                    file: filePath,
+                    email: userEmail
+                });
+                
                 try {
-                    console.log('Saving to GitHub:', { userEmail, fileName });
+                    // FIRST: Ensure directory exists
+                    await this.createDataDirectory();
                     
-                    // First, check if file already exists
-                    const existingFile = await this.getFileInfo(fileName);
+                    // SECOND: Create or update the file
+                    // We'll try to get the SHA first, but handle errors gracefully
+                    let sha = null;
                     
-                    let response;
-                    
-                    if (existingFile && existingFile.sha) {
-                        // Update existing file
-                        response = await fetch(
-                            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
-                            {
-                                method: 'PUT',
-                                headers: {
-                                    'Authorization': `token ${this.token}`,
-                                    'Accept': 'application/vnd.github.v3+json',
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    message: `Update GST Invoice data for ${userEmail}`,
-                                    content: encodedContent,
-                                    sha: existingFile.sha,  // Required for updates
-                                    branch: this.branch
-                                })
-                            }
-                        );
-                    } else {
-                        // Create new file
-                        response = await fetch(
-                            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
-                            {
-                                method: 'PUT',
-                                headers: {
-                                    'Authorization': `token ${this.token}`,
-                                    'Accept': 'application/vnd.github.v3+json',
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    message: `Create GST Invoice data for ${userEmail}`,
-                                    content: encodedContent,
-                                    branch: this.branch
-                                })
-                            }
-                        );
+                    try {
+                        const existingFile = await this.getFileSHA(filePath);
+                        if (existingFile && existingFile.sha) {
+                            sha = existingFile.sha;
+                            console.log('Found existing file with SHA:', sha);
+                        }
+                    } catch (error) {
+                        console.log('File does not exist or error getting SHA:', error.message);
+                        // Continue without SHA - will create new file
                     }
+                    
+                    // Prepare request
+                    const requestBody = {
+                        message: `GST Invoice System: ${userEmail} - ${new Date().toISOString()}`,
+                        content: encodedContent,
+                        branch: this.branch
+                    };
+                    
+                    // Add SHA if we have it (for update)
+                    if (sha) {
+                        requestBody.sha = sha;
+                    }
+                    
+                    // Make the API call
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${filePath}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(requestBody)
+                        }
+                    );
                     
                     const result = await response.json();
                     
                     if (response.ok) {
-                        console.log('GitHub save successful:', result);
+                        console.log('✅ GitHub save successful');
                         return { 
                             success: true, 
                             message: 'Data synced to GitHub successfully!',
                             data: result 
                         };
                     } else {
-                        console.error('GitHub save failed:', result);
+                        console.error('❌ GitHub save failed:', {
+                            status: response.status,
+                            message: result.message,
+                            errors: result.errors
+                        });
+                        
+                        // Handle specific errors
+                        let errorMessage = result.message || 'Failed to save to GitHub';
+                        
+                        if (response.status === 409) {
+                            errorMessage = 'File conflict. Please try syncing again.';
+                            // The 409 usually means the SHA was wrong - file was modified
+                            // We could retry with fresh SHA, but for simplicity just report error
+                        } else if (response.status === 404) {
+                            errorMessage = 'Repository or path not found. Check your configuration.';
+                        }
+                        
                         return { 
                             success: false, 
-                            message: result.message || 'Failed to save to GitHub',
+                            message: errorMessage,
+                            status: response.status,
                             error: result 
                         };
                     }
                     
                 } catch (error) {
-                    console.error('GitHub save error:', error);
+                    console.error('Network error:', error);
                     return { 
                         success: false, 
                         message: 'Network error: ' + error.message 
@@ -2329,59 +2567,11 @@
                 }
             }
             
-            // Load user data from GitHub
-            async loadUserData(userEmail) {
-                if (!this.isValidConfig()) {
-                    console.log('GitHub config not set');
-                    return null;
-                }
-                
-                const safeEmail = userEmail.replace(/[@.]/g, '-');
-                const fileName = `${safeEmail}.json`;
-                
-                try {
-                    console.log('Loading from GitHub:', { userEmail, fileName });
-                    
-                    const response = await fetch(
-                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}?ref=${this.branch}`,
-                        {
-                            headers: {
-                                'Authorization': `token ${this.token}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            }
-                        }
-                    );
-                    
-                    if (response.status === 404) {
-                        console.log('No data found on GitHub for this user');
-                        return null;
-                    }
-                    
-                    if (!response.ok) {
-                        console.error('GitHub load failed:', response.status);
-                        return null;
-                    }
-                    
-                    const fileData = await response.json();
-                    
-                    // Decode content from base64
-                    const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
-                    const data = JSON.parse(decodedContent);
-                    
-                    console.log('GitHub load successful');
-                    return data;
-                    
-                } catch (error) {
-                    console.error('GitHub load error:', error);
-                    return null;
-                }
-            }
-            
-            // Get file info (to check if exists and get SHA)
-            async getFileInfo(fileName) {
+            // Get file SHA (simplified)
+            async getFileSHA(filePath) {
                 try {
                     const response = await fetch(
-                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}?ref=${this.branch}`,
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${filePath}?ref=${this.branch}`,
                         {
                             headers: {
                                 'Authorization': `token ${this.token}`,
@@ -2399,7 +2589,93 @@
                 }
             }
             
-            // Test connection to GitHub
+            // Create data directory if it doesn't exist
+            async createDataDirectory() {
+                try {
+                    // Check if directory exists
+                    const checkResponse = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (checkResponse.status === 404) {
+                        // Directory doesn't exist - create a README file
+                        const readmeContent = '# User Data\n\nThis directory contains user data for the GST Invoice System.';
+                        const encodedContent = btoa(unescape(encodeURIComponent(readmeContent)));
+                        
+                        const createResponse = await fetch(
+                            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}README.md`,
+                            {
+                                method: 'PUT',
+                                headers: {
+                                    'Authorization': `token ${this.token}`,
+                                    'Accept': 'application/vnd.github.v3+json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    message: 'Create user data directory',
+                                    content: encodedContent,
+                                    branch: this.branch
+                                })
+                            }
+                        );
+                        
+                        if (createResponse.ok) {
+                            console.log('✅ Created data directory');
+                        }
+                    }
+                } catch (error) {
+                    console.log('Directory check/create failed:', error.message);
+                }
+            }
+            
+            // Load user data
+            async loadUserData(userEmail) {
+                if (!this.isValidConfig()) {
+                    console.log('GitHub config not set');
+                    return null;
+                }
+                
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                const fileName = `${safeEmail}.json`;
+                
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.status === 404) {
+                        console.log('No data found for user');
+                        return null;
+                    }
+                    
+                    if (!response.ok) {
+                        console.error('Load failed:', response.status);
+                        return null;
+                    }
+                    
+                    const fileData = await response.json();
+                    const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                    return JSON.parse(decodedContent);
+                    
+                } catch (error) {
+                    console.error('Load error:', error);
+                    return null;
+                }
+            }
+            
+            // Test connection
             async testConnection() {
                 if (!this.isValidConfig()) {
                     return { success: false, message: 'Configuration incomplete' };
@@ -2417,18 +2693,111 @@
                     );
                     
                     if (response.ok) {
-                        return { success: true, message: 'Connected to GitHub successfully!' };
+                        const repoInfo = await response.json();
+                        return { 
+                            success: true, 
+                            message: `Connected to ${repoInfo.full_name}`,
+                            data: repoInfo
+                        };
                     } else {
                         const error = await response.json();
-                        return { success: false, message: error.message || 'Connection failed' };
+                        return { 
+                            success: false, 
+                            message: `Error ${response.status}: ${error.message}`,
+                            status: response.status
+                        };
                     }
                 } catch (error) {
                     return { success: false, message: 'Network error: ' + error.message };
                 }
             }
+            
+            // List files in data directory
+            async listDataFiles() {
+                if (!this.isValidConfig()) {
+                    return [];
+                }
+                
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        const files = await response.json();
+                        return files.filter(file => file.name !== 'README.md');
+                    }
+                    return [];
+                } catch (error) {
+                    console.error('List files error:', error);
+                    return [];
+                }
+            }
+            
+            // Force create (ignore conflicts)
+            async forceCreate(userEmail, data) {
+                if (!this.isValidConfig()) {
+                    return { success: false, message: 'Configuration incomplete' };
+                }
+                
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                const fileName = `${safeEmail}.json`;
+                
+                // Create unique filename with timestamp to avoid conflicts
+                const uniqueFileName = `${safeEmail}-${Date.now()}.json`;
+                
+                const content = JSON.stringify(data, null, 2);
+                const encodedContent = btoa(unescape(encodeURIComponent(content)));
+                
+                try {
+                    await this.createDataDirectory();
+                    
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${uniqueFileName}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                message: `Backup: ${userEmail} - ${new Date().toISOString()}`,
+                                content: encodedContent,
+                                branch: this.branch
+                            })
+                        }
+                    );
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        return { 
+                            success: true, 
+                            message: `Created backup file: ${uniqueFileName}`,
+                            data: result,
+                            fileName: uniqueFileName
+                        };
+                    } else {
+                        return { 
+                            success: false, 
+                            message: result.message || 'Failed to create backup',
+                            error: result 
+                        };
+                    }
+                } catch (error) {
+                    return { success: false, message: 'Error: ' + error.message };
+                }
+            }
         }
 
-        // Create global instance
+        // Global instance
         const githubStorage = new GitHubStorage();
     </script>
 </body>
