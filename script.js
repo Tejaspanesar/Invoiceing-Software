@@ -5026,3 +5026,265 @@ window.initMultiDeviceSystem = initMultiDeviceSystem;
 window.loginWithAutoShare = loginWithAutoShare;
 window.shareDataAcrossDevices = shareDataAcrossDevices;
 window.autoShareData = autoShareData;
+// ============================================
+// SIMPLIFIED MULTI-DEVICE LOGIN - FIXED
+// ============================================
+
+// Initialize multi-device system
+async function initMultiDeviceSystem() {
+    console.log('Multi-device system starting...');
+    
+    // Try to load GitHub config
+    loadGitHubConfig();
+    
+    // Check if user is logged in
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+    
+    if (!isLoggedIn && !currentUser) {
+        console.log('User not logged in, checking cloud for auto-login');
+        await tryCloudAutoLogin();
+    } else if (currentUser && githubStorage.isValidConfig()) {
+        console.log('User logged in, syncing data to cloud');
+        // Sync data to cloud
+        await syncUserDataToCloud(currentUser.email);
+    }
+}
+
+// Try cloud auto-login
+async function tryCloudAutoLogin() {
+    try {
+        if (!githubStorage.isValidConfig()) {
+            console.log('GitHub not configured for auto-login');
+            return false;
+        }
+        
+        console.log('Checking for cloud accounts...');
+        
+        // Get all user files from GitHub
+        const allUsers = await getAllUsersFromCloud();
+        
+        if (allUsers.length === 0) {
+            console.log('No cloud accounts found');
+            return false;
+        }
+        
+        console.log(`Found ${allUsers.length} user(s) in cloud`);
+        
+        // For now, don't auto-login, just show info
+        // In production, you'd show a login selection modal
+        return false;
+        
+    } catch (error) {
+        console.error('Cloud auto-login error:', error);
+        return false;
+    }
+}
+
+// Get all users from cloud
+async function getAllUsersFromCloud() {
+    try {
+        if (!githubStorage.isValidConfig()) {
+            return [];
+        }
+        
+        const response = await fetch(`https://api.github.com/repos/${githubStorage.username}/${githubStorage.repo}/contents/`, {
+            headers: {
+                'Authorization': `token ${githubStorage.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch GitHub files');
+            return [];
+        }
+
+        const files = await response.json();
+        const userFiles = files.filter(file => 
+            file.name.startsWith('gst-invoice-') && file.name.endsWith('.json')
+        );
+
+        const users = [];
+        for (const file of userFiles.slice(0, 5)) {
+            try {
+                const fileData = await githubStorage.getFile(file.name);
+                if (fileData) {
+                    const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                    const data = JSON.parse(decodedContent);
+                    if (data.user && data.user.email) {
+                        users.push({
+                            email: data.user.email,
+                            name: data.user.firstName + ' ' + data.user.lastName,
+                            business: data.user.businessName,
+                            lastSync: data.syncDate
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error(`Error loading user from ${file.name}:`, error);
+            }
+        }
+
+        return users;
+    } catch (error) {
+        console.error('Get all users error:', error);
+        return [];
+    }
+}
+
+// Login from cloud
+async function loginFromCloud(email, password) {
+    try {
+        if (!githubStorage.isValidConfig()) {
+            return { success: false, message: 'GitHub not configured' };
+        }
+        
+        console.log('Attempting cloud login for:', email);
+        
+        // Load user data from GitHub
+        const cloudData = await githubStorage.loadUserData(email);
+        
+        if (!cloudData || !cloudData.user) {
+            return { success: false, message: 'No account found in cloud' };
+        }
+        
+        // Check password
+        if (cloudData.user.password !== password) {
+            return { success: false, message: 'Incorrect password' };
+        }
+        
+        // Save user locally
+        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+        const existingUserIndex = localUsers.findIndex(u => u.email === email);
+        
+        if (existingUserIndex === -1) {
+            localUsers.push(cloudData.user);
+        } else {
+            localUsers[existingUserIndex] = { ...localUsers[existingUserIndex], ...cloudData.user };
+        }
+        
+        localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
+        
+        // Save other data
+        if (cloudData.inventory && cloudData.inventory.length > 0) {
+            localStorage.setItem('inventory', JSON.stringify(cloudData.inventory));
+        }
+        
+        if (cloudData.invoices && cloudData.invoices.length > 0) {
+            localStorage.setItem('invoices', JSON.stringify(cloudData.invoices));
+        }
+        
+        if (cloudData.shopProfile && Object.keys(cloudData.shopProfile).length > 0) {
+            localStorage.setItem('shopProfile', JSON.stringify(cloudData.shopProfile));
+        }
+        
+        // Set session
+        sessionStorage.setItem('currentUser', JSON.stringify(cloudData.user));
+        sessionStorage.setItem('isLoggedIn', 'true');
+        
+        // Update global currentUser
+        currentUser = cloudData.user;
+        
+        console.log('Cloud login successful for:', email);
+        return { success: true, user: cloudData.user };
+        
+    } catch (error) {
+        console.error('Cloud login error:', error);
+        return { success: false, message: 'Cloud login failed: ' + error.message };
+    }
+}
+
+// Enhanced login function
+async function enhancedLogin(email, password) {
+    try {
+        console.log('Enhanced login attempt for:', email);
+        
+        // First try local login
+        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+        const localUser = localUsers.find(u => 
+            u.email === email && 
+            u.password === password && 
+            u.isActive !== false
+        );
+        
+        if (localUser) {
+            console.log('Local login successful');
+            sessionStorage.setItem('currentUser', JSON.stringify(localUser));
+            sessionStorage.setItem('isLoggedIn', 'true');
+            currentUser = localUser;
+            
+            // Try to sync with cloud if configured
+            if (githubStorage.isValidConfig()) {
+                setTimeout(() => {
+                    syncUserDataToCloud(email).catch(console.error);
+                }, 1000);
+            }
+            
+            return { success: true, user: localUser };
+        }
+        
+        // If local login fails, try cloud login
+        if (githubStorage.isValidConfig()) {
+            console.log('Local login failed, trying cloud login');
+            const cloudResult = await loginFromCloud(email, password);
+            
+            if (cloudResult.success) {
+                return cloudResult;
+            }
+        }
+        
+        return { success: false, message: 'Invalid email or password' };
+        
+    } catch (error) {
+        console.error('Enhanced login error:', error);
+        return { success: false, message: 'Login failed' };
+    }
+}
+
+// Sync user data to cloud
+async function syncUserDataToCloud(email) {
+    try {
+        if (!githubStorage.isValidConfig()) {
+            console.log('GitHub not configured for sync');
+            return false;
+        }
+        
+        console.log('Syncing data to cloud for:', email);
+        
+        // Get current user
+        const user = users.find(u => u.email === email) || 
+                    JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]').find(u => u.email === email);
+        
+        if (!user) {
+            console.log('User not found for sync');
+            return false;
+        }
+        
+        // Prepare data
+        const dataToSync = {
+            user: user,
+            inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
+            invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
+            shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
+            syncDate: new Date().toISOString(),
+            version: '1.0'
+        };
+        
+        // Save to GitHub
+        const result = await githubStorage.saveUserData(email, dataToSync);
+        
+        if (result.success) {
+            console.log('Data synced to cloud successfully');
+            localStorage.setItem('lastGitHubSync', new Date().toISOString());
+            return true;
+        } else {
+            console.error('Sync failed:', result.message);
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('Sync error:', error);
+        return false;
+    }
+}
