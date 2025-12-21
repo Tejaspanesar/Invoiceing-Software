@@ -1,314 +1,203 @@
-// github-storage.js
-class GitHubStorage {
-    constructor() {
-        // These will be set by user in settings
-        this.username = '';
-        this.repo = '';
-        this.branch = 'main';  // Usually 'main' or 'master'
-        this.token = '';
-        this.dataPath = 'user-data/';  // Folder in your repo for data
+// Update these GitHub functions in your settings.html JavaScript:
+
+async function testGitHubConnection() {
+    const username = document.getElementById('githubUsername').value.trim();
+    const repo = document.getElementById('githubRepo').value.trim();
+    const token = document.getElementById('githubToken').value.trim();
+    
+    if (!username || !repo || !token) {
+        showAlert('Please fill in all GitHub configuration fields', 'warning');
+        return;
     }
     
-    // Test if configuration is valid
-    isValidConfig() {
-        return this.token && this.username && this.repo;
-    }
+    // IMPORTANT: GitHub usernames are CASE-SENSITIVE!
+    // Use exactly the same case as your GitHub username
+    githubStorage.username = username;
+    githubStorage.repo = repo;
+    githubStorage.token = token;
     
-    // Save user data to GitHub
-    async saveUserData(userEmail, data) {
-        if (!this.isValidConfig()) {
-            return { 
-                success: false, 
-                message: 'Please configure GitHub settings first' 
-            };
-        }
-        
-        // Create filename from user email (replace @ and . with -)
-        const safeEmail = userEmail.replace(/[@.]/g, '-');
-        const fileName = `${safeEmail}.json`;
-        
-        // Convert data to JSON and encode for GitHub
-        const content = JSON.stringify(data, null, 2);
-        const encodedContent = btoa(unescape(encodeURIComponent(content)));
-        
-        try {
-            console.log('Saving to GitHub:', { userEmail, fileName });
-            
-            // Try to get file info first
-            const fileInfo = await this.getFileInfo(fileName);
-            
-            let response;
-            let requestBody;
-            
-            if (fileInfo && fileInfo.sha) {
-                // Update existing file
-                requestBody = {
-                    message: `Update GST Invoice data for ${userEmail} on ${new Date().toLocaleString()}`,
-                    content: encodedContent,
-                    sha: fileInfo.sha,
-                    branch: this.branch
-                };
-                
-                response = await fetch(
-                    `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${this.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(requestBody)
-                    }
-                );
-            } else {
-                // Create new file - first ensure directory exists
-                await this.ensureDataDirectoryExists();
-                
-                requestBody = {
-                    message: `Create GST Invoice data for ${userEmail} on ${new Date().toLocaleString()}`,
-                    content: encodedContent,
-                    branch: this.branch
-                };
-                
-                response = await fetch(
-                    `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${this.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(requestBody)
-                    }
-                );
-            }
-            
-            const result = await response.json();
-            
-            if (response.ok) {
-                console.log('GitHub save successful:', result);
-                return { 
-                    success: true, 
-                    message: 'Data synced to GitHub successfully!',
-                    data: result 
-                };
-            } else {
-                console.error('GitHub save failed:', result);
-                
-                // Handle specific error cases
-                let errorMessage = result.message || 'Failed to save to GitHub';
-                
-                if (result.message && result.message.includes('409')) {
-                    errorMessage = 'File conflict. Try syncing again.';
-                } else if (result.message && result.message.includes('404')) {
-                    errorMessage = 'Repository not found or incorrect path. Check your repository name.';
-                } else if (result.message && result.message.includes('401')) {
-                    errorMessage = 'Invalid token. Please check your GitHub token.';
-                } else if (result.message && result.message.includes('403')) {
-                    errorMessage = 'Permission denied. Check token permissions.';
-                }
-                
-                return { 
-                    success: false, 
-                    message: errorMessage,
-                    error: result 
-                };
-            }
-            
-        } catch (error) {
-            console.error('GitHub save error:', error);
-            return { 
-                success: false, 
-                message: 'Network error: ' + error.message 
-            };
-        }
-    }
+    const statusElement = document.getElementById('githubStatus');
+    const statusText = document.getElementById('githubStatusText');
+    statusElement.style.display = 'flex';
+    statusElement.className = 'alert alert-info';
+    statusText.textContent = 'Testing connection to GitHub...';
     
-    // Ensure data directory exists
-    async ensureDataDirectoryExists() {
-        try {
-            // Try to create the directory by creating a placeholder file
-            const placeholderFile = 'README.md';
-            const placeholderContent = '# User Data Directory\n\nThis directory stores user data for GST Invoice System.';
-            const encodedContent = btoa(unescape(encodeURIComponent(placeholderContent)));
-            
-            // Check if directory already exists by trying to list it
-            const dirCheck = await fetch(
-                `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
-                {
-                    headers: {
-                        'Authorization': `token ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                }
-            );
-            
-            if (dirCheck.status === 404) {
-                // Directory doesn't exist, create it
-                await fetch(
-                    `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${placeholderFile}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${this.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            message: 'Create user data directory',
-                            content: encodedContent,
-                            branch: this.branch
-                        })
-                    }
-                );
-                console.log('Created data directory');
-            }
-        } catch (error) {
-            console.log('Directory check/create failed, continuing:', error.message);
-        }
-    }
-    
-    // Load user data from GitHub
-    async loadUserData(userEmail) {
-        if (!this.isValidConfig()) {
-            console.log('GitHub config not set');
-            return null;
-        }
+    try {
+        const result = await githubStorage.testConnection();
         
-        const safeEmail = userEmail.replace(/[@.]/g, '-');
-        const fileName = `${safeEmail}.json`;
-        
-        try {
-            console.log('Loading from GitHub:', { userEmail, fileName });
+        if (result.success) {
+            statusElement.className = 'alert alert-success';
+            statusText.textContent = result.message;
+            showAlert('✓ GitHub connection successful!', 'success');
             
-            const response = await fetch(
-                `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}?ref=${this.branch}`,
-                {
-                    headers: {
-                        'Authorization': `token ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                }
-            );
+            // Save the configuration
+            saveGitHubConfig();
             
-            if (response.status === 404) {
-                console.log('No data found on GitHub for this user');
-                return null;
-            }
+            // Test if we can access/write to the data directory
+            const accessCheck = await githubStorage.checkRepositoryAccess();
+            console.log('Repository access check:', accessCheck);
             
-            if (!response.ok) {
-                console.error('GitHub load failed:', response.status);
-                return null;
-            }
-            
-            const fileData = await response.json();
-            
-            // Decode content from base64
-            const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
-            const data = JSON.parse(decodedContent);
-            
-            console.log('GitHub load successful');
-            return data;
-            
-        } catch (error) {
-            console.error('GitHub load error:', error);
-            return null;
+        } else {
+            statusElement.className = 'alert alert-danger';
+            statusText.textContent = result.message;
+            showAlert('✗ GitHub connection failed: ' + result.message, 'danger');
         }
-    }
-    
-    // Get file info (to check if exists and get SHA)
-    async getFileInfo(fileName) {
-        try {
-            const response = await fetch(
-                `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}?ref=${this.branch}`,
-                {
-                    headers: {
-                        'Authorization': `token ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                }
-            );
-            
-            if (response.ok) {
-                return await response.json();
-            } else if (response.status === 404) {
-                return null; // File doesn't exist
-            }
-            return null;
-        } catch (error) {
-            console.error('Error getting file info:', error);
-            return null;
-        }
-    }
-    
-    // Test connection to GitHub
-    async testConnection() {
-        if (!this.isValidConfig()) {
-            return { success: false, message: 'Configuration incomplete' };
-        }
-        
-        try {
-            const response = await fetch(
-                `https://api.github.com/repos/${this.username}/${this.repo}`,
-                {
-                    headers: {
-                        'Authorization': `token ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                }
-            );
-            
-            if (response.ok) {
-                return { success: true, message: 'Connected to GitHub successfully!' };
-            } else {
-                const error = await response.json();
-                let errorMessage = error.message || 'Connection failed';
-                
-                // Provide more helpful error messages
-                if (response.status === 404) {
-                    errorMessage = `Repository "${this.username}/${this.repo}" not found. Please check the repository name.`;
-                } else if (response.status === 401) {
-                    errorMessage = 'Invalid token. Please check your GitHub Personal Access Token.';
-                } else if (response.status === 403) {
-                    errorMessage = 'Permission denied. Token may not have sufficient permissions.';
-                }
-                
-                return { success: false, message: errorMessage };
-            }
-        } catch (error) {
-            return { success: false, message: 'Network error: ' + error.message };
-        }
-    }
-    
-    // List files in data directory (for debugging)
-    async listDataFiles() {
-        if (!this.isValidConfig()) {
-            return [];
-        }
-        
-        try {
-            const response = await fetch(
-                `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
-                {
-                    headers: {
-                        'Authorization': `token ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                }
-            );
-            
-            if (response.ok) {
-                return await response.json();
-            }
-            return [];
-        } catch (error) {
-            console.error('Error listing files:', error);
-            return [];
-        }
+    } catch (error) {
+        statusElement.className = 'alert alert-danger';
+        statusText.textContent = 'Error: ' + error.message;
+        showAlert('Connection error: ' + error.message, 'danger');
     }
 }
 
-// Create global instance
-const githubStorage = new GitHubStorage();
+async function syncToGitHub() {
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+    
+    if (!currentUser || !currentUser.email) {
+        showAlert('Please log in first', 'warning');
+        return;
+    }
+    
+    // Get configuration from form
+    const username = document.getElementById('githubUsername').value.trim();
+    const repo = document.getElementById('githubRepo').value.trim();
+    const token = document.getElementById('githubToken').value.trim();
+    
+    if (!username || !repo || !token) {
+        showAlert('Please configure GitHub settings first', 'warning');
+        return;
+    }
+    
+    // Update the global githubStorage object
+    githubStorage.username = username;
+    githubStorage.repo = repo;
+    githubStorage.token = token;
+    
+    const statusElement = document.getElementById('githubStatus');
+    const statusText = document.getElementById('githubStatusText');
+    statusElement.style.display = 'flex';
+    statusElement.className = 'alert alert-info';
+    statusText.textContent = 'Syncing data to GitHub...';
+    
+    try {
+        // First, test the connection
+        const connectionTest = await githubStorage.testConnection();
+        if (!connectionTest.success) {
+            statusElement.className = 'alert alert-danger';
+            statusText.textContent = 'Connection failed: ' + connectionTest.message;
+            showAlert('Cannot sync: ' + connectionTest.message, 'danger');
+            return;
+        }
+        
+        // Prepare all data to sync
+        const allData = {
+            invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
+            inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
+            shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
+            users: JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]'),
+            settings: {
+                theme: localStorage.getItem('themePreference'),
+                invoiceDefaults: JSON.parse(localStorage.getItem('invoiceDefaults') || '{}'),
+                nextInvoiceNumber: localStorage.getItem('nextInvoiceNumber'),
+                darkMode: localStorage.getItem('darkMode'),
+                githubConfig: {
+                    username: username,
+                    repo: repo,
+                    token: '***', // Don't save the actual token
+                    savedAt: new Date().toISOString()
+                }
+            },
+            metadata: {
+                syncTime: new Date().toISOString(),
+                userEmail: currentUser.email,
+                appVersion: '1.0.0'
+            }
+        };
+        
+        console.log('Attempting to sync data to GitHub...');
+        
+        // Try simple save first if regular save fails
+        let result = await githubStorage.saveUserData(currentUser.email, allData);
+        
+        if (!result.success && result.status === 404) {
+            // If 404, try creating directory and saving again
+            console.log('Trying alternative save method...');
+            result = await githubStorage.simpleSave(currentUser.email, allData);
+        }
+        
+        if (result.success) {
+            statusElement.className = 'alert alert-success';
+            statusText.textContent = result.message;
+            
+            // Update last sync time
+            const now = new Date();
+            document.getElementById('lastSyncTime').textContent = now.toLocaleString();
+            
+            // Update saved config with last sync time
+            const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+            savedConfig.lastSync = now.toISOString();
+            savedConfig.username = username;
+            savedConfig.repo = repo;
+            savedConfig.token = token; // Save token (it's already in localStorage anyway)
+            localStorage.setItem('githubConfig', JSON.stringify(savedConfig));
+            
+            showAlert('✓ Data synced to GitHub successfully!', 'success');
+        } else {
+            statusElement.className = 'alert alert-danger';
+            statusText.textContent = result.message;
+            showAlert('✗ Sync failed: ' + result.message, 'danger');
+        }
+    } catch (error) {
+        statusElement.className = 'alert alert-danger';
+        statusText.textContent = 'Error: ' + error.message;
+        showAlert('Sync error: ' + error.message, 'danger');
+    }
+}
+
+// Add a debug function
+async function debugGitHubSetup() {
+    const username = document.getElementById('githubUsername').value.trim() || 'tejaspanesar';
+    const repo = document.getElementById('githubRepo').value.trim() || 'Invoiceing-Software';
+    const token = document.getElementById('githubToken').value.trim();
+    
+    if (!token) {
+        showAlert('Please enter your GitHub token', 'warning');
+        return;
+    }
+    
+    console.log('=== GitHub Debug Information ===');
+    console.log('Username:', username);
+    console.log('Repository:', repo);
+    console.log('Token exists:', !!token);
+    console.log('Token length:', token.length);
+    console.log('Repository URL:', `https://github.com/${username}/${repo}`);
+    console.log('API URL:', `https://api.github.com/repos/${username}/${repo}`);
+    
+    githubStorage.username = username;
+    githubStorage.repo = repo;
+    githubStorage.token = token;
+    
+    // Test direct API call
+    try {
+        const response = await fetch(`https://api.github.com/repos/${username}/${repo}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        
+        console.log('Direct API Response Status:', response.status);
+        
+        if (response.ok) {
+            const repoData = await response.json();
+            console.log('Repository Data:', repoData);
+            showAlert(`✓ Repository found: ${repoData.full_name}`, 'success');
+        } else {
+            const error = await response.json();
+            console.log('API Error:', error);
+            showAlert(`✗ Error ${response.status}: ${error.message}`, 'danger');
+        }
+    } catch (error) {
+        console.log('Network Error:', error);
+        showAlert('Network error: ' + error.message, 'danger');
+    }
+}
