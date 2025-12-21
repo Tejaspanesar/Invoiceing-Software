@@ -3888,3 +3888,150 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+// script.js - Add these functions for cross-device login
+
+// Updated login function
+async function handleLogin(email, password) {
+    try {
+        // Check local storage first
+        const users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+        const user = users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+            // Local login successful
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // Check for GitHub sync
+            await checkGitHubForUserData(email);
+            
+            showAlert('Login successful!', 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+            return true;
+        } else {
+            // Try loading from GitHub
+            return await loginFromGitHub(email, password);
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showAlert('Login failed. Please try again.', 'danger');
+        return false;
+    }
+}
+
+// Check GitHub for user data
+async function checkGitHubForUserData(email) {
+    try {
+        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+        
+        if (savedConfig.username && savedConfig.repo && savedConfig.token) {
+            // Initialize GitHub storage
+            githubStorage.username = savedConfig.username;
+            githubStorage.repo = savedConfig.repo;
+            githubStorage.token = savedConfig.token;
+            
+            // Try to load user data from GitHub
+            const userData = await githubStorage.loadUserData(email);
+            
+            if (userData && userData.users) {
+                // Merge GitHub users with local users
+                const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                const mergedUsers = [...localUsers];
+                
+                userData.users.forEach(githubUser => {
+                    if (!mergedUsers.some(localUser => localUser.email === githubUser.email)) {
+                        mergedUsers.push(githubUser);
+                    }
+                });
+                
+                localStorage.setItem('gstInvoiceUsers', JSON.stringify(mergedUsers));
+                console.log('Synced users from GitHub');
+            }
+        }
+    } catch (error) {
+        console.log('No GitHub sync or error:', error.message);
+    }
+}
+
+// Login from GitHub data
+async function loginFromGitHub(email, password) {
+    try {
+        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+        
+        if (!savedConfig.username || !savedConfig.repo || !savedConfig.token) {
+            return false; // No GitHub config
+        }
+        
+        // Initialize GitHub storage
+        githubStorage.username = savedConfig.username;
+        githubStorage.repo = savedConfig.repo;
+        githubStorage.token = savedConfig.token;
+        
+        // Load all data from GitHub
+        const allData = await githubStorage.loadUserData(email);
+        
+        if (!allData || !allData.users) {
+            return false; // No data found on GitHub
+        }
+        
+        // Find user in GitHub data
+        const user = allData.users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+            // Save user locally
+            const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+            if (!localUsers.some(u => u.email === email)) {
+                localUsers.push(user);
+                localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
+            }
+            
+            // Also save other data from GitHub if needed
+            if (allData.invoices) {
+                localStorage.setItem('invoices', JSON.stringify(allData.invoices));
+            }
+            if (allData.inventory) {
+                localStorage.setItem('inventory', JSON.stringify(allData.inventory));
+            }
+            if (allData.shopProfile) {
+                localStorage.setItem('shopProfile', JSON.stringify(allData.shopProfile));
+            }
+            
+            // Set current user
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            
+            showAlert('Logged in from cloud data!', 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('GitHub login error:', error);
+        return false;
+    }
+}
+
+// Updated login event listener (add to your existing script.js)
+document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    
+    if (!email || !password) {
+        showAlert('Please fill in all fields', 'warning');
+        return;
+    }
+    
+    const loginBtn = this.querySelector('button[type="submit"]');
+    const originalText = loginBtn.innerHTML;
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    loginBtn.disabled = true;
+    
+    const success = await handleLogin(email, password);
+    
+    if (!success) {
+        showAlert('Invalid email or password', 'danger');
+        loginBtn.innerHTML = originalText;
+        loginBtn.disabled = false;
+    }
+});
