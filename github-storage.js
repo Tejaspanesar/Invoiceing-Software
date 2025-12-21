@@ -34,13 +34,21 @@ class GitHubStorage {
         try {
             console.log('Saving to GitHub:', { userEmail, fileName });
             
-            // First, check if file already exists
-            const existingFile = await this.getFileInfo(fileName);
+            // Try to get file info first
+            const fileInfo = await this.getFileInfo(fileName);
             
             let response;
+            let requestBody;
             
-            if (existingFile && existingFile.sha) {
+            if (fileInfo && fileInfo.sha) {
                 // Update existing file
+                requestBody = {
+                    message: `Update GST Invoice data for ${userEmail} on ${new Date().toLocaleString()}`,
+                    content: encodedContent,
+                    sha: fileInfo.sha,
+                    branch: this.branch
+                };
+                
                 response = await fetch(
                     `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
                     {
@@ -50,16 +58,19 @@ class GitHubStorage {
                             'Accept': 'application/vnd.github.v3+json',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            message: `Update GST Invoice data for ${userEmail}`,
-                            content: encodedContent,
-                            sha: existingFile.sha,  // Required for updates
-                            branch: this.branch
-                        })
+                        body: JSON.stringify(requestBody)
                     }
                 );
             } else {
-                // Create new file
+                // Create new file - first ensure directory exists
+                await this.ensureDataDirectoryExists();
+                
+                requestBody = {
+                    message: `Create GST Invoice data for ${userEmail} on ${new Date().toLocaleString()}`,
+                    content: encodedContent,
+                    branch: this.branch
+                };
+                
                 response = await fetch(
                     `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
                     {
@@ -69,11 +80,7 @@ class GitHubStorage {
                             'Accept': 'application/vnd.github.v3+json',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            message: `Create GST Invoice data for ${userEmail}`,
-                            content: encodedContent,
-                            branch: this.branch
-                        })
+                        body: JSON.stringify(requestBody)
                     }
                 );
             }
@@ -89,9 +96,23 @@ class GitHubStorage {
                 };
             } else {
                 console.error('GitHub save failed:', result);
+                
+                // Handle specific error cases
+                let errorMessage = result.message || 'Failed to save to GitHub';
+                
+                if (result.message && result.message.includes('409')) {
+                    errorMessage = 'File conflict. Try syncing again.';
+                } else if (result.message && result.message.includes('404')) {
+                    errorMessage = 'Repository not found or incorrect path. Check your repository name.';
+                } else if (result.message && result.message.includes('401')) {
+                    errorMessage = 'Invalid token. Please check your GitHub token.';
+                } else if (result.message && result.message.includes('403')) {
+                    errorMessage = 'Permission denied. Check token permissions.';
+                }
+                
                 return { 
                     success: false, 
-                    message: result.message || 'Failed to save to GitHub',
+                    message: errorMessage,
                     error: result 
                 };
             }
@@ -102,6 +123,50 @@ class GitHubStorage {
                 success: false, 
                 message: 'Network error: ' + error.message 
             };
+        }
+    }
+    
+    // Ensure data directory exists
+    async ensureDataDirectoryExists() {
+        try {
+            // Try to create the directory by creating a placeholder file
+            const placeholderFile = 'README.md';
+            const placeholderContent = '# User Data Directory\n\nThis directory stores user data for GST Invoice System.';
+            const encodedContent = btoa(unescape(encodeURIComponent(placeholderContent)));
+            
+            // Check if directory already exists by trying to list it
+            const dirCheck = await fetch(
+                `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
+                {
+                    headers: {
+                        'Authorization': `token ${this.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                }
+            );
+            
+            if (dirCheck.status === 404) {
+                // Directory doesn't exist, create it
+                await fetch(
+                    `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${placeholderFile}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${this.token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: 'Create user data directory',
+                            content: encodedContent,
+                            branch: this.branch
+                        })
+                    }
+                );
+                console.log('Created data directory');
+            }
+        } catch (error) {
+            console.log('Directory check/create failed, continuing:', error.message);
         }
     }
     
@@ -168,9 +233,12 @@ class GitHubStorage {
             
             if (response.ok) {
                 return await response.json();
+            } else if (response.status === 404) {
+                return null; // File doesn't exist
             }
             return null;
         } catch (error) {
+            console.error('Error getting file info:', error);
             return null;
         }
     }
@@ -196,10 +264,48 @@ class GitHubStorage {
                 return { success: true, message: 'Connected to GitHub successfully!' };
             } else {
                 const error = await response.json();
-                return { success: false, message: error.message || 'Connection failed' };
+                let errorMessage = error.message || 'Connection failed';
+                
+                // Provide more helpful error messages
+                if (response.status === 404) {
+                    errorMessage = `Repository "${this.username}/${this.repo}" not found. Please check the repository name.`;
+                } else if (response.status === 401) {
+                    errorMessage = 'Invalid token. Please check your GitHub Personal Access Token.';
+                } else if (response.status === 403) {
+                    errorMessage = 'Permission denied. Token may not have sufficient permissions.';
+                }
+                
+                return { success: false, message: errorMessage };
             }
         } catch (error) {
             return { success: false, message: 'Network error: ' + error.message };
+        }
+    }
+    
+    // List files in data directory (for debugging)
+    async listDataFiles() {
+        if (!this.isValidConfig()) {
+            return [];
+        }
+        
+        try {
+            const response = await fetch(
+                `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
+                {
+                    headers: {
+                        'Authorization': `token ${this.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                }
+            );
+            
+            if (response.ok) {
+                return await response.json();
+            }
+            return [];
+        } catch (error) {
+            console.error('Error listing files:', error);
+            return [];
         }
     }
 }
