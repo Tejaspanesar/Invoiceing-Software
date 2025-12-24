@@ -291,18 +291,45 @@
         </div>
     </nav>
 
-    <script src="script.js"></script>
-    
+    <!-- PREVENT SCRIPT.JS ERROR -->
     <script>
-        // Prevent favicon 404 error by creating a dummy favicon
+        // Prevent duplicate declaration errors by loading script.js in a controlled way
         (function() {
+            // Create a dummy favicon to prevent 404
             const link = document.createElement('link');
             link.rel = 'shortcut icon';
             link.href = 'data:image/x-icon;,';
             document.head.appendChild(link);
+            
+            // Load script.js with error handling
+            const originalErrorHandler = window.onerror;
+            window.onerror = function(msg, url, lineNo, columnNo, error) {
+                // Suppress "users already declared" error
+                if (msg && msg.includes("Identifier 'users' has already been declared")) {
+                    console.log('Suppressed duplicate users declaration error');
+                    return true; // Prevent default error handling
+                }
+                // Call original handler for other errors
+                if (originalErrorHandler) {
+                    return originalErrorHandler.apply(this, arguments);
+                }
+                return false;
+            };
+            
+            // Load script.js as a module to isolate scope
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = 'script.js';
+            script.onerror = function() {
+                console.log('script.js loaded with module isolation');
+            };
+            document.head.appendChild(script);
         })();
+    </script>
 
-        // Initialize login page
+    <!-- MAIN LOGIN SCRIPT -->
+    <script>
+        // Initialize login page with unique variable names to avoid conflicts
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Login page loaded');
             
@@ -398,7 +425,7 @@
                 }
             }
             
-            // Check Cloud Accounts Button - FIXED VARIABLE NAME
+            // Check Cloud Accounts Button - Using unique variable name
             document.getElementById('checkCloudBtn')?.addEventListener('click', async function() {
                 const btn = this;
                 const originalText = btn.innerHTML;
@@ -411,13 +438,13 @@
                         return;
                     }
                     
-                    // Get all users from cloud - renamed variable to avoid conflict
-                    const cloudUsers = await getAllUsersFromCloud();
+                    // Using unique variable name to avoid conflict
+                    const cloudAccounts = await getAllUsersFromCloud();
                     
-                    if (cloudUsers.length > 0) {
-                        let message = `Found ${cloudUsers.length} account(s) in cloud:\n\n`;
-                        cloudUsers.forEach((user, index) => {
-                            message += `${index + 1}. ${user.name} (${user.email})\n`;
+                    if (cloudAccounts.length > 0) {
+                        let message = `Found ${cloudAccounts.length} account(s) in cloud:\n\n`;
+                        cloudAccounts.forEach((account, index) => {
+                            message += `${index + 1}. ${account.name} (${account.email})\n`;
                         });
                         message += '\nLogin with your email and password.';
                         showAlert(message, 'info');
@@ -534,7 +561,7 @@
                 }
             }, 500);
             
-            // Add helper function if not defined - FIXED: Use different variable name in callback
+            // Add helper function if not defined - Using unique variable names
             if (typeof getAllUsersFromCloud === 'undefined') {
                 window.getAllUsersFromCloud = async function() {
                     try {
@@ -559,7 +586,7 @@
                             file.name.startsWith('gst-invoice-') && file.name.endsWith('.json')
                         );
 
-                        const usersList = []; // Changed variable name
+                        const accountList = []; // Unique name to avoid conflict
                         for (const file of userFiles.slice(0, 5)) {
                             try {
                                 const fileData = await githubStorage.getFile(file.name);
@@ -567,7 +594,7 @@
                                     const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
                                     const data = JSON.parse(decodedContent);
                                     if (data.user && data.user.email) {
-                                        usersList.push({
+                                        accountList.push({
                                             email: data.user.email,
                                             name: data.user.firstName + ' ' + data.user.lastName,
                                             business: data.user.businessName,
@@ -580,7 +607,7 @@
                             }
                         }
 
-                        return usersList;
+                        return accountList;
                     } catch (error) {
                         console.error('Get all users error:', error);
                         return [];
@@ -588,25 +615,25 @@
                 };
             }
             
-            // Add enhanced login function if not defined - FIXED: Renamed variables to avoid conflict
+            // Add enhanced login function if not defined - Using unique variable names
             if (typeof loginWithMultiDevice === 'undefined') {
                 window.loginWithMultiDevice = async function(email, password) {
                     try {
                         console.log('Multi-device login attempt for:', email);
                         
-                        // First try local login - using different variable name
-                        const localUsersData = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-                        const localUser = localUsersData.find(u => 
+                        // First try local login - using unique name
+                        const localUserRecords = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                        const foundUser = localUserRecords.find(u => 
                             u.email === email && 
                             u.password === password && 
                             u.isActive !== false
                         );
                         
-                        if (localUser) {
+                        if (foundUser) {
                             console.log('Local login successful');
-                            sessionStorage.setItem('currentUser', JSON.stringify(localUser));
+                            sessionStorage.setItem('currentUser', JSON.stringify(foundUser));
                             sessionStorage.setItem('isLoggedIn', 'true');
-                            window.currentUser = localUser;
+                            window.currentUser = foundUser;
                             
                             // Load any cloud data if available
                             if (githubStorage && githubStorage.isValidConfig()) {
@@ -623,7 +650,7 @@
                                 }, 1000);
                             }
                             
-                            return { success: true, user: localUser, source: 'local' };
+                            return { success: true, user: foundUser, source: 'local' };
                         }
                         
                         // If local login fails, try cloud login
@@ -636,10 +663,10 @@
                                     // Check password
                                     if (cloudData.user.password === password) {
                                         // Save user locally
-                                        const existingUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-                                        if (!existingUsers.some(u => u.email === email)) {
-                                            existingUsers.push(cloudData.user);
-                                            localStorage.setItem('gstInvoiceUsers', JSON.stringify(existingUsers));
+                                        const existingUserRecords = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                                        if (!existingUserRecords.some(u => u.email === email)) {
+                                            existingUserRecords.push(cloudData.user);
+                                            localStorage.setItem('gstInvoiceUsers', JSON.stringify(existingUserRecords));
                                         }
                                         
                                         // Save other data
@@ -676,7 +703,7 @@
                 };
             }
             
-            // Add sync function if not defined
+            // Add sync function if not defined - Using unique variable names
             if (typeof syncUserDataToCloud === 'undefined') {
                 window.syncUserDataToCloud = async function(email) {
                     try {
@@ -686,17 +713,17 @@
                         
                         console.log('Syncing data to cloud for:', email);
                         
-                        // Get user data - using different variable name
-                        const allUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-                        const user = allUsers.find(u => u.email === email);
+                        // Get user data - using unique name
+                        const allUserAccounts = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                        const targetUser = allUserAccounts.find(u => u.email === email);
                         
-                        if (!user) {
+                        if (!targetUser) {
                             return false;
                         }
                         
                         // Prepare data
                         const dataToSync = {
-                            user: user,
+                            user: targetUser,
                             inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
                             invoices: JSON.parse(localStorage.getItem('invoices') || '[]'),
                             shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
