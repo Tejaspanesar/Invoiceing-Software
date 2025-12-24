@@ -353,50 +353,47 @@ class GitHubStorage {
             return { success: false, message: 'Error: ' + error.message };
         }
     }
+    
+    // Load data for any user (used for login)
+    async loadAnyUserData() {
+        if (!this.isValidConfig()) {
+            console.log('GitHub config not set');
+            return null;
+        }
+        
+        try {
+            // List all files in data directory
+            const files = await this.listDataFiles();
+            
+            if (files.length === 0) {
+                return null;
+            }
+            
+            // Load the first user file we find
+            const firstFile = files[0];
+            const response = await fetch(
+                `https://api.github.com/repos/${this.username}/${this.repo}/contents/${firstFile.path}`,
+                {
+                    headers: {
+                        'Authorization': `token ${this.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                }
+            );
+            
+            if (response.ok) {
+                const fileData = await response.json();
+                const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                return JSON.parse(decodedContent);
+            }
+            
+            return null;
+        } catch (error) {
+            console.error('Load any user error:', error);
+            return null;
+        }
+    }
 }
 
 // Global instance
 const githubStorage = new GitHubStorage();
-// Add to github-storage.js
-// Load data for any user (used for login)
-async function loadAnyUserData() {
-    if (!this.isValidConfig()) {
-        console.log('GitHub config not set');
-        return null;
-    }
-    
-    try {
-        // List all files in data directory
-        const files = await this.listDataFiles();
-        
-        if (files.length === 0) {
-            return null;
-        }
-        
-        // Load the first user file we find
-        const firstFile = files[0];
-        const response = await fetch(
-            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${firstFile.path}`,
-            {
-                headers: {
-                    'Authorization': `token ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            }
-        );
-        
-        if (response.ok) {
-            const fileData = await response.json();
-            const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
-            return JSON.parse(decodedContent);
-        }
-        
-        return null;
-    } catch (error) {
-        console.error('Load any user error:', error);
-        return null;
-    }
-}
-
-// Add to GitHubStorage class
-GitHubStorage.prototype.loadAnyUserData = loadAnyUserData;
