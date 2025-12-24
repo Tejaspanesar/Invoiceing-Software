@@ -114,7 +114,7 @@ let deletionQueue = JSON.parse(localStorage.getItem('deletionQueue')) || [];
 
 // Invoice Creation Variables (from second script)
 let currentGstType = 'sgst-cgst';
-let shopProfile = {};
+let shopProfile = {}; // <-- SINGLE DECLARATION HERE - KEEP THIS ONE
 let nextInvoiceNumber = 1;
 
 // ============================================
@@ -2616,11 +2616,11 @@ function generateInvoiceNumberEnhanced() {
     return invoiceNumber;
 }
 
-// Load shop profile (enhanced version)
+// Load shop profile (enhanced version) - FIXED: NO let declaration here
 function loadShopProfile() {
     try {
         // First try to get shop profile from localStorage
-        shopProfile = JSON.parse(localStorage.getItem('shopProfile')) || {};
+        shopProfile = JSON.parse(localStorage.getItem('shopProfile')) || {}; // NO "let" here
         
         // If no shop profile in localStorage, try to get from current user
         if (!shopProfile.name && currentUser) {
@@ -3457,7 +3457,7 @@ function createPDFContentEnhanced(data) {
                 <div>₹ ${data.cgst.toFixed(2)}</div>
             </div>
         ` : `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding: 5px 0; border-bottom: 1px solid #ddd;">
+            <div style="display: flex; justifyContent: space-between; margin-bottom: 8px; padding: 5px 0; border-bottom: 1px solid #ddd;">
                 <div>IGST:</div>
                 <div>₹ ${data.igst.toFixed(2)}</div>
             </div>
