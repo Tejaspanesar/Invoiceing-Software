@@ -1182,14 +1182,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
     <script>
-        // Global variables
-        let allInvoices = [];
-        let currentFilter = 'all';
-        let currentSearch = '';
-        let invoicesPerPage = 10;
-        let currentPage = 1;
-        let selectedInvoices = new Set();
-        let shopProfile = {};
+        // Global variables - Check if they already exist
+        let allInvoices = window.allInvoices || [];
+        let currentFilter = window.currentFilter || 'all';
+        let currentSearch = window.currentSearch || '';
+        let invoicesPerPage = window.invoicesPerPage || 10;
+        let currentPage = window.currentPage || 1;
+        let selectedInvoices = window.selectedInvoices || new Set();
+        // Don't redeclare shopProfile here - it's already declared in script.js
+        
+        // Function to load shop profile
+        function loadShopProfile() {
+            try {
+                window.shopProfile = JSON.parse(localStorage.getItem('shopProfile')) || {};
+            } catch(e) {
+                console.error('Error loading shop profile:', e);
+                window.shopProfile = {};
+            }
+        }
 
         // DOM Content Loaded - Sync dark mode with dashboard
         document.addEventListener('DOMContentLoaded', function() {
@@ -1234,16 +1244,6 @@
                     }
                 }
             });
-        }
-
-        // Load shop profile
-        function loadShopProfile() {
-            try {
-                shopProfile = JSON.parse(localStorage.getItem('shopProfile')) || {};
-            } catch(e) {
-                console.error('Error loading shop profile:', e);
-                shopProfile = {};
-            }
         }
 
         // Load invoices from localStorage - FIXED VERSION
@@ -1882,10 +1882,10 @@
                     logoContainer.style.background = '#fff';
                     
                     // Add logo if exists
-                    if (shopProfile.logo && shopProfile.logo.startsWith('data:image')) {
+                    if (window.shopProfile.logo && window.shopProfile.logo.startsWith('data:image')) {
                         const logoImg = document.createElement('img');
-                        logoImg.src = shopProfile.logo;
-                        logoImg.alt = shopProfile.name || 'Business Logo';
+                        logoImg.src = window.shopProfile.logo;
+                        logoImg.alt = window.shopProfile.name || 'Business Logo';
                         logoImg.style.width = '100%';
                         logoImg.style.height = '100%';
                         logoImg.style.objectFit = 'contain';
@@ -1906,7 +1906,7 @@
                     
                     // Business Name - Large and bold
                     const businessName = document.createElement('h1');
-                    businessName.textContent = shopProfile.name || 'PANESAR SANITARY STORE';
+                    businessName.textContent = window.shopProfile.name || 'PANESAR SANITARY STORE';
                     businessName.style.margin = '0 0 5px 0';
                     businessName.style.fontSize = '24px';
                     businessName.style.fontWeight = '900';
@@ -1922,8 +1922,8 @@
                     taxInfo.style.fontSize = '11px';
                     taxInfo.style.color = '#000000';
                     taxInfo.innerHTML = `
-                        GSTIN: ${shopProfile.gstin || '03ABRPS9453M2ZR'} &nbsp;&nbsp;&nbsp;&nbsp; 
-                        PAN: ${shopProfile.pan || 'ABRPS9453M'}
+                        GSTIN: ${window.shopProfile.gstin || '03ABRPS9453M2ZR'} &nbsp;&nbsp;&nbsp;&nbsp; 
+                        PAN: ${window.shopProfile.pan || 'ABRPS9453M'}
                     `;
                     
                     // Business Description
@@ -1932,7 +1932,7 @@
                     businessDesc.style.marginBottom = '5px';
                     businessDesc.style.fontSize = '12px';
                     businessDesc.style.color = '#000000';
-                    businessDesc.textContent = shopProfile.description || 'DEALS IN : ALL KIND OF SANITARY';
+                    businessDesc.textContent = window.shopProfile.description || 'DEALS IN : ALL KIND OF SANITARY';
                     
                     // Address and Contact Info
                     const contactInfo = document.createElement('div');
@@ -1940,12 +1940,12 @@
                     contactInfo.style.fontSize = '11px';
                     contactInfo.style.color = '#000000';
                     
-                    let contactText = shopProfile.address || '#4076/4 OPP. I.T.I. GILL ROAD LUDHIANA';
-                    if (shopProfile.phone) {
-                        contactText += `<br>Mobile: ${shopProfile.phone}`;
+                    let contactText = window.shopProfile.address || '#4076/4 OPP. I.T.I. GILL ROAD LUDHIANA';
+                    if (window.shopProfile.phone) {
+                        contactText += `<br>Mobile: ${window.shopProfile.phone}`;
                     }
-                    if (shopProfile.email) {
-                        contactText += `<br>Email: ${shopProfile.email}`;
+                    if (window.shopProfile.email) {
+                        contactText += `<br>Email: ${window.shopProfile.email}`;
                     }
                     contactInfo.innerHTML = contactText;
                     
@@ -2133,7 +2133,7 @@
                     
                     const termsContent = document.createElement('div');
                     termsContent.style.color = '#000000';
-                    termsContent.innerHTML = shopProfile.terms || 'No terms & conditions set. Please update your shop profile.';
+                    termsContent.innerHTML = window.shopProfile.terms || 'No terms & conditions set. Please update your shop profile.';
                     
                     termsDiv.appendChild(termsTitle);
                     termsDiv.appendChild(termsContent);
@@ -2211,7 +2211,7 @@
                     authorizedSign.style.textAlign = 'right';
                     authorizedSign.style.color = '#000000';
                     authorizedSign.innerHTML = `
-                        <div style="font-size: 11px; margin-bottom: 8px; font-weight: bold; color: #000000;">For ${shopProfile.name || 'Your Business Name'}</div>
+                        <div style="font-size: 11px; margin-bottom: 8px; font-weight: bold; color: #000000;">For ${window.shopProfile.name || 'Your Business Name'}</div>
                         <div style="border-top: 1px solid #000; width: 80%; margin-left: auto; padding-top: 8px; font-size: 11px; font-weight: bold; margin-top: 25px; color: #000000;">
                             Authorized Signatory
                         </div>
@@ -2623,6 +2623,10 @@
                 }
             } catch (error) {
                 console.log('GitHub data check error:', error);
+                // Suppress the console error if it's just a normal case
+                if (!error.message.includes('No data found') && !error.message.includes('404')) {
+                    console.error('GitHub data check error:', error);
+                }
             }
         }
     </script>
