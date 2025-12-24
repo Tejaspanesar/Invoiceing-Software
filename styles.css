@@ -1482,3 +1482,63 @@ input:checked + .toggle-slider:before {
         gap: 15px;
     }
 }
+/* Permanent Dark Theme */
+.dark-theme {
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+.dark-theme .navbar {
+    background-color: #1f2937;
+    border-bottom: 1px solid #374151;
+}
+
+.dark-theme .card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    color: #f9fafb;
+}
+
+.dark-theme .table {
+    color: #f9fafb;
+}
+
+.dark-theme .table thead th {
+    border-bottom: 2px solid #374151;
+    color: #d1d5db;
+}
+
+.dark-theme .table tbody tr {
+    border-bottom: 1px solid #374151;
+}
+
+.dark-theme .btn {
+    color: #f9fafb;
+}
+
+.dark-theme .footer {
+    background-color: #1f2937;
+    color: #9ca3af;
+    border-top: 1px solid #374151;
+}
+
+/* Additional dark theme styles for your components */
+.dark-theme .stat-card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    color: #f9fafb;
+}
+
+.dark-theme .nav-link {
+    color: #d1d5db;
+}
+
+.dark-theme .nav-link.active {
+    background-color: #374151;
+    color: #ffffff;
+}
+
+.dark-theme .nav-link:hover {
+    background-color: #374151;
+    color: #ffffff;
+}
