@@ -17,6 +17,7 @@
             min-height: 100vh;
         }
 
+        /* NAVIGATION BAR - SIMPLIFIED VERSION */
         .navbar {
             background-color: #1f2937 !important;
             border-bottom: 1px solid #374151 !important;
@@ -50,10 +51,14 @@
             font-size: 1.2rem;
         }
 
+        /* NAV LINKS - SIMPLE VERSION WITHOUT DROPDOWN */
         .nav-links {
             display: flex;
             gap: 8px;
             align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
         }
 
         .nav-link {
@@ -77,21 +82,67 @@
             color: #ffffff !important;
         }
 
-        /* Remove any user dropdown if it exists */
+        /* FORCE REMOVE ANY DROPDOWN ELEMENTS */
         .user-dropdown, 
         .profile-dropdown,
         .dropdown-menu,
         .user-menu,
-        .nav-user {
+        .nav-user,
+        .dropdown,
+        .dropdown-toggle,
+        .dropdown-content,
+        .menu-dropdown,
+        .shop-dropdown {
             display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+            overflow: hidden !important;
         }
 
-        /* Hide any text like "Panesar Sanitary" in navbar */
+        /* HIDE ANY TEXT LIKE "PANESAR SANITARY" */
         .navbar-text,
         .user-name,
         .shop-name,
-        .nav-text {
+        .nav-text,
+        .shop-info,
+        .user-info,
+        .profile-name,
+        .company-name,
+        .business-name {
             display: none !important;
+        }
+
+        /* HIDE DROPDOWN ICONS/ARROWS */
+        .dropdown-arrow,
+        .caret,
+        .fa-chevron-down,
+        .fa-angle-down,
+        .dropdown-icon {
+            display: none !important;
+        }
+
+        /* Simple logout button */
+        .logout-btn {
+            padding: 10px 16px;
+            color: #d1d5db !important;
+            text-decoration: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .logout-btn:hover {
+            background-color: #374151 !important;
+            color: #ffffff !important;
         }
 
         .container {
@@ -119,7 +170,9 @@
         .period-select,
         .timeframe-select,
         .date-range,
-        .dropdown-select {
+        .dropdown-select,
+        select[class*="dropdown"],
+        select[class*="select"] {
             display: none !important;
         }
 
@@ -428,7 +481,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation - Simplified without dropdown -->
+    <!-- SIMPLIFIED NAVIGATION - NO DROPDOWN -->
     <nav class="navbar">
         <a href="dashboard.html" class="logo">
             <div class="logo-icon">
@@ -436,6 +489,7 @@
             </div>
             GST Invoice System
         </a>
+        
         <div class="nav-links">
             <a href="dashboard.html" class="nav-link active">
                 <i class="fas fa-chart-bar"></i> Dashboard
@@ -458,10 +512,9 @@
             <a href="settings.html" class="nav-link">
                 <i class="fas fa-cog"></i> Settings
             </a>
-            <!-- Simple logout link without dropdown -->
-            <a href="login.html" class="nav-link" onclick="logout()">
+            <button class="logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
+            </button>
         </div>
     </nav>
 
@@ -675,7 +728,36 @@
                     }
                 }
             }, 100);
+            
+            // REMOVE ANY EXISTING DROPDOWN ELEMENTS
+            removeDropdownElements();
         });
+
+        // Function to remove dropdown elements
+        function removeDropdownElements() {
+            // Remove dropdown containers
+            const dropdowns = document.querySelectorAll('.dropdown, .user-dropdown, .profile-dropdown, .dropdown-menu, .user-menu');
+            dropdowns.forEach(dropdown => {
+                dropdown.remove();
+            });
+            
+            // Remove any text containing "Panesar" or "Sanitary"
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(element => {
+                if (element.textContent && element.textContent.includes('Panesar')) {
+                    element.remove();
+                }
+                if (element.textContent && element.textContent.includes('Sanitary')) {
+                    element.remove();
+                }
+            });
+            
+            // Remove any dropdown buttons
+            const dropdownButtons = document.querySelectorAll('[data-toggle="dropdown"], .dropdown-toggle');
+            dropdownButtons.forEach(button => {
+                button.remove();
+            });
+        }
 
         // Logout function
         function logout() {
@@ -683,13 +765,6 @@
             sessionStorage.removeItem('currentUser');
             window.location.href = 'login.html';
         }
-
-        // Dashboard Data
-        const dashboardData = {
-            totalInvoices: 0,
-            totalRevenue: 0,
-            totalGST: 0
-        };
 
         // Initialize Chart
         let revenueChart;
