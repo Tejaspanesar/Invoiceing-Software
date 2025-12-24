@@ -294,6 +294,14 @@
     <script src="script.js"></script>
     
     <script>
+        // Prevent favicon 404 error by creating a dummy favicon
+        (function() {
+            const link = document.createElement('link');
+            link.rel = 'shortcut icon';
+            link.href = 'data:image/x-icon;,';
+            document.head.appendChild(link);
+        })();
+
         // Initialize login page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Login page loaded');
@@ -390,7 +398,7 @@
                 }
             }
             
-            // Check Cloud Accounts Button
+            // Check Cloud Accounts Button - FIXED VARIABLE NAME
             document.getElementById('checkCloudBtn')?.addEventListener('click', async function() {
                 const btn = this;
                 const originalText = btn.innerHTML;
@@ -403,12 +411,12 @@
                         return;
                     }
                     
-                    // Get all users from cloud
-                    const users = await getAllUsersFromCloud();
+                    // Get all users from cloud - renamed variable to avoid conflict
+                    const cloudUsers = await getAllUsersFromCloud();
                     
-                    if (users.length > 0) {
-                        let message = `Found ${users.length} account(s) in cloud:\n\n`;
-                        users.forEach((user, index) => {
+                    if (cloudUsers.length > 0) {
+                        let message = `Found ${cloudUsers.length} account(s) in cloud:\n\n`;
+                        cloudUsers.forEach((user, index) => {
                             message += `${index + 1}. ${user.name} (${user.email})\n`;
                         });
                         message += '\nLogin with your email and password.';
@@ -526,7 +534,7 @@
                 }
             }, 500);
             
-            // Add helper function if not defined
+            // Add helper function if not defined - FIXED: Use different variable name in callback
             if (typeof getAllUsersFromCloud === 'undefined') {
                 window.getAllUsersFromCloud = async function() {
                     try {
@@ -551,7 +559,7 @@
                             file.name.startsWith('gst-invoice-') && file.name.endsWith('.json')
                         );
 
-                        const users = [];
+                        const usersList = []; // Changed variable name
                         for (const file of userFiles.slice(0, 5)) {
                             try {
                                 const fileData = await githubStorage.getFile(file.name);
@@ -559,7 +567,7 @@
                                     const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
                                     const data = JSON.parse(decodedContent);
                                     if (data.user && data.user.email) {
-                                        users.push({
+                                        usersList.push({
                                             email: data.user.email,
                                             name: data.user.firstName + ' ' + data.user.lastName,
                                             business: data.user.businessName,
@@ -572,7 +580,7 @@
                             }
                         }
 
-                        return users;
+                        return usersList;
                     } catch (error) {
                         console.error('Get all users error:', error);
                         return [];
@@ -580,15 +588,15 @@
                 };
             }
             
-            // Add enhanced login function if not defined
+            // Add enhanced login function if not defined - FIXED: Renamed variables to avoid conflict
             if (typeof loginWithMultiDevice === 'undefined') {
                 window.loginWithMultiDevice = async function(email, password) {
                     try {
                         console.log('Multi-device login attempt for:', email);
                         
-                        // First try local login
-                        const users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-                        const localUser = users.find(u => 
+                        // First try local login - using different variable name
+                        const localUsersData = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                        const localUser = localUsersData.find(u => 
                             u.email === email && 
                             u.password === password && 
                             u.isActive !== false
@@ -628,10 +636,10 @@
                                     // Check password
                                     if (cloudData.user.password === password) {
                                         // Save user locally
-                                        const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-                                        if (!localUsers.some(u => u.email === email)) {
-                                            localUsers.push(cloudData.user);
-                                            localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
+                                        const existingUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                                        if (!existingUsers.some(u => u.email === email)) {
+                                            existingUsers.push(cloudData.user);
+                                            localStorage.setItem('gstInvoiceUsers', JSON.stringify(existingUsers));
                                         }
                                         
                                         // Save other data
@@ -678,9 +686,9 @@
                         
                         console.log('Syncing data to cloud for:', email);
                         
-                        // Get user data
-                        const users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
-                        const user = users.find(u => u.email === email);
+                        // Get user data - using different variable name
+                        const allUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+                        const user = allUsers.find(u => u.email === email);
                         
                         if (!user) {
                             return false;
