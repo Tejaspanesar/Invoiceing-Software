@@ -25,6 +25,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
         }
 
         .logo {
@@ -52,6 +53,7 @@
         .nav-links {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         .nav-link {
@@ -75,6 +77,23 @@
             color: #ffffff !important;
         }
 
+        /* Remove any user dropdown if it exists */
+        .user-dropdown, 
+        .profile-dropdown,
+        .dropdown-menu,
+        .user-menu,
+        .nav-user {
+            display: none !important;
+        }
+
+        /* Hide any text like "Panesar Sanitary" in navbar */
+        .navbar-text,
+        .user-name,
+        .shop-name,
+        .nav-text {
+            display: none !important;
+        }
+
         .container {
             padding: 24px;
             max-width: 1400px;
@@ -94,6 +113,20 @@
             gap: 12px;
             margin: 0;
             color: #ffffff !important;
+        }
+
+        /* Remove any period select dropdown */
+        .period-select,
+        .timeframe-select,
+        .date-range,
+        .dropdown-select {
+            display: none !important;
+        }
+
+        .page-header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
         .stats-grid {
@@ -395,7 +428,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navigation - Simplified without dropdown -->
     <nav class="navbar">
         <a href="dashboard.html" class="logo">
             <div class="logo-icon">
@@ -424,6 +457,10 @@
             </a>
             <a href="settings.html" class="nav-link">
                 <i class="fas fa-cog"></i> Settings
+            </a>
+            <!-- Simple logout link without dropdown -->
+            <a href="login.html" class="nav-link" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>
     </nav>
@@ -614,7 +651,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
                 // Check if user is logged in using the function from script.js
-                // We'll check directly since isLoggedIn should be available from script.js
                 if (typeof isLoggedIn === 'function') {
                     if (!isLoggedIn()) {
                         if (!window.location.href.includes('login.html')) {
@@ -640,6 +676,13 @@
                 }
             }, 100);
         });
+
+        // Logout function
+        function logout() {
+            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
 
         // Dashboard Data
         const dashboardData = {
