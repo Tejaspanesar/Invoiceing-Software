@@ -5293,7 +5293,7 @@ async function syncUserDataToCloud(email) {
 // ============================================
 
 // User Data Storage
-let users = JSON.parse(localStorage.getItem('gstInvoiceUsers')) || [
+const localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
     {
         id: 1,
         firstName: 'Admin',
