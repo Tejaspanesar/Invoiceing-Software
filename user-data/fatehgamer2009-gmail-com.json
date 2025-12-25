@@ -1,45 +1,22 @@
 {
-  "invoices": [],
-  "inventory": [],
   "shopProfile": {
-    "name": "3456",
-    "description": "",
-    "address": "",
-    "phone": "",
-    "email": "",
-    "gstin": "",
-    "pan": "",
-    "terms": "fghggglh\nkhhukhljijil\n\nkjhuhukj;m\njiji",
-    "logo": "",
-    "lastUpdated": "2025-12-20T12:55:15.677Z"
-  },
-  "users": [
-    {
-      "id": 1766225976420,
-      "firstName": "Panesar Sanitary",
-      "lastName": "Store",
-      "email": "fatehgamer2009@gmail.com",
-      "password": "tejas123",
-      "businessName": "",
-      "phone": "",
-      "gstin": "",
-      "address": "",
-      "role": "user",
-      "createdAt": "2025-12-20T10:19:36.420Z",
-      "isActive": true,
-      "theme": "light"
-    }
-  ],
-  "settings": {
-    "theme": "dark",
-    "invoiceDefaults": {},
-    "nextInvoiceNumber": null,
-    "darkMode": "true"
+    "shopName": "8765465",
+    "businessCategory": "",
+    "shopDescription": "",
+    "shopPhone": "4567890987",
+    "shopEmail": "8765@gmail.com",
+    "shopGSTIN": "546557546",
+    "shopPAN": "",
+    "shopAddress": "",
+    "bankName": "",
+    "accountNumber": "",
+    "ifscCode": "",
+    "shopTerms": "",
+    "lastUpdated": "2025-12-25T09:00:29.164Z"
   },
   "metadata": {
-    "syncTime": "2025-12-21T11:01:14.884Z",
+    "savedAt": "2025-12-25T09:00:32.748Z",
     "user": "fatehgamer2009@gmail.com",
-    "totalInvoices": 0,
-    "totalInventory": 0
+    "app": "GST Invoice System"
   }
 }
