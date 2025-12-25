@@ -905,8 +905,8 @@
       }
     })();
 
-    // Common unit types
-    const UNIT_TYPES = ['pcs', 'kg', 'g', 'mg', 'litre', 'ml', 'meter', 'cm', 'feet', 'yard', 'box', 'pack', 'dozen', 'pair', 'set', 'roll', 'bundle', 'carton', 'bag', 'bottle', 'can', 'jar', 'tube', 'unit', 'sheet', 'packet'];
+    // Common unit types - ONLY SI AND COMMONLY USED
+    const UNIT_TYPES = ['pcs', 'kg', 'g', 'meter', 'cm', 'feet', 'litre', 'ml', 'box', 'pack', 'dozen', 'pair', 'set', 'roll', 'bundle', 'carton'];
 
     // Main JavaScript - All functions properly defined
     document.addEventListener('DOMContentLoaded', function() {
@@ -1013,13 +1013,11 @@
                     <option value="pcs">pcs</option>
                     <option value="kg">kg</option>
                     <option value="g">g</option>
-                    <option value="mg">mg</option>
-                    <option value="litre">litre</option>
-                    <option value="ml">ml</option>
                     <option value="meter">meter</option>
                     <option value="cm">cm</option>
                     <option value="feet">feet</option>
-                    <option value="yard">yard</option>
+                    <option value="litre">litre</option>
+                    <option value="ml">ml</option>
                     <option value="box">box</option>
                     <option value="pack">pack</option>
                     <option value="dozen">dozen</option>
@@ -1028,14 +1026,6 @@
                     <option value="roll">roll</option>
                     <option value="bundle">bundle</option>
                     <option value="carton">carton</option>
-                    <option value="bag">bag</option>
-                    <option value="bottle">bottle</option>
-                    <option value="can">can</option>
-                    <option value="jar">jar</option>
-                    <option value="tube">tube</option>
-                    <option value="unit">unit</option>
-                    <option value="sheet">sheet</option>
-                    <option value="packet">packet</option>
                 </select>
             </td>
             <td>
