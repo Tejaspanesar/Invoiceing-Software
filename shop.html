@@ -5,9 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Profile - GST Invoice System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Reset and Base Styles */
+        /* Dark Mode Theme */
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #6366f1;
+            --border-color: #475569;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,77 +31,19 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: #333;
             line-height: 1.6;
-        }
-
-        /* Navigation */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-brand a {
-            color: #4f46e5;
-            text-decoration: none;
-            font-size: 1.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-brand a:hover {
-            transform: translateY(-2px);
-        }
-
-        .nav-brand i {
-            font-size: 2rem;
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 25px;
-        }
-
-        .nav-links a {
-            color: #4b5563;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-links a:hover {
-            background: rgba(79, 70, 229, 0.1);
-            color: #4f46e5;
-            transform: translateY(-2px);
         }
 
         /* Main Container */
         .container {
             max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            min-height: calc(100vh - 80px);
         }
 
         /* Page Header */
@@ -96,8 +54,7 @@
 
         .page-header h1 {
             font-size: 2.5rem;
-            font-family: 'Playfair Display', serif;
-            color: white;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
@@ -105,46 +62,48 @@
             gap: 15px;
         }
 
+        .page-header h1 i {
+            color: var(--accent-primary);
+        }
+
         .subtitle {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-secondary);
             font-size: 1.1rem;
             font-weight: 300;
         }
 
         /* Card Styles */
         .card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             margin-bottom: 2rem;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
 
         .card-header {
             padding: 1.5rem 2rem;
-            border-bottom: 2px solid #f3f4f6;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid var(--border-color);
+            background: rgba(30, 41, 59, 0.5);
         }
 
         .card-title {
             font-size: 1.5rem;
-            font-family: 'Playfair Display', serif;
-            color: #1f2937;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
         .card-title i {
-            color: #4f46e5;
+            color: var(--accent-primary);
             font-size: 1.3rem;
         }
 
@@ -167,29 +126,30 @@
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #4b5563;
+            color: var(--text-secondary);
             font-weight: 500;
             font-size: 0.95rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: white;
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
 
         .form-control::placeholder {
-            color: #9ca3af;
+            color: var(--text-muted);
         }
 
         textarea.form-control {
@@ -197,8 +157,61 @@
             resize: vertical;
         }
 
-        select.form-control {
-            cursor: pointer;
+        /* Logo Upload Section */
+        .logo-upload-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 2px dashed var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-upload-section:hover {
+            border-color: var(--accent-primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .logo-preview-container {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #logoPreview {
+            max-width: 200px;
+            max-height: 120px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            display: none;
+        }
+
+        .logo-placeholder {
+            width: 200px;
+            height: 120px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 2px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .logo-placeholder i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent-primary);
+        }
+
+        .logo-placeholder:hover {
+            border-color: var(--accent-primary);
+            background: rgba(139, 92, 246, 0.05);
         }
 
         /* Action Buttons */
@@ -207,13 +220,13 @@
             gap: 1rem;
             margin-top: 2rem;
             padding-top: 1.5rem;
-            border-top: 2px solid #f3f4f6;
+            border-top: 2px solid var(--border-color);
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
@@ -222,161 +235,126 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            text-decoration: none;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
             color: white;
+            flex: 1;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
         }
 
         .btn-secondary {
-            background: #f3f4f6;
-            color: #4b5563;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            flex: 1;
         }
 
         .btn-secondary:hover {
-            background: #e5e7eb;
+            background: var(--border-color);
             transform: translateY(-2px);
+        }
+
+        /* Back to Dashboard Button */
+        .back-to-dashboard {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .back-to-dashboard .btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-dashboard .btn:hover {
+            transform: translateY(-4px) translateX(-50%);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
         }
 
         /* Invoice Preview */
         .invoice-preview {
-            background: white;
+            background: var(--bg-secondary);
             padding: 2rem;
-            border-radius: 15px;
-            border: 2px solid #e5e7eb;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
         }
 
         .preview-header {
-            border-bottom: 3px solid #1f2937;
+            border-bottom: 3px solid var(--accent-primary);
             padding-bottom: 1.5rem;
             margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .preview-logo {
+            width: 150px;
+            height: 80px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .preview-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .preview-logo i {
+            font-size: 2.5rem;
+            color: var(--accent-primary);
+        }
+
+        .preview-content h2 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-content p {
+            color: var(--text-secondary);
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
         }
 
         .mt-4 {
             margin-top: 2rem;
         }
 
-        /* File Upload */
-        input[type="file"] {
-            padding: 10px;
-            background: #f9fafb;
-            border: 2px dashed #d1d5db;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        input[type="file"]:hover {
-            border-color: #4f46e5;
-            background: #f3f4f6;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 1rem;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .container {
-                padding: 0 1rem;
-                margin: 1rem auto;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
-            .card-body {
-                padding: 1.5rem;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #4338ca, #7c3aed);
-        }
-
-        /* Utility Classes */
-        .text-center {
-            text-align: center;
-        }
-
-        .text-muted {
-            color: #6b7280;
-        }
-
-        .mb-3 {
-            margin-bottom: 1rem;
-        }
-
-        .mb-4 {
-            margin-bottom: 1.5rem;
-        }
-
         /* Toast Notification */
         .toast {
             position: fixed;
-            bottom: 20px;
+            top: 20px;
             right: 20px;
-            background: #10b981;
+            background: var(--success);
             color: white;
             padding: 1rem 1.5rem;
-            border-radius: 10px;
+            border-radius: 12px;
             box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
             display: none;
             align-items: center;
@@ -396,28 +374,104 @@
             }
         }
 
-        /* Signature Preview */
-        #signaturePreview {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f9fafb;
-            border-radius: 8px;
-            border: 2px solid #e5e7eb;
+        /* File Upload */
+        .file-upload-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
         }
 
-        #signaturePreview img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
         }
 
-        /* Form Validation */
-        .form-control:invalid:not(:focus):not(:placeholder-shown) {
-            border-color: #ef4444;
+        .file-upload-label {
+            display: block;
+            padding: 14px;
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
         }
 
-        .form-control:valid:not(:focus):not(:placeholder-shown) {
-            border-color: #10b981;
+        .file-upload-label:hover {
+            border-color: var(--accent-primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .file-upload-label i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+            color: var(--accent-primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .back-to-dashboard {
+                width: 90%;
+            }
+
+            .back-to-dashboard .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .preview-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .preview-logo {
+                width: 120px;
+                height: 60px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-secondary);
         }
 
         /* Loading State */
@@ -435,8 +489,8 @@
             transform: translate(-50%, -50%);
             width: 20px;
             height: 20px;
-            border: 2px solid #f3f4f6;
-            border-top-color: #4f46e5;
+            border: 2px solid var(--bg-secondary);
+            border-top-color: var(--accent-primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -447,21 +501,52 @@
             }
         }
 
-        /* Hover Effects */
-        .hover-lift {
-            transition: transform 0.2s ease;
+        /* Required Field Indicator */
+        .required::after {
+            content: " *";
+            color: var(--error);
         }
 
-        .hover-lift:hover {
-            transform: translateY(-2px);
+        /* Preview Section Enhancements */
+        .preview-section {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
         }
 
-        /* Focus Styles for Accessibility */
-        .form-control:focus,
-        .btn:focus,
-        input[type="file"]:focus {
-            outline: 2px solid #4f46e5;
-            outline-offset: 2px;
+        .preview-section h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-section h4 i {
+            color: var(--accent-primary);
+        }
+
+        .preview-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Animation for logo upload */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
         }
     </style>
 </head>
@@ -472,48 +557,13 @@
         <span id="toastMessage">Profile saved successfully!</span>
     </div>
 
-    <nav class="navbar">
-        <div class="nav-brand">
-            <a href="dashboard.html">
-                <i class="fas fa-file-invoice"></i>
-                <span>GST Invoice</span>
-            </a>
-        </div>
-        <div class="nav-links">
-            <a href="dashboard.html">
-                <i class="fas fa-home"></i>
-                Dashboard
-            </a>
-            <a href="shop.html" class="active">
-                <i class="fas fa-store"></i>
-                Shop Profile
-            </a>
-            <a href="products.html">
-                <i class="fas fa-boxes"></i>
-                Products
-            </a>
-            <a href="customers.html">
-                <i class="fas fa-users"></i>
-                Customers
-            </a>
-            <a href="invoices.html">
-                <i class="fas fa-file-invoice-dollar"></i>
-                Invoices
-            </a>
-            <a href="reports.html">
-                <i class="fas fa-chart-bar"></i>
-                Reports
-            </a>
-        </div>
-    </nav>
-
     <main class="container">
         <div class="page-header">
             <h1>
                 <i class="fas fa-store"></i>
                 Shop Profile
             </h1>
-            <p class="subtitle">Manage your business information</p>
+            <p class="subtitle">Manage your business information and logo</p>
         </div>
 
         <div class="card">
@@ -527,19 +577,14 @@
                 <form id="shopProfileForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Shop/Business Name*</label>
+                            <label class="form-label required">Shop/Business Name</label>
                             <input type="text" class="form-control" id="shopName" 
                                    placeholder="Enter your business name" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Business Type</label>
-                            <select class="form-control" id="businessType">
-                                <option value="proprietorship">Proprietorship</option>
-                                <option value="partnership">Partnership</option>
-                                <option value="pvt-ltd">Private Limited</option>
-                                <option value="llp">LLP</option>
-                                <option value="individual">Individual</option>
-                            </select>
+                            <label class="form-label">Business Category</label>
+                            <input type="text" class="form-control" id="businessCategory" 
+                                   placeholder="e.g., Retail, Wholesale, Services">
                         </div>
                     </div>
 
@@ -551,12 +596,12 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Phone Number*</label>
+                            <label class="form-label required">Phone Number</label>
                             <input type="tel" class="form-control" id="shopPhone" 
                                    placeholder="+91 9876543210" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Email Address*</label>
+                            <label class="form-label required">Email Address</label>
                             <input type="email" class="form-control" id="shopEmail" 
                                    placeholder="contact@business.com" required>
                         </div>
@@ -576,7 +621,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Business Address*</label>
+                        <label class="form-label required">Business Address</label>
                         <textarea class="form-control" id="shopAddress" 
                                   rows="3" placeholder="Complete address including city, state, and PIN" required></textarea>
                     </div>
@@ -599,19 +644,40 @@
                         </div>
                     </div>
 
+                    <!-- Logo Upload Section -->
+                    <div class="logo-upload-section">
+                        <label class="form-label">
+                            <i class="fas fa-image"></i> Shop Logo (Optional)
+                        </label>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Upload your business logo. Recommended size: 200x120px
+                        </p>
+                        
+                        <div class="file-upload-wrapper">
+                            <input type="file" class="form-control" id="logoUpload" 
+                                   accept="image/*">
+                            <div class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Click to upload logo</span>
+                                <span style="display: block; font-size: 0.8rem; margin-top: 5px;">
+                                    Supports: JPG, PNG, SVG (Max: 2MB)
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="logo-preview-container">
+                            <div class="logo-placeholder" id="logoPlaceholder">
+                                <i class="fas fa-store"></i>
+                                <span>No logo uploaded</span>
+                            </div>
+                            <img id="logoPreview" class="fade-in" alt="Shop Logo Preview">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label">Terms & Conditions</label>
                         <textarea class="form-control" id="shopTerms" rows="5" 
                                   placeholder="Enter your business terms and conditions..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Signature (Optional)</label>
-                        <input type="file" class="form-control" id="signatureUpload" 
-                               accept="image/*" style="margin-bottom: 10px;">
-                        <div id="signaturePreview" style="max-width: 200px; display: none;">
-                            <img src="" alt="Signature" style="max-width: 100%; border: 1px solid #ddd;">
-                        </div>
                     </div>
 
                     <div class="action-buttons">
@@ -636,56 +702,47 @@
             <div class="card-body">
                 <div class="invoice-preview">
                     <div class="preview-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-                            <div style="flex: 1;">
-                                <h2 id="previewShopName" style="margin: 0; font-size: 24px; font-weight: bold; color: #1f2937;">Your Business Name</h2>
-                                <p id="previewShopDesc" style="margin: 5px 0; color: #6b7280; font-style: italic;">Business Description</p>
-                                <p id="previewShopAddress" style="margin: 5px 0; font-size: 14px; color: #4b5563;">Address Line 1, City, State - PIN</p>
-                                <p id="previewShopContact" style="margin: 5px 0; font-size: 14px; color: #4b5563;">
-                                    <span id="previewPhone">Phone: +91 9876543210</span> | 
-                                    <span id="previewEmail">Email: contact@business.com</span>
-                                </p>
-                                <p style="margin: 5px 0; font-size: 14px; color: #4b5563;">
-                                    <span id="previewGSTIN">GSTIN: 27ABCDE1234F1Z5</span> | 
-                                    <span id="previewPAN">PAN: ABCDE1234F</span>
-                                </p>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="width: 120px; height: 120px; border: 2px solid #e5e7eb; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8fafc, #f1f5f9);">
-                                    <i class="fas fa-store" style="font-size: 48px; background: linear-gradient(135deg, #4f46e5, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-                                </div>
-                            </div>
+                        <div class="preview-content">
+                            <h2 id="previewShopName">Your Business Name</h2>
+                            <p id="previewShopDesc">Business Description</p>
+                            <p id="previewShopAddress">Address Line 1, City, State - PIN</p>
+                            <p id="previewShopContact">
+                                <span id="previewPhone">Phone: +91 9876543210</span> | 
+                                <span id="previewEmail">Email: contact@business.com</span>
+                            </p>
+                            <p>
+                                <span id="previewGSTIN">GSTIN: Not provided</span> | 
+                                <span id="previewPAN">PAN: Not provided</span>
+                            </p>
+                        </div>
+                        <div class="preview-logo" id="previewLogo">
+                            <i class="fas fa-store"></i>
                         </div>
                     </div>
                     
-                    <div style="margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">
-                        <h3 style="margin-bottom: 10px; color: #1f2937; font-size: 18px;">
-                            <i class="fas fa-university"></i> Bank Details:
-                        </h3>
-                        <p id="previewBankDetails" style="margin: 5px 0; color: #6b7280; font-family: monospace; font-size: 14px;">Not provided</p>
+                    <div class="preview-section">
+                        <h4><i class="fas fa-university"></i> Bank Details</h4>
+                        <p id="previewBankDetails">Not provided</p>
                     </div>
                     
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
-                        <h3 style="margin-bottom: 10px; color: #1f2937; font-size: 18px;">
-                            <i class="fas fa-file-contract"></i> Terms & Conditions:
-                        </h3>
-                        <div id="previewTerms" style="color: #6b7280; font-style: italic; padding: 10px; background: #f9fafb; border-radius: 6px; max-height: 150px; overflow-y: auto;">
+                    <div class="preview-section mt-4">
+                        <h4><i class="fas fa-file-contract"></i> Terms & Conditions</h4>
+                        <p id="previewTerms" style="color: var(--text-secondary); font-style: italic;">
                             No terms & conditions set
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center;">
-                        <div style="display: inline-block; padding: 10px 20px; background: #f9fafb; border-radius: 8px;">
-                            <p style="color: #6b7280; font-size: 12px; margin-bottom: 5px;">Authorized Signature</p>
-                            <div id="previewSignature" style="min-height: 50px; display: flex; align-items: center; justify-content: center;">
-                                <span style="color: #9ca3af; font-style: italic;">No signature uploaded</span>
-                            </div>
-                        </div>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Back to Dashboard Button -->
+    <div class="back-to-dashboard">
+        <a href="dashboard.html" class="btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
 
     <script>
         // Initialize shop page with all functionality
@@ -701,8 +758,8 @@
             // Setup real-time preview updates
             setupPreviewUpdates();
             
-            // Setup signature upload
-            setupSignatureUpload();
+            // Setup logo upload
+            setupLogoUpload();
             
             // Show success message if redirected from save
             const urlParams = new URLSearchParams(window.location.search);
@@ -720,10 +777,23 @@
                 // Populate form fields
                 Object.keys(data).forEach(key => {
                     const element = document.getElementById(key);
-                    if (element) {
+                    if (element && key !== 'logo') {
                         element.value = data[key];
                     }
                 });
+                
+                // Load logo if exists
+                if (data.logo) {
+                    const logoPreview = document.getElementById('logoPreview');
+                    const logoPlaceholder = document.getElementById('logoPlaceholder');
+                    const previewLogo = document.getElementById('previewLogo');
+                    
+                    logoPreview.src = data.logo;
+                    logoPreview.style.display = 'block';
+                    logoPlaceholder.style.display = 'none';
+                    
+                    previewLogo.innerHTML = `<img src="${data.logo}" alt="Shop Logo">`;
+                }
                 
                 // Update preview
                 updatePreview(data);
@@ -735,6 +805,10 @@
             const form = document.getElementById('shopProfileForm');
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                if (!validateForm()) {
+                    return;
+                }
                 
                 // Get form data
                 const formData = getFormData();
@@ -760,24 +834,26 @@
             const data = {};
             
             // Get all form inputs
-            const formElements = document.querySelectorAll('#shopProfileForm input, #shopProfileForm select, #shopProfileForm textarea');
+            const formElements = document.querySelectorAll('#shopProfileForm input:not([type="file"]), #shopProfileForm textarea');
             
             formElements.forEach(element => {
                 if (element.id) {
-                    if (element.type === 'file') {
-                        // Handle file uploads separately
-                        return;
-                    }
                     data[element.id] = element.value;
                 }
             });
+            
+            // Get logo data
+            const logoPreview = document.getElementById('logoPreview');
+            if (logoPreview.src && !logoPreview.src.includes('data:,')) {
+                data.logo = logoPreview.src;
+            }
             
             return data;
         }
 
         // Setup real-time preview updates
         function setupPreviewUpdates() {
-            const formElements = document.querySelectorAll('#shopProfileForm input, #shopProfileForm select, #shopProfileForm textarea');
+            const formElements = document.querySelectorAll('#shopProfileForm input:not([type="file"]), #shopProfileForm textarea');
             
             formElements.forEach(element => {
                 element.addEventListener('input', updatePreviewFromForm);
@@ -816,57 +892,105 @@
             // Terms & Conditions
             document.getElementById('previewTerms').textContent = data.shopTerms || 'No terms & conditions set';
             
-            // Business Type
-            const businessTypeSelect = document.getElementById('businessType');
-            if (businessTypeSelect) {
-                const selectedOption = businessTypeSelect.options[businessTypeSelect.selectedIndex];
-                const businessTypeElement = document.createElement('p');
-                businessTypeElement.style.margin = '5px 0';
-                businessTypeElement.style.color = '#6b7280';
-                businessTypeElement.style.fontSize = '14px';
-                businessTypeElement.innerHTML = `<strong>Business Type:</strong> ${selectedOption.text}`;
-                document.getElementById('previewShopContact').after(businessTypeElement);
+            // Business Category
+            if (data.businessCategory) {
+                const categoryElement = document.createElement('p');
+                categoryElement.style.color = 'var(--text-secondary)';
+                categoryElement.style.marginTop = '0.25rem';
+                categoryElement.innerHTML = `<strong>Category:</strong> ${data.businessCategory}`;
+                document.getElementById('previewShopContact').after(categoryElement);
             }
         }
 
-        // Setup signature upload
-        function setupSignatureUpload() {
-            const signatureUpload = document.getElementById('signatureUpload');
-            const signaturePreview = document.getElementById('signaturePreview');
-            const previewSignature = document.getElementById('previewSignature');
+        // Setup logo upload
+        function setupLogoUpload() {
+            const logoUpload = document.getElementById('logoUpload');
+            const logoPreview = document.getElementById('logoPreview');
+            const logoPlaceholder = document.getElementById('logoPlaceholder');
+            const previewLogo = document.getElementById('previewLogo');
             
-            signatureUpload.addEventListener('change', function(e) {
+            logoUpload.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
+                    // Validate file size (max 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        showToast('File size must be less than 2MB', 'error');
+                        return;
+                    }
+                    
+                    // Validate file type
+                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml', 'image/gif'];
+                    if (!validTypes.includes(file.type)) {
+                        showToast('Please upload a valid image file (JPG, PNG, SVG, GIF)', 'error');
+                        return;
+                    }
+                    
                     const reader = new FileReader();
                     
                     reader.onload = function(e) {
                         // Show preview in form
-                        const img = signaturePreview.querySelector('img');
-                        img.src = e.target.result;
-                        signaturePreview.style.display = 'block';
+                        logoPreview.src = e.target.result;
+                        logoPreview.style.display = 'block';
+                        logoPreview.classList.add('fade-in');
+                        logoPlaceholder.style.display = 'none';
                         
                         // Update main preview
-                        previewSignature.innerHTML = `<img src="${e.target.result}" alt="Signature" style="max-width: 150px; max-height: 50px;">`;
+                        previewLogo.innerHTML = `<img src="${e.target.result}" alt="Shop Logo">`;
                         
                         // Save to localStorage
                         const savedData = JSON.parse(localStorage.getItem('shopProfile') || '{}');
-                        savedData.signature = e.target.result;
+                        savedData.logo = e.target.result;
                         localStorage.setItem('shopProfile', JSON.stringify(savedData));
+                        
+                        showToast('Logo uploaded successfully!', 'success');
+                    };
+                    
+                    reader.onerror = function() {
+                        showToast('Error uploading file. Please try again.', 'error');
                     };
                     
                     reader.readAsDataURL(file);
                 }
             });
             
-            // Load saved signature
+            // Load saved logo
             const savedData = JSON.parse(localStorage.getItem('shopProfile') || '{}');
-            if (savedData.signature) {
-                const img = signaturePreview.querySelector('img');
-                img.src = savedData.signature;
-                signaturePreview.style.display = 'block';
-                previewSignature.innerHTML = `<img src="${savedData.signature}" alt="Signature" style="max-width: 150px; max-height: 50px;">`;
+            if (savedData.logo) {
+                logoPreview.src = savedData.logo;
+                logoPreview.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+                previewLogo.innerHTML = `<img src="${savedData.logo}" alt="Shop Logo">`;
             }
+            
+            // Add click event to logo placeholder
+            logoPlaceholder.addEventListener('click', function() {
+                logoUpload.click();
+            });
+            
+            // Add click event to file upload label
+            document.querySelector('.file-upload-label').addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Remove logo
+        function removeLogo() {
+            const logoUpload = document.getElementById('logoUpload');
+            const logoPreview = document.getElementById('logoPreview');
+            const logoPlaceholder = document.getElementById('logoPlaceholder');
+            const previewLogo = document.getElementById('previewLogo');
+            
+            logoUpload.value = '';
+            logoPreview.style.display = 'none';
+            logoPlaceholder.style.display = 'flex';
+            previewLogo.innerHTML = '<i class="fas fa-store"></i>';
+            
+            // Remove from localStorage
+            const savedData = JSON.parse(localStorage.getItem('shopProfile') || '{}');
+            delete savedData.logo;
+            localStorage.setItem('shopProfile', JSON.stringify(savedData));
+            
+            showToast('Logo removed successfully', 'info');
         }
 
         // Reset form
@@ -876,9 +1000,15 @@
                 localStorage.removeItem('shopProfile');
                 updatePreview({});
                 
-                // Reset signature preview
-                document.getElementById('signaturePreview').style.display = 'none';
-                document.getElementById('previewSignature').innerHTML = '<span style="color: #9ca3af; font-style: italic;">No signature uploaded</span>';
+                // Reset logo preview
+                const logoPreview = document.getElementById('logoPreview');
+                const logoPlaceholder = document.getElementById('logoPlaceholder');
+                const previewLogo = document.getElementById('previewLogo');
+                
+                document.getElementById('logoUpload').value = '';
+                logoPreview.style.display = 'none';
+                logoPlaceholder.style.display = 'flex';
+                previewLogo.innerHTML = '<i class="fas fa-store"></i>';
                 
                 showToast('Form reset successfully!', 'info');
             }
@@ -891,7 +1021,9 @@
             
             // Set message and type
             toastMessage.textContent = message;
-            toast.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+            toast.style.background = type === 'success' ? 'var(--success)' : 
+                                    type === 'error' ? 'var(--error)' : 
+                                    type === 'warning' ? 'var(--warning)' : 'var(--info)';
             
             // Show toast
             toast.style.display = 'flex';
@@ -910,10 +1042,11 @@
             requiredFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (!field.value.trim()) {
-                    field.style.borderColor = '#ef4444';
+                    field.style.borderColor = 'var(--error)';
+                    showToast(`Please fill in the ${field.previousElementSibling.textContent}`, 'error');
                     isValid = false;
                 } else {
-                    field.style.borderColor = '#e5e7eb';
+                    field.style.borderColor = 'var(--border-color)';
                 }
             });
             
@@ -921,7 +1054,7 @@
             const emailField = document.getElementById('shopEmail');
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (emailField.value && !emailRegex.test(emailField.value)) {
-                emailField.style.borderColor = '#ef4444';
+                emailField.style.borderColor = 'var(--error)';
                 showToast('Please enter a valid email address', 'error');
                 isValid = false;
             }
@@ -930,7 +1063,7 @@
             const phoneField = document.getElementById('shopPhone');
             const phoneRegex = /^[\d\s\+\-\(\)]{10,}$/;
             if (phoneField.value && !phoneRegex.test(phoneField.value.replace(/\s/g, ''))) {
-                phoneField.style.borderColor = '#ef4444';
+                phoneField.style.borderColor = 'var(--error)';
                 showToast('Please enter a valid phone number', 'error');
                 isValid = false;
             }
