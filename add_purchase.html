@@ -488,6 +488,24 @@
           transition: all 0.3s ease;
         }
         
+        .items-table select {
+          width: 100%;
+          padding: 8px 10px;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          background: var(--card-bg);
+          color: var(--text-primary);
+          font-size: 0.875rem;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+        
+        .items-table select:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+        
         .items-table input:focus {
           outline: none;
           border-color: var(--primary);
@@ -594,7 +612,7 @@
           }
           
           .items-table {
-            min-width: 800px;
+            min-width: 900px;
           }
         }
         
@@ -699,6 +717,7 @@
                   <th style="width: 40px">#</th>
                   <th>Product Name *</th>
                   <th style="width: 100px">Quantity *</th>
+                  <th style="width: 100px">Unit</th>
                   <th style="width: 100px">Unit Price *</th>
                   <th style="width: 80px">GST %</th>
                   <th style="width: 120px">Total</th>
@@ -800,6 +819,95 @@
   <script src="github-storage.js"></script>
 
   <script>
+    // GitHub Storage Check - Run immediately
+    (function() {
+      console.log('Checking GitHub storage availability...');
+      
+      // Check if githubStorage is available
+      if (typeof githubStorage === 'undefined') {
+        console.warn('github-storage.js not loaded or githubStorage object not found');
+        
+        // Create a mock githubStorage object if it doesn't exist
+        window.githubStorage = {
+          username: '',
+          repo: '',
+          token: '',
+          
+          isValidConfig: function() {
+            try {
+              const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+              return !!(savedConfig.username && savedConfig.repo && savedConfig.token);
+            } catch (e) {
+              return false;
+            }
+          },
+          
+          loadUserData: function(email) {
+            console.log('Mock: loadUserData called for', email);
+            return Promise.resolve(null);
+          },
+          
+          saveUserData: function(email, data) {
+            console.log('Mock: saveUserData called for', email);
+            return Promise.resolve({success: false, message: 'GitHub storage not configured'});
+          },
+          
+          loadAnyUserData: function() {
+            console.log('Mock: loadAnyUserData called');
+            return Promise.resolve(null);
+          }
+        };
+        
+        console.log('Created mock githubStorage object');
+      } else {
+        console.log('GitHub storage is available');
+        
+        // Check if GitHub is configured
+        const isConfigured = githubStorage.isValidConfig();
+        console.log('GitHub storage configured:', isConfigured);
+        
+        if (isConfigured) {
+          console.log('GitHub storage ready for use');
+          console.log('Username:', githubStorage.username);
+          console.log('Repo:', githubStorage.repo);
+          console.log('Token available:', !!githubStorage.token);
+        } else {
+          console.log('GitHub storage not configured. Data will be saved locally only.');
+        }
+      }
+      
+      // Check for existing GitHub config
+      try {
+        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+        if (savedConfig.username && savedConfig.repo) {
+          console.log('Found saved GitHub config:', {
+            username: savedConfig.username,
+            repo: savedConfig.repo,
+            hasToken: !!savedConfig.token
+          });
+        } else {
+          console.log('No saved GitHub config found');
+        }
+      } catch (e) {
+        console.error('Error reading GitHub config:', e);
+      }
+      
+      // Check for any saved user data
+      try {
+        const currentUser = sessionStorage.getItem('currentUser');
+        if (currentUser) {
+          console.log('Current user session found:', JSON.parse(currentUser).email);
+        } else {
+          console.log('No current user session found');
+        }
+      } catch (e) {
+        console.error('Error checking user session:', e);
+      }
+    })();
+
+    // Common unit types
+    const UNIT_TYPES = ['pcs', 'kg', 'g', 'mg', 'litre', 'ml', 'meter', 'cm', 'feet', 'yard', 'box', 'pack', 'dozen', 'pair', 'set', 'roll', 'bundle', 'carton', 'bag', 'bottle', 'can', 'jar', 'tube', 'unit', 'sheet', 'packet'];
+
     // Main JavaScript - All functions properly defined
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Page loaded, initializing...');
@@ -901,6 +1009,36 @@
                 <input type="number" class="form-control item-qty" min="0.001" step="0.001" value="1" required>
             </td>
             <td>
+                <select class="form-control item-unit">
+                    <option value="pcs">pcs</option>
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="litre">litre</option>
+                    <option value="ml">ml</option>
+                    <option value="meter">meter</option>
+                    <option value="cm">cm</option>
+                    <option value="feet">feet</option>
+                    <option value="yard">yard</option>
+                    <option value="box">box</option>
+                    <option value="pack">pack</option>
+                    <option value="dozen">dozen</option>
+                    <option value="pair">pair</option>
+                    <option value="set">set</option>
+                    <option value="roll">roll</option>
+                    <option value="bundle">bundle</option>
+                    <option value="carton">carton</option>
+                    <option value="bag">bag</option>
+                    <option value="bottle">bottle</option>
+                    <option value="can">can</option>
+                    <option value="jar">jar</option>
+                    <option value="tube">tube</option>
+                    <option value="unit">unit</option>
+                    <option value="sheet">sheet</option>
+                    <option value="packet">packet</option>
+                </select>
+            </td>
+            <td>
                 <input type="number" class="form-control item-price" min="0" step="0.01" required>
             </td>
             <td>
@@ -928,16 +1066,22 @@
     function setupItemRowListeners(row) {
         const productInput = row.querySelector('.item-product');
         const qtyInput = row.querySelector('.item-qty');
+        const unitInput = row.querySelector('.item-unit');
         const priceInput = row.querySelector('.item-price');
         const gstInput = row.querySelector('.item-gst');
         const suggestions = row.querySelector('.item-suggestions');
         
         // Calculate total when inputs change
-        [qtyInput, priceInput, gstInput].forEach(input => {
+        [qtyInput, unitInput, priceInput, gstInput].forEach(input => {
             input.addEventListener('input', function() {
                 calculateItemTotal(row);
                 updatePurchaseSummary();
             });
+        });
+        
+        unitInput.addEventListener('change', function() {
+            calculateItemTotal(row);
+            updatePurchaseSummary();
         });
         
         // Product autocomplete
@@ -945,7 +1089,7 @@
             const query = this.value.toLowerCase();
             
             if (query.length < 2) {
-                suggestions.style.display = 'none';
+                if (suggestions) suggestions.style.display = 'none';
                 return;
             }
             
@@ -962,12 +1106,12 @@
                 p.name && p.name.toLowerCase().includes(query)
             ).slice(0, 10);
             
-            if (filtered.length > 0) {
+            if (filtered.length > 0 && suggestions) {
                 suggestions.innerHTML = filtered.map(p => `
-                    <div class="suggestion-item" data-name="${p.name}" data-gst="${p.gstRate || 0}" data-price="${p.price || ''}">
+                    <div class="suggestion-item" data-name="${p.name}" data-unit="${p.unit || 'pcs'}" data-gst="${p.gstRate || 0}" data-price="${p.price || ''}">
                         <strong>${p.name}</strong>
                         ${p.description ? `<br><small>${p.description.substring(0, 50)}...</small>` : ''}
-                        <br><small>Stock: ${p.stock || 0} | GST: ${p.gstRate || 0}% | Price: ₹${p.price || 0}</small>
+                        <br><small>Stock: ${p.stock || 0} ${p.unit || 'pcs'} | GST: ${p.gstRate || 0}% | Price: ₹${p.price || 0}</small>
                     </div>
                 `).join('');
                 
@@ -977,21 +1121,22 @@
                 suggestions.querySelectorAll('.suggestion-item').forEach(item => {
                     item.addEventListener('click', function() {
                         productInput.value = this.dataset.name;
+                        unitInput.value = this.dataset.unit || 'pcs';
                         gstInput.value = this.dataset.gst;
                         priceInput.value = this.dataset.price || '';
-                        suggestions.style.display = 'none';
+                        if (suggestions) suggestions.style.display = 'none';
                         calculateItemTotal(row);
                         updatePurchaseSummary();
                     });
                 });
             } else {
-                suggestions.style.display = 'none';
+                if (suggestions) suggestions.style.display = 'none';
             }
         });
         
-        // Hide suggestions when clicking outside
+        // Hide suggestions when clicking outside - FIXED: Check if suggestions exists
         document.addEventListener('click', function(e) {
-            if (!productInput.contains(e.target) && !suggestions.contains(e.target)) {
+            if (!productInput.contains(e.target) && suggestions && !suggestions.contains(e.target)) {
                 suggestions.style.display = 'none';
             }
         });
@@ -1050,6 +1195,7 @@
         rows.forEach((row, index) => {
             const product = row.querySelector('.item-product').value;
             const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const unit = row.querySelector('.item-unit').value || 'pcs';
             const price = parseFloat(row.querySelector('.item-price').value) || 0;
             const total = parseFloat(row.querySelector('.item-total').value) || 0;
             
@@ -1059,8 +1205,8 @@
                 
                 itemsHTML += `
                     <div class="item-row">
-                        <div>${product}</div>
-                        <div>${qty.toFixed(3)} × ₹${price.toFixed(2)} = ₹${total.toFixed(2)}</div>
+                        <div>${product} (${qty.toFixed(3)} ${unit})</div>
+                        <div>₹${price.toFixed(2)} × ${qty.toFixed(3)} = ₹${total.toFixed(2)}</div>
                     </div>
                 `;
             }
@@ -1178,13 +1324,14 @@
                 if (purchase.items && Array.isArray(purchase.items)) {
                     purchase.items.forEach(item => {
                         const qty = parseFloat(item.qty) || 0;
+                        const unit = item.unit || 'pcs';
                         const price = parseFloat(item.price) || 0;
                         totalQty += qty;
                         totalAmount += qty * price;
                         itemCount++;
                         
                         if (itemCount <= 2) {
-                            itemsText += `${item.product || 'Unknown'} (${qty}), `;
+                            itemsText += `${item.product || 'Unknown'} (${qty} ${unit}), `;
                         }
                     });
                     
@@ -1251,6 +1398,7 @@
         rows.forEach(row => {
             const product = row.querySelector('.item-product').value.trim();
             const qty = parseFloat(row.querySelector('.item-qty').value);
+            const unit = row.querySelector('.item-unit').value || 'pcs';
             const price = parseFloat(row.querySelector('.item-price').value);
             const gst = parseFloat(row.querySelector('.item-gst').value || 0);
             
@@ -1259,6 +1407,7 @@
                 items.push({
                     product: product,
                     qty: qty,
+                    unit: unit,
                     price: price,
                     gst: gst
                 });
@@ -1303,8 +1452,8 @@
             
             items.forEach(item => {
                 try {
-                    updateInventory(item.product, item.qty, item.price, item.gst, notes);
-                    inventoryUpdateMessage += `✓ ${item.product}: Added ${item.qty} units\n`;
+                    updateInventory(item.product, item.qty, item.unit, item.price, item.gst, notes);
+                    inventoryUpdateMessage += `✓ ${item.product}: Added ${item.qty} ${item.unit}\n`;
                 } catch (error) {
                     console.error(`Error updating inventory for ${item.product}:`, error);
                     inventoryUpdateSuccess = false;
@@ -1344,7 +1493,7 @@
             let successMessage = `Purchase recorded successfully!\n\nItems:\n`;
             items.forEach(item => {
                 const itemTotal = item.qty * item.price;
-                successMessage += `• ${item.product}: ${item.qty} × ₹${item.price} = ₹${itemTotal.toFixed(2)}\n`;
+                successMessage += `• ${item.product}: ${item.qty} ${item.unit} × ₹${item.price} = ₹${itemTotal.toFixed(2)}\n`;
             });
             
             successMessage += `\nInventory Update:\n${inventoryUpdateMessage}`;
@@ -1368,8 +1517,8 @@
     }
     
     // Update inventory after purchase
-    function updateInventory(productName, qty, price, gst, notes) {
-        console.log('Updating inventory for:', productName, 'Quantity:', qty);
+    function updateInventory(productName, qty, unit, price, gst, notes) {
+        console.log('Updating inventory for:', productName, 'Quantity:', qty, unit);
         
         try {
             // Load current inventory
@@ -1406,6 +1555,7 @@
                 console.log('Current stock:', currentStock, 'Adding:', qty, 'New stock:', newStock);
                 
                 inventory[existingIndex].stock = newStock.toFixed(3);
+                inventory[existingIndex].unit = unit; // Update unit
                 inventory[existingIndex].price = price; // Update purchase price
                 inventory[existingIndex].gstRate = gst;
                 inventory[existingIndex].lastUpdated = new Date().toISOString().split('T')[0];
@@ -1424,6 +1574,7 @@
                     name: productName,
                     category: 'General',
                     stock: qty.toFixed(3),
+                    unit: unit, // Add unit
                     price: price,
                     gstRate: gst,
                     description: notes || 'Added via purchase',
@@ -1596,81 +1747,3 @@
   </script>
 </body>
 </html>
-// Add this to your dashboard.js or script.js
-async function initializeApp() {
-    // Check if user is logged in
-    const currentUser = sessionStorage.getItem('currentUser');
-    
-    if (!currentUser) {
-        // Check for GitHub config and try to auto-login
-        await tryAutoLoginFromGitHub();
-        return;
-    }
-    
-    // Load GitHub data if configured
-    await checkAndLoadGitHubData();
-}
-
-async function tryAutoLoginFromGitHub() {
-    try {
-        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-        
-        if (savedConfig.username && savedConfig.repo && savedConfig.token) {
-            githubStorage.username = savedConfig.username;
-            githubStorage.repo = savedConfig.repo;
-            githubStorage.token = savedConfig.token;
-            
-            // Try to load any user data
-            const allData = await githubStorage.loadAnyUserData();
-            
-            if (allData && allData.users && allData.users.length > 0) {
-                // Auto-login with first user (you might want to add a login selection)
-                const firstUser = allData.users[0];
-                sessionStorage.setItem('currentUser', JSON.stringify(firstUser));
-                
-                // Save data locally
-                if (allData.invoices) localStorage.setItem('invoices', JSON.stringify(allData.invoices));
-                if (allData.inventory) localStorage.setItem('inventory', JSON.stringify(allData.inventory));
-                if (allData.shopProfile) localStorage.setItem('shopProfile', JSON.stringify(allData.shopProfile));
-                
-                showAlert('Auto-logged in from cloud!', 'info');
-                window.location.href = 'dashboard.html';
-                return true;
-            }
-        }
-        
-        // No auto-login possible, redirect to login
-        window.location.href = 'login.html';
-        return false;
-    } catch (error) {
-        console.error('Auto-login error:', error);
-        window.location.href = 'login.html';
-        return false;
-    }
-}
-
-async function checkAndLoadGitHubData() {
-    try {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-        
-        if (currentUser.email && savedConfig.username && savedConfig.repo && savedConfig.token) {
-            githubStorage.username = savedConfig.username;
-            githubStorage.repo = savedConfig.repo;
-            githubStorage.token = savedConfig.token;
-            
-            // Check for newer data on GitHub
-            const githubData = await githubStorage.loadUserData(currentUser.email);
-            
-            if (githubData) {
-                // Compare timestamps or implement your sync logic
-                console.log('GitHub data available:', githubData);
-            }
-        }
-    } catch (error) {
-        console.log('GitHub data check error:', error);
-    }
-}
-
-// Call this on page load
-document.addEventListener('DOMContentLoaded', initializeApp);
