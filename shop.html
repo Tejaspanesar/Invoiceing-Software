@@ -38,6 +38,167 @@
             line-height: 1.6;
         }
 
+        /* GitHub Config Modal */
+        .github-config-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .github-config-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--accent-primary);
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .config-header h3 {
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .config-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .config-form input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .config-form input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .form-help a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .form-help a:hover {
+            text-decoration: underline;
+        }
+
+        .test-connection-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .test-connection-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .test-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            color: var(--success);
+        }
+
+        .test-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--error);
+            color: var(--error);
+        }
+
+        /* Sync Status */
+        .sync-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-primary);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 999;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .sync-success {
+            border-left-color: var(--success);
+        }
+
+        .sync-error {
+            border-left-color: var(--error);
+        }
+
+        .sync-warning {
+            border-left-color: var(--warning);
+        }
+
         /* Main Container */
         .container {
             max-width: 1200px;
@@ -50,6 +211,22 @@
         .page-header {
             margin-bottom: 2.5rem;
             text-align: center;
+            position: relative;
+        }
+
+        .github-info {
+            position: absolute;
+            right: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .github-info i {
+            color: var(--accent-primary);
         }
 
         .page-header h1 {
@@ -92,6 +269,9 @@
             padding: 1.5rem 2rem;
             border-bottom: 2px solid var(--border-color);
             background: rgba(30, 41, 59, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .card-title {
@@ -261,6 +441,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-gh {
+            background: #333;
+            color: white;
+        }
+
+        .btn-gh:hover {
+            background: #444;
+            transform: translateY(-2px);
+        }
+
         /* Back to Dashboard Button */
         .back-to-dashboard {
             position: fixed;
@@ -346,34 +536,6 @@
             margin-top: 2rem;
         }
 
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--success);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
-            display: none;
-            align-items: center;
-            gap: 10px;
-            z-index: 9999;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
         /* File Upload */
         .file-upload-wrapper {
             position: relative;
@@ -424,6 +586,12 @@
                 font-size: 2rem;
             }
 
+            .github-info {
+                position: relative;
+                margin-top: 1rem;
+                justify-content: center;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
@@ -456,109 +624,102 @@
             }
         }
 
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-primary);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-secondary);
-        }
-
-        /* Loading State */
-        .loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--bg-secondary);
-            border-top-color: var(--accent-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
-        }
-
         /* Required Field Indicator */
         .required::after {
             content: " *";
             color: var(--error);
         }
 
-        /* Preview Section Enhancements */
-        .preview-section {
-            background: var(--bg-card);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-top: 1rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .preview-section h4 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            display: flex;
+        /* GitHub Storage Status */
+        .storage-status {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-left: 10px;
         }
 
-        .preview-section h4 i {
-            color: var(--accent-primary);
+        .storage-connected {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
         }
 
-        .preview-section p {
-            color: var(--text-secondary);
-            line-height: 1.6;
+        .storage-disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid var(--error);
         }
 
-        /* Animation for logo upload */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
+        .storage-icon {
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-        <i class="fas fa-check-circle"></i>
-        <span id="toastMessage">Profile saved successfully!</span>
+    <!-- GitHub Configuration Modal -->
+    <div id="githubConfigModal" class="github-config-modal">
+        <div class="github-config-content">
+            <div class="config-header">
+                <h3><i class="fab fa-github"></i> GitHub Configuration</h3>
+                <button onclick="closeGitHubConfig()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="githubConfigForm" class="config-form">
+                <div class="form-group">
+                    <label>GitHub Personal Access Token</label>
+                    <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" required>
+                    <div class="form-help">
+                        Create one at: <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a><br>
+                        Required scopes: <code>repo</code> (full control of private repositories)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>GitHub Username</label>
+                    <input type="text" id="githubUsername" placeholder="your-username" required>
+                </div>
+                <div class="form-group">
+                    <label>Repository Name</label>
+                    <input type="text" id="githubRepo" placeholder="Invoiceing-Software" required>
+                    <div class="form-help">
+                        This repository must exist in your GitHub account
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Branch (optional)</label>
+                    <input type="text" id="githubBranch" placeholder="main">
+                </div>
+                <button type="button" class="test-connection-btn" onclick="testGitHubConnection()">
+                    <i class="fas fa-plug"></i> Test Connection
+                </button>
+                <div id="testResult" class="test-result"></div>
+                <div class="action-buttons" style="margin-top: 2rem; border-top: 0;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-save"></i> Save Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sync Status -->
+    <div id="syncStatus" class="sync-status">
+        <i class="fas fa-sync"></i>
+        <span id="syncMessage">Syncing...</span>
     </div>
 
     <main class="container">
         <div class="page-header">
+            <div class="github-info">
+                <i class="fab fa-github"></i>
+                <span id="githubStatus">Not Connected</span>
+                <button onclick="openGitHubConfig()" style="background: none; border: none; color: var(--accent-primary); cursor: pointer; margin-left: 10px;">
+                    <i class="fas fa-cog"></i> Configure
+                </button>
+            </div>
             <h1>
                 <i class="fas fa-store"></i>
                 Shop Profile
@@ -572,6 +733,10 @@
                     <i class="fas fa-building"></i>
                     Business Information
                 </h2>
+                <div class="storage-status" id="storageStatus">
+                    <i class="fas fa-cloud storage-icon"></i>
+                    <span>Local Storage</span>
+                </div>
             </div>
             <div class="card-body">
                 <form id="shopProfileForm">
@@ -670,7 +835,7 @@
                                 <i class="fas fa-store"></i>
                                 <span>No logo uploaded</span>
                             </div>
-                            <img id="logoPreview" class="fade-in" alt="Shop Logo Preview">
+                            <img id="logoPreview" alt="Shop Logo Preview">
                         </div>
                     </div>
 
@@ -686,6 +851,9 @@
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="resetShopForm()">
                             <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button type="button" class="btn btn-gh" onclick="syncToGitHub()">
+                            <i class="fab fa-github"></i> Sync to GitHub
                         </button>
                     </div>
                 </form>
@@ -720,13 +888,17 @@
                         </div>
                     </div>
                     
-                    <div class="preview-section">
-                        <h4><i class="fas fa-university"></i> Bank Details</h4>
-                        <p id="previewBankDetails">Not provided</p>
+                    <div class="preview-section" style="padding: 15px; background: var(--bg-card); border-radius: 8px;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-university"></i> Bank Details
+                        </h4>
+                        <p id="previewBankDetails" style="color: var(--text-secondary); font-family: monospace; font-size: 14px;">Not provided</p>
                     </div>
                     
-                    <div class="preview-section mt-4">
-                        <h4><i class="fas fa-file-contract"></i> Terms & Conditions</h4>
+                    <div class="preview-section" style="padding: 15px; background: var(--bg-card); border-radius: 8px; margin-top: 20px;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-file-contract"></i> Terms & Conditions
+                        </h4>
                         <p id="previewTerms" style="color: var(--text-secondary); font-style: italic;">
                             No terms & conditions set
                         </p>
@@ -745,7 +917,249 @@
     </div>
 
     <script>
-        // Initialize shop page with all functionality
+        // GitHub Storage Class
+        class GitHubStorage {
+            constructor() {
+                this.username = localStorage.getItem('github_username') || '';
+                this.repo = localStorage.getItem('github_repo') || '';
+                this.branch = localStorage.getItem('github_branch') || 'main';
+                this.token = localStorage.getItem('github_token') || '';
+                this.dataPath = 'user-data/';
+                this.isConfigured = this.token && this.username && this.repo;
+            }
+            
+            // Configure storage
+            configure(token, username, repo, branch = 'main') {
+                this.token = token;
+                this.username = username;
+                this.repo = repo;
+                this.branch = branch || 'main';
+                this.isConfigured = true;
+                
+                // Save to localStorage
+                localStorage.setItem('github_token', token);
+                localStorage.setItem('github_username', username);
+                localStorage.setItem('github_repo', repo);
+                localStorage.setItem('github_branch', branch || 'main');
+                
+                return true;
+            }
+            
+            // Test connection to GitHub
+            async testConnection() {
+                if (!this.isConfigured) {
+                    return { success: false, message: 'Not configured' };
+                }
+                
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        const repoInfo = await response.json();
+                        return { 
+                            success: true, 
+                            message: `Connected to ${repoInfo.full_name}`,
+                            data: repoInfo
+                        };
+                    } else {
+                        const error = await response.json();
+                        return { 
+                            success: false, 
+                            message: `Error ${response.status}: ${error.message}`,
+                            status: response.status
+                        };
+                    }
+                } catch (error) {
+                    return { success: false, message: 'Network error: ' + error.message };
+                }
+            }
+            
+            // Save user data to GitHub
+            async saveUserData(userEmail, data) {
+                if (!this.isConfigured) {
+                    return { 
+                        success: false, 
+                        message: 'GitHub not configured. Please configure in settings.' 
+                    };
+                }
+                
+                // Create filename from email
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                const fileName = `${safeEmail}.json`;
+                const filePath = `${this.dataPath}${fileName}`;
+                
+                // Prepare data
+                const content = JSON.stringify(data, null, 2);
+                const encodedContent = btoa(unescape(encodeURIComponent(content)));
+                
+                try {
+                    // First, try to get the file to get its SHA (if it exists)
+                    let sha = null;
+                    try {
+                        const existingFile = await fetch(
+                            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${filePath}?ref=${this.branch}`,
+                            {
+                                headers: {
+                                    'Authorization': `token ${this.token}`,
+                                    'Accept': 'application/vnd.github.v3+json'
+                                }
+                            }
+                        );
+                        
+                        if (existingFile.ok) {
+                            const fileData = await existingFile.json();
+                            sha = fileData.sha;
+                        }
+                    } catch (error) {
+                        console.log('File does not exist, will create new');
+                    }
+                    
+                    // Ensure data directory exists
+                    await this.createDataDirectory();
+                    
+                    // Create or update the file
+                    const requestBody = {
+                        message: `GST Invoice System: ${userEmail} - ${new Date().toISOString()}`,
+                        content: encodedContent,
+                        branch: this.branch
+                    };
+                    
+                    if (sha) {
+                        requestBody.sha = sha; // Update existing file
+                    }
+                    
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${filePath}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(requestBody)
+                        }
+                    );
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        return { 
+                            success: true, 
+                            message: 'Data saved to GitHub successfully!',
+                            data: result
+                        };
+                    } else {
+                        console.error('GitHub save error:', result);
+                        return { 
+                            success: false, 
+                            message: `Error: ${result.message || 'Failed to save to GitHub'}`,
+                            error: result
+                        };
+                    }
+                    
+                } catch (error) {
+                    console.error('Save error:', error);
+                    return { 
+                        success: false, 
+                        message: 'Network error: ' + error.message 
+                    };
+                }
+            }
+            
+            // Create data directory if it doesn't exist
+            async createDataDirectory() {
+                try {
+                    // Check if directory exists
+                    const checkResponse = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (checkResponse.status === 404) {
+                        // Create a README file to create the directory
+                        const readmeContent = '# User Data\n\nThis directory contains user data for the GST Invoice System.';
+                        const encodedContent = btoa(unescape(encodeURIComponent(readmeContent)));
+                        
+                        await fetch(
+                            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}README.md`,
+                            {
+                                method: 'PUT',
+                                headers: {
+                                    'Authorization': `token ${this.token}`,
+                                    'Accept': 'application/vnd.github.v3+json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    message: 'Create user data directory',
+                                    content: encodedContent,
+                                    branch: this.branch
+                                })
+                            }
+                        );
+                    }
+                } catch (error) {
+                    console.log('Directory check/create failed:', error.message);
+                }
+            }
+            
+            // Load user data from GitHub
+            async loadUserData(userEmail) {
+                if (!this.isConfigured) {
+                    return null;
+                }
+                
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                const fileName = `${safeEmail}.json`;
+                
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.status === 404) {
+                        return null;
+                    }
+                    
+                    if (!response.ok) {
+                        console.error('Load failed:', response.status);
+                        return null;
+                    }
+                    
+                    const fileData = await response.json();
+                    const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                    return JSON.parse(decodedContent);
+                    
+                } catch (error) {
+                    console.error('Load error:', error);
+                    return null;
+                }
+            }
+        }
+
+        // Create global GitHub storage instance
+        window.githubStorage = new GitHubStorage();
+
+        // Main Application Functions
         function initShopPage() {
             console.log('Shop page initialized');
             
@@ -761,11 +1175,11 @@
             // Setup logo upload
             setupLogoUpload();
             
-            // Show success message if redirected from save
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('saved') === 'true') {
-                showToast('Profile saved successfully!', 'success');
-            }
+            // Update GitHub status display
+            updateGitHubStatus();
+            
+            // Try to load from GitHub if configured
+            loadFromGitHubIfConfigured();
         }
 
         // Load saved data from localStorage
@@ -777,7 +1191,7 @@
                 // Populate form fields
                 Object.keys(data).forEach(key => {
                     const element = document.getElementById(key);
-                    if (element && key !== 'logo') {
+                    if (element && key !== 'logo' && key !== 'shopProfile') {
                         element.value = data[key];
                     }
                 });
@@ -820,12 +1234,10 @@
                 updatePreview(formData);
                 
                 // Show success message
-                showToast('Profile saved successfully!', 'success');
+                showSyncStatus('Profile saved locally!', 'success');
                 
-                // Update URL to show saved state
-                const url = new URL(window.location);
-                url.searchParams.set('saved', 'true');
-                window.history.replaceState({}, '', url);
+                // Auto-sync to GitHub if configured
+                autoSyncToGitHub(formData);
             });
         }
 
@@ -847,6 +1259,9 @@
             if (logoPreview.src && !logoPreview.src.includes('data:,')) {
                 data.logo = logoPreview.src;
             }
+            
+            // Add timestamp
+            data.lastUpdated = new Date().toISOString();
             
             return data;
         }
@@ -898,7 +1313,10 @@
                 categoryElement.style.color = 'var(--text-secondary)';
                 categoryElement.style.marginTop = '0.25rem';
                 categoryElement.innerHTML = `<strong>Category:</strong> ${data.businessCategory}`;
-                document.getElementById('previewShopContact').after(categoryElement);
+                const shopContact = document.getElementById('previewShopContact');
+                if (shopContact && shopContact.nextSibling) {
+                    shopContact.parentNode.insertBefore(categoryElement, shopContact.nextSibling);
+                }
             }
         }
 
@@ -914,14 +1332,14 @@
                 if (file) {
                     // Validate file size (max 2MB)
                     if (file.size > 2 * 1024 * 1024) {
-                        showToast('File size must be less than 2MB', 'error');
+                        showSyncStatus('File size must be less than 2MB', 'error');
                         return;
                     }
                     
                     // Validate file type
                     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml', 'image/gif'];
                     if (!validTypes.includes(file.type)) {
-                        showToast('Please upload a valid image file (JPG, PNG, SVG, GIF)', 'error');
+                        showSyncStatus('Please upload a valid image file (JPG, PNG, SVG, GIF)', 'error');
                         return;
                     }
                     
@@ -931,7 +1349,6 @@
                         // Show preview in form
                         logoPreview.src = e.target.result;
                         logoPreview.style.display = 'block';
-                        logoPreview.classList.add('fade-in');
                         logoPlaceholder.style.display = 'none';
                         
                         // Update main preview
@@ -942,11 +1359,11 @@
                         savedData.logo = e.target.result;
                         localStorage.setItem('shopProfile', JSON.stringify(savedData));
                         
-                        showToast('Logo uploaded successfully!', 'success');
+                        showSyncStatus('Logo uploaded successfully!', 'success');
                     };
                     
                     reader.onerror = function() {
-                        showToast('Error uploading file. Please try again.', 'error');
+                        showSyncStatus('Error uploading file. Please try again.', 'error');
                     };
                     
                     reader.readAsDataURL(file);
@@ -966,31 +1383,6 @@
             logoPlaceholder.addEventListener('click', function() {
                 logoUpload.click();
             });
-            
-            // Add click event to file upload label
-            document.querySelector('.file-upload-label').addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-
-        // Remove logo
-        function removeLogo() {
-            const logoUpload = document.getElementById('logoUpload');
-            const logoPreview = document.getElementById('logoPreview');
-            const logoPlaceholder = document.getElementById('logoPlaceholder');
-            const previewLogo = document.getElementById('previewLogo');
-            
-            logoUpload.value = '';
-            logoPreview.style.display = 'none';
-            logoPlaceholder.style.display = 'flex';
-            previewLogo.innerHTML = '<i class="fas fa-store"></i>';
-            
-            // Remove from localStorage
-            const savedData = JSON.parse(localStorage.getItem('shopProfile') || '{}');
-            delete savedData.logo;
-            localStorage.setItem('shopProfile', JSON.stringify(savedData));
-            
-            showToast('Logo removed successfully', 'info');
         }
 
         // Reset form
@@ -1007,31 +1399,259 @@
                 
                 document.getElementById('logoUpload').value = '';
                 logoPreview.style.display = 'none';
+                logoPreview.src = '';
                 logoPlaceholder.style.display = 'flex';
                 previewLogo.innerHTML = '<i class="fas fa-store"></i>';
                 
-                showToast('Form reset successfully!', 'info');
+                showSyncStatus('Form reset successfully!', 'info');
             }
         }
 
-        // Show toast notification
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
+        // GitHub Configuration Functions
+        function openGitHubConfig() {
+            document.getElementById('githubConfigModal').style.display = 'flex';
             
-            // Set message and type
-            toastMessage.textContent = message;
-            toast.style.background = type === 'success' ? 'var(--success)' : 
-                                    type === 'error' ? 'var(--error)' : 
-                                    type === 'warning' ? 'var(--warning)' : 'var(--info)';
+            // Load existing config if any
+            const token = localStorage.getItem('github_token') || '';
+            const username = localStorage.getItem('github_username') || '';
+            const repo = localStorage.getItem('github_repo') || '';
+            const branch = localStorage.getItem('github_branch') || 'main';
             
-            // Show toast
-            toast.style.display = 'flex';
+            document.getElementById('githubToken').value = token;
+            document.getElementById('githubUsername').value = username;
+            document.getElementById('githubRepo').value = repo;
+            document.getElementById('githubBranch').value = branch;
+        }
+
+        function closeGitHubConfig() {
+            document.getElementById('githubConfigModal').style.display = 'none';
+        }
+
+        async function testGitHubConnection() {
+            const token = document.getElementById('githubToken').value.trim();
+            const username = document.getElementById('githubUsername').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const branch = document.getElementById('githubBranch').value.trim() || 'main';
             
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
+            if (!token || !username || !repo) {
+                showTestResult('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Create temporary storage instance for testing
+            const testStorage = new GitHubStorage();
+            testStorage.configure(token, username, repo, branch);
+            
+            const result = await testStorage.testConnection();
+            
+            if (result.success) {
+                showTestResult(`✅ ${result.message}`, 'success');
+            } else {
+                showTestResult(`❌ ${result.message}`, 'error');
+            }
+        }
+
+        function showTestResult(message, type) {
+            const testResult = document.getElementById('testResult');
+            testResult.textContent = message;
+            testResult.className = 'test-result';
+            testResult.classList.add(`test-${type}`);
+            testResult.style.display = 'flex';
+        }
+
+        // Save GitHub configuration
+        document.getElementById('githubConfigForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const token = document.getElementById('githubToken').value.trim();
+            const username = document.getElementById('githubUsername').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const branch = document.getElementById('githubBranch').value.trim() || 'main';
+            
+            if (!token || !username || !repo) {
+                showSyncStatus('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Save configuration
+            window.githubStorage.configure(token, username, repo, branch);
+            
+            // Update display
+            updateGitHubStatus();
+            
+            // Close modal
+            closeGitHubConfig();
+            
+            showSyncStatus('GitHub configuration saved!', 'success');
+            
+            // Try to load existing data from GitHub
+            loadFromGitHubIfConfigured();
+        });
+
+        // Update GitHub status display
+        function updateGitHubStatus() {
+            const githubStatus = document.getElementById('githubStatus');
+            const storageStatus = document.getElementById('storageStatus');
+            
+            if (window.githubStorage.isConfigured) {
+                githubStatus.innerHTML = `<span style="color: var(--success);">Connected to ${window.githubStorage.repo}</span>`;
+                storageStatus.innerHTML = '<i class="fas fa-cloud storage-icon"></i> <span>GitHub Cloud</span>';
+                storageStatus.className = 'storage-status storage-connected';
+            } else {
+                githubStatus.innerHTML = '<span style="color: var(--text-secondary);">Not Connected</span>';
+                storageStatus.innerHTML = '<i class="fas fa-hdd storage-icon"></i> <span>Local Storage</span>';
+                storageStatus.className = 'storage-status storage-disconnected';
+            }
+        }
+
+        // Sync data to GitHub
+        async function syncToGitHub() {
+            if (!window.githubStorage.isConfigured) {
+                openGitHubConfig();
+                showSyncStatus('Please configure GitHub first', 'warning');
+                return;
+            }
+            
+            const formData = getFormData();
+            const userEmail = formData.shopEmail;
+            
+            if (!userEmail) {
+                showSyncStatus('Please enter your email address first', 'error');
+                return;
+            }
+            
+            showSyncStatus('Syncing to GitHub...', 'info');
+            
+            const result = await window.githubStorage.saveUserData(userEmail, formData);
+            
+            if (result.success) {
+                showSyncStatus(result.message, 'success');
+                
+                // Update localStorage with successful sync timestamp
+                formData.lastGitHubSync = new Date().toISOString();
+                localStorage.setItem('shopProfile', JSON.stringify(formData));
+            } else {
+                showSyncStatus(result.message, 'error');
+            }
+        }
+
+        // Auto-sync to GitHub
+        async function autoSyncToGitHub(formData) {
+            if (!window.githubStorage.isConfigured) {
+                return;
+            }
+            
+            const userEmail = formData.shopEmail;
+            if (!userEmail) {
+                return;
+            }
+            
+            // Only auto-sync if last sync was more than 5 minutes ago
+            const lastSync = formData.lastGitHubSync;
+            if (lastSync) {
+                const lastSyncTime = new Date(lastSync).getTime();
+                const currentTime = new Date().getTime();
+                const fiveMinutes = 5 * 60 * 1000;
+                
+                if (currentTime - lastSyncTime < fiveMinutes) {
+                    return; // Skip auto-sync, too recent
+                }
+            }
+            
+            // Show auto-sync indicator
+            showSyncStatus('Auto-syncing to GitHub...', 'info');
+            
+            const result = await window.githubStorage.saveUserData(userEmail, formData);
+            
+            if (result.success) {
+                showSyncStatus('Auto-sync complete!', 'success', 2000);
+            } else {
+                console.log('Auto-sync failed:', result.message);
+            }
+        }
+
+        // Load data from GitHub if configured
+        async function loadFromGitHubIfConfigured() {
+            if (!window.githubStorage.isConfigured) {
+                return;
+            }
+            
+            // Get email from localStorage to load specific user data
+            const savedData = JSON.parse(localStorage.getItem('shopProfile') || '{}');
+            const userEmail = savedData.shopEmail;
+            
+            if (!userEmail) {
+                return;
+            }
+            
+            showSyncStatus('Loading from GitHub...', 'info');
+            
+            const cloudData = await window.githubStorage.loadUserData(userEmail);
+            
+            if (cloudData) {
+                // Merge cloud data with local data (cloud data takes precedence)
+                const mergedData = { ...savedData, ...cloudData };
+                
+                // Update form with cloud data
+                Object.keys(mergedData).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element && key !== 'logo' && key !== 'shopProfile') {
+                        element.value = mergedData[key];
+                    }
+                });
+                
+                // Update logo if exists in cloud
+                if (mergedData.logo) {
+                    const logoPreview = document.getElementById('logoPreview');
+                    const logoPlaceholder = document.getElementById('logoPlaceholder');
+                    const previewLogo = document.getElementById('previewLogo');
+                    
+                    logoPreview.src = mergedData.logo;
+                    logoPreview.style.display = 'block';
+                    logoPlaceholder.style.display = 'none';
+                    previewLogo.innerHTML = `<img src="${mergedData.logo}" alt="Shop Logo">`;
+                }
+                
+                // Update preview
+                updatePreview(mergedData);
+                
+                // Save merged data to localStorage
+                localStorage.setItem('shopProfile', JSON.stringify(mergedData));
+                
+                showSyncStatus('Data loaded from GitHub!', 'success');
+            } else {
+                showSyncStatus('No data found on GitHub', 'info', 2000);
+            }
+        }
+
+        // Show sync status message
+        function showSyncStatus(message, type = 'info', duration = 3000) {
+            const syncStatus = document.getElementById('syncStatus');
+            const syncMessage = document.getElementById('syncMessage');
+            
+            syncMessage.textContent = message;
+            syncStatus.className = 'sync-status';
+            syncStatus.classList.add(`sync-${type}`);
+            
+            // Set icon based on type
+            const icon = syncStatus.querySelector('i');
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle';
+            } else {
+                icon.className = 'fas fa-sync';
+            }
+            
+            syncStatus.style.display = 'flex';
+            
+            // Auto-hide after duration
+            clearTimeout(window.syncTimeout);
+            window.syncTimeout = setTimeout(() => {
+                syncStatus.style.display = 'none';
+            }, duration);
         }
 
         // Form validation
@@ -1043,7 +1663,7 @@
                 const field = document.getElementById(fieldId);
                 if (!field.value.trim()) {
                     field.style.borderColor = 'var(--error)';
-                    showToast(`Please fill in the ${field.previousElementSibling.textContent}`, 'error');
+                    showSyncStatus(`Please fill in the ${field.previousElementSibling.textContent}`, 'error');
                     isValid = false;
                 } else {
                     field.style.borderColor = 'var(--border-color)';
@@ -1055,7 +1675,7 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (emailField.value && !emailRegex.test(emailField.value)) {
                 emailField.style.borderColor = 'var(--error)';
-                showToast('Please enter a valid email address', 'error');
+                showSyncStatus('Please enter a valid email address', 'error');
                 isValid = false;
             }
             
@@ -1064,7 +1684,7 @@
             const phoneRegex = /^[\d\s\+\-\(\)]{10,}$/;
             if (phoneField.value && !phoneRegex.test(phoneField.value.replace(/\s/g, ''))) {
                 phoneField.style.borderColor = 'var(--error)';
-                showToast('Please enter a valid phone number', 'error');
+                showSyncStatus('Please enter a valid phone number', 'error');
                 isValid = false;
             }
             
