@@ -59,7 +59,7 @@
         /* Navigation */
         .navbar {
             background: var(--card-bg);
-            padding: 15px 30px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -87,12 +87,12 @@
 
         .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
         }
 
         .nav-btn {
-            padding: 8px 20px;
+            padding: 8px 16px;
             background: var(--primary);
             color: white;
             text-decoration: none;
@@ -102,6 +102,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.9rem;
         }
 
         .nav-btn:hover {
@@ -113,12 +114,12 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 30px;
+            padding: 20px;
             background: var(--invoice-bg);
             border-radius: 16px;
             box-shadow: var(--card-shadow);
             margin-top: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 80px;
         }
 
         /* Page Header */
@@ -131,12 +132,13 @@
 
         .page-header h1 {
             color: var(--text-primary);
-            font-size: 32px;
+            font-size: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 15px;
             margin: 0;
+            flex-wrap: wrap;
         }
 
         .page-header h1 i {
@@ -146,7 +148,24 @@
         .subtitle {
             color: var(--text-secondary);
             margin-top: 10px;
-            font-size: 1.1rem;
+            font-size: 1rem;
+        }
+
+        /* User Info for Mobile */
+        .user-info-mobile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--hover-bg);
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            justify-content: center;
+        }
+
+        .user-info-mobile i {
+            color: var(--primary);
         }
 
         /* Cloud Status Badge */
@@ -154,10 +173,10 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 5px 15px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.9rem;
-            margin-left: 15px;
+            font-size: 0.8rem;
+            margin-left: 10px;
             background: var(--hover-bg);
             border: 1px solid var(--border-color);
         }
@@ -174,20 +193,6 @@
             color: var(--danger);
         }
 
-        /* User Info */
-        .user-info {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 10px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .user-info i {
-            color: var(--primary);
-        }
-
         /* Card Styles */
         .card {
             background: var(--card-bg);
@@ -199,20 +204,17 @@
         }
 
         .card-header {
-            padding: 1.5rem 2rem;
+            padding: 1.2rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
             background: var(--hover-bg);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .card-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .card-title i {
@@ -220,19 +222,25 @@
         }
 
         .card-body {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         /* Form Styles */
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-row {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
 
         .form-label {
@@ -240,17 +248,17 @@
             margin-bottom: 0.5rem;
             color: var(--text-primary);
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px 14px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             background: var(--card-bg);
             color: var(--text-primary);
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
         }
 
@@ -265,14 +273,14 @@
         }
 
         textarea.form-control {
-            min-height: 100px;
+            min-height: 90px;
             resize: vertical;
         }
 
         /* Logo Upload Section */
         .logo-upload-section {
-            margin: 2rem 0;
-            padding: 1.5rem;
+            margin: 1.5rem 0;
+            padding: 1.2rem;
             background: var(--hover-bg);
             border-radius: 8px;
             border: 2px dashed var(--border-color);
@@ -288,16 +296,16 @@
         }
 
         #logoPreview {
-            max-width: 200px;
-            max-height: 120px;
+            max-width: 180px;
+            max-height: 100px;
             border-radius: 8px;
             border: 2px solid var(--border-color);
             display: none;
         }
 
         .logo-placeholder {
-            width: 200px;
-            height: 120px;
+            width: 180px;
+            height: 100px;
             background: var(--card-bg);
             border-radius: 8px;
             border: 2px dashed var(--border-color);
@@ -309,33 +317,35 @@
         }
 
         .logo-placeholder i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            margin-bottom: 8px;
             color: var(--primary);
         }
 
         /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
             padding-top: 1.5rem;
             border-top: 1px solid var(--border-color);
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: 8px;
             border: none;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
         }
 
         .btn-primary {
@@ -381,10 +391,12 @@
         /* Back to Dashboard Button */
         .back-to-dashboard {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
+            width: 90%;
+            max-width: 400px;
         }
 
         .back-to-dashboard .btn {
@@ -397,28 +409,38 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            justify-content: center;
+            width: 100%;
         }
 
         /* Invoice Preview */
         .invoice-preview {
             background: var(--hover-bg);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 12px;
             border: 1px solid var(--border-color);
         }
 
         .preview-header {
             border-bottom: 2px solid var(--primary);
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding-bottom: 1.2rem;
+            margin-bottom: 1.2rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .preview-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
 
         .preview-logo {
-            width: 120px;
-            height: 60px;
+            width: 100px;
+            height: 50px;
             background: var(--card-bg);
             border-radius: 6px;
             border: 1px solid var(--border-color);
@@ -433,20 +455,20 @@
         }
 
         .preview-logo i {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: var(--primary);
         }
 
         .preview-content h2 {
             color: var(--text-primary);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             margin-bottom: 0.5rem;
         }
 
         .preview-content p {
             color: var(--text-secondary);
-            margin: 0.25rem 0;
-            font-size: 0.9rem;
+            margin: 0.2rem 0;
+            font-size: 0.85rem;
         }
 
         /* Toast Notifications */
@@ -455,7 +477,7 @@
             top: 20px;
             right: 20px;
             background: var(--card-bg);
-            padding: 1rem 1.5rem;
+            padding: 12px 16px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             display: none;
@@ -464,6 +486,7 @@
             z-index: 9999;
             border-left: 4px solid var(--primary);
             animation: slideIn 0.3s ease;
+            max-width: 90%;
         }
 
         @keyframes slideIn {
@@ -496,7 +519,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
@@ -508,13 +531,14 @@
             padding: 2rem;
             border-radius: 12px;
             text-align: center;
-            max-width: 400px;
+            max-width: 350px;
             width: 90%;
+            margin: 20px;
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border: 3px solid var(--border-color);
             border-top-color: var(--primary);
             border-radius: 50%;
@@ -530,54 +554,17 @@
 
         /* Data Source Info */
         .data-source {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             margin-top: 5px;
             display: flex;
             align-items: center;
             gap: 5px;
+            justify-content: center;
         }
 
         .data-source i {
             font-size: 0.8rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin-top: 10px;
-            }
-
-            .page-header h1 {
-                font-size: 24px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
-            .back-to-dashboard {
-                width: 90%;
-            }
-
-            .back-to-dashboard .btn {
-                width: 100%;
-            }
-
-            .preview-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 20px;
-            }
         }
 
         /* Alerts */
@@ -614,6 +601,18 @@
             border-left-color: var(--danger);
             color: var(--text-primary);
         }
+
+        /* Debug Info - Only visible in development */
+        .debug-info {
+            display: none;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -621,8 +620,8 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <h3 id="loadingTitle">Loading from Cloud</h3>
-            <p id="loadingMessage">Fetching your data from GitHub...</p>
+            <h3 id="loadingTitle">Loading Shop Profile</h3>
+            <p id="loadingMessage">Please wait...</p>
         </div>
     </div>
 
@@ -636,16 +635,12 @@
     <nav class="navbar">
         <a href="dashboard.html" class="nav-brand">
             <i class="fas fa-file-invoice"></i>
-            <span>GST Invoice System</span>
+            <span>GST Invoice</span>
         </a>
         <div class="nav-links">
-            <span class="user-info" id="userEmailDisplay">
-                <i class="fas fa-user"></i>
-                <span>Loading...</span>
-            </span>
             <a href="settings.html" class="nav-btn">
-                <i class="fas fa-cloud"></i>
-                Cloud Settings
+                <i class="fas fa-cog"></i>
+                Settings
             </a>
         </div>
     </nav>
@@ -662,15 +657,24 @@
                 </span>
             </h1>
             <p class="subtitle">Manage your business information and logo</p>
+            
+            <!-- User Info for Mobile -->
+            <div class="user-info-mobile" id="userEmailDisplay">
+                <i class="fas fa-user"></i>
+                <span id="userEmailText">Loading...</span>
+            </div>
         </div>
+
+        <!-- Debug Info (Optional - Enable for troubleshooting) -->
+        <div class="debug-info" id="debugInfo"></div>
 
         <!-- Auto-load Alert -->
         <div class="alert alert-info" id="autoLoadAlert" style="display: none;">
             <i class="fas fa-sync-alt"></i>
             <div>
                 <strong>Auto-loading from Cloud</strong>
-                <p style="margin-top: 5px; font-size: 0.9rem;">
-                    Your data is being loaded from GitHub cloud storage based on your login email.
+                <p style="margin-top: 5px; font-size: 0.85rem;">
+                    Loading your shop profile from cloud storage...
                 </p>
             </div>
         </div>
@@ -690,7 +694,7 @@
                     <i class="fas fa-building"></i>
                     Business Information
                 </h2>
-                <div id="formStatus" style="font-size: 0.9rem; color: var(--text-secondary);">
+                <div id="formStatus" style="font-size: 0.8rem; color: var(--text-secondary);">
                     <i class="fas fa-edit"></i>
                     <span>Ready to edit</span>
                 </div>
@@ -713,7 +717,7 @@
                     <div class="form-group">
                         <label class="form-label">Business Description</label>
                         <textarea class="form-control" id="shopDescription" 
-                                  rows="3" placeholder="Describe your business..."></textarea>
+                                  rows="2" placeholder="Describe your business..."></textarea>
                     </div>
 
                     <div class="form-row">
@@ -745,7 +749,7 @@
                     <div class="form-group">
                         <label class="form-label">Business Address</label>
                         <textarea class="form-control" id="shopAddress" 
-                                  rows="3" placeholder="Complete address including city, state, and PIN"></textarea>
+                                  rows="2" placeholder="Complete address including city, state, and PIN"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -775,18 +779,18 @@
                         <div style="position: relative;">
                             <input type="file" class="form-control" id="logoUpload" 
                                    accept="image/*" style="opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer;">
-                            <div style="padding: 12px; background: var(--card-bg); border: 2px dashed var(--border-color); border-radius: 8px; text-align: center;">
-                                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px; display: block;"></i>
+                            <div style="padding: 10px; background: var(--card-bg); border: 2px dashed var(--border-color); border-radius: 8px; text-align: center;">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; display: block;"></i>
                                 <span>Click to upload logo</span>
                                 <br>
-                                <small style="color: var(--text-secondary);">Supports: JPG, PNG, SVG (Max: 2MB)</small>
+                                <small style="color: var(--text-secondary); font-size: 0.75rem;">Supports: JPG, PNG, SVG</small>
                             </div>
                         </div>
                         
                         <div class="logo-preview-container">
                             <div class="logo-placeholder" id="logoPlaceholder">
                                 <i class="fas fa-store"></i>
-                                <span>No logo uploaded</span>
+                                <span style="font-size: 0.8rem;">No logo uploaded</span>
                             </div>
                             <img id="logoPreview" alt="Shop Logo Preview">
                         </div>
@@ -794,7 +798,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Terms & Conditions</label>
-                        <textarea class="form-control" id="shopTerms" rows="5" 
+                        <textarea class="form-control" id="shopTerms" rows="3" 
                                   placeholder="Enter your business terms and conditions..."></textarea>
                     </div>
 
@@ -842,18 +846,18 @@
                         </div>
                     </div>
                     
-                    <div style="margin-top: 20px;">
-                        <h4 style="color: var(--text-primary); margin-bottom: 10px;">
+                    <div style="margin-top: 15px;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 8px; font-size: 1rem;">
                             <i class="fas fa-university"></i> Bank Details
                         </h4>
-                        <p id="previewBankDetails" style="color: var(--text-secondary);">Not provided</p>
+                        <p id="previewBankDetails" style="color: var(--text-secondary); font-size: 0.85rem;">Not provided</p>
                     </div>
                     
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                        <h4 style="color: var(--text-primary); margin-bottom: 10px;">
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                        <h4 style="color: var(--text-primary); margin-bottom: 8px; font-size: 1rem;">
                             <i class="fas fa-file-contract"></i> Terms & Conditions
                         </h4>
-                        <p id="previewTerms" style="color: var(--text-secondary); font-style: italic;">
+                        <p id="previewTerms" style="color: var(--text-secondary); font-style: italic; font-size: 0.85rem;">
                             No terms & conditions set
                         </p>
                     </div>
@@ -871,11 +875,13 @@
     </div>
 
     <script>
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', async function() {
-            await initShopPage();
-        });
+        // ============================================
+        // FIXED VERSION FOR MOBILE LOGIN ISSUES
+        // ============================================
 
+        // Enable debug mode for troubleshooting
+        const DEBUG_MODE = true;
+        
         // GitHub Storage Class
         class GitHubStorage {
             constructor() {
@@ -887,7 +893,7 @@
                 this.isConfigured = false;
             }
             
-            // Load config from localStorage (from settings page)
+            // Load config from localStorage
             loadConfig() {
                 try {
                     const config = JSON.parse(localStorage.getItem('githubConfig') || '{}');
@@ -896,12 +902,22 @@
                         this.repo = config.repo;
                         this.token = config.token;
                         this.isConfigured = true;
+                        
+                        if (DEBUG_MODE) {
+                            console.log('✅ GitHub Config Loaded:', {
+                                username: this.username,
+                                repo: this.repo,
+                                hasToken: !!this.token
+                            });
+                        }
                         return true;
                     }
                 } catch (e) {
-                    console.error('Error loading GitHub config:', e);
+                    console.error('❌ Error loading GitHub config:', e);
                 }
+                
                 this.isConfigured = false;
+                if (DEBUG_MODE) console.log('❌ GitHub not configured');
                 return false;
             }
             
@@ -949,17 +965,24 @@
                     return null;
                 }
                 
-                // Convert email to safe filename
-                const safeEmail = userEmail.toLowerCase().replace(/[@.]/g, '-');
+                // Convert email to safe filename (FIXED for mobile)
+                const safeEmail = userEmail.toLowerCase()
+                    .replace(/@/g, '-at-')
+                    .replace(/\./g, '-dot-')
+                    .replace(/[^a-z0-9-]/g, '');
+                
                 const fileName = `${safeEmail}.json`;
                 const filePath = `${this.dataPath}${fileName}`;
                 
-                console.log('Loading cloud data for:', {
-                    email: userEmail,
-                    filename: fileName,
-                    path: filePath,
-                    repo: `${this.username}/${this.repo}`
-                });
+                if (DEBUG_MODE) {
+                    console.log('🔍 Loading cloud data:', {
+                        email: userEmail,
+                        safeEmail: safeEmail,
+                        filename: fileName,
+                        path: filePath,
+                        repo: `${this.username}/${this.repo}`
+                    });
+                }
                 
                 try {
                     const response = await fetch(
@@ -973,12 +996,12 @@
                     );
                     
                     if (response.status === 404) {
-                        console.log('No cloud data found for user');
+                        if (DEBUG_MODE) console.log('ℹ️ No cloud data found for user');
                         return null;
                     }
                     
                     if (!response.ok) {
-                        console.error('Cloud load failed:', response.status);
+                        console.error('❌ Cloud load failed:', response.status);
                         return null;
                     }
                     
@@ -986,11 +1009,11 @@
                     const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
                     const parsedData = JSON.parse(decodedContent);
                     
-                    console.log('Cloud data loaded successfully');
+                    if (DEBUG_MODE) console.log('✅ Cloud data loaded successfully');
                     return parsedData;
                     
                 } catch (error) {
-                    console.error('Cloud load error:', error);
+                    console.error('❌ Cloud load error:', error);
                     return null;
                 }
             }
@@ -1001,7 +1024,11 @@
                     return { success: false, message: 'Not configured' };
                 }
                 
-                const safeEmail = userEmail.toLowerCase().replace(/[@.]/g, '-');
+                const safeEmail = userEmail.toLowerCase()
+                    .replace(/@/g, '-at-')
+                    .replace(/\./g, '-dot-')
+                    .replace(/[^a-z0-9-]/g, '');
+                
                 const fileName = `${safeEmail}.json`;
                 const filePath = `${this.dataPath}${fileName}`;
                 
@@ -1026,14 +1053,11 @@
                         if (existingFile.ok) {
                             const fileData = await existingFile.json();
                             sha = fileData.sha;
-                            console.log('Found existing file with SHA:', sha);
+                            if (DEBUG_MODE) console.log('📁 Found existing file with SHA:', sha);
                         }
                     } catch (error) {
-                        console.log('File does not exist, will create new');
+                        if (DEBUG_MODE) console.log('📄 File does not exist, will create new');
                     }
-                    
-                    // Create data directory if needed
-                    await this.createDataDirectory();
                     
                     // Create or update the file
                     const requestBody = {
@@ -1062,56 +1086,16 @@
                     const result = await response.json();
                     
                     if (response.ok) {
-                        console.log('Cloud save successful');
+                        if (DEBUG_MODE) console.log('✅ Cloud save successful');
                         return { success: true, message: 'Saved to cloud successfully!' };
                     } else {
-                        console.error('Cloud save failed:', result);
+                        console.error('❌ Cloud save failed:', result);
                         return { success: false, message: result.message || 'Failed to save to cloud' };
                     }
                     
                 } catch (error) {
-                    console.error('Cloud save error:', error);
+                    console.error('❌ Cloud save error:', error);
                     return { success: false, message: 'Network error: ' + error.message };
-                }
-            }
-            
-            // Create data directory
-            async createDataDirectory() {
-                try {
-                    const checkResponse = await fetch(
-                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
-                        {
-                            headers: {
-                                'Authorization': `token ${this.token}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            }
-                        }
-                    );
-                    
-                    if (checkResponse.status === 404) {
-                        const readmeContent = '# User Data\n\nThis directory contains user data for GST Invoice System.';
-                        const encodedContent = btoa(unescape(encodeURIComponent(readmeContent)));
-                        
-                        await fetch(
-                            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}README.md`,
-                            {
-                                method: 'PUT',
-                                headers: {
-                                    'Authorization': `token ${this.token}`,
-                                    'Accept': 'application/vnd.github.v3+json',
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    message: 'Create user data directory',
-                                    content: encodedContent,
-                                    branch: this.branch
-                                })
-                            }
-                        );
-                        console.log('Created data directory');
-                    }
-                } catch (error) {
-                    console.log('Directory check/create failed:', error.message);
                 }
             }
         }
@@ -1121,140 +1105,187 @@
 
         // Main Application
         async function initShopPage() {
-            console.log('Initializing Shop Profile Page...');
+            if (DEBUG_MODE) console.log('🚀 Initializing Shop Profile Page...');
+            
+            // Show loading
+            showLoading('Initializing', 'Loading shop profile...');
             
             // Setup dark mode
             setupDarkMode();
             
-            // Check if user is logged in
-            const currentUser = getCurrentUser();
+            // Setup form handlers
+            setupFormSubmission();
+            setupLogoUpload();
+            setupPreviewUpdates();
+            
+            // Check authentication first
+            const currentUser = await checkAuthentication();
             if (!currentUser) {
-                showToast('Please login first', 'error');
-                setTimeout(() => window.location.href = 'login.html', 2000);
+                hideLoading();
                 return;
             }
             
             // Display user email
-            document.getElementById('userEmailDisplay').innerHTML = 
-                `<i class="fas fa-user"></i> <span>${currentUser.email}</span>`;
-            
-            // Setup form and preview
-            setupFormSubmission();
-            setupLogoUpload();
-            setupPreviewUpdates();
+            displayUserEmail(currentUser.email);
             
             // Check cloud status
             await checkCloudStatus();
             
             // Auto-load data based on login email
             await autoLoadData(currentUser.email);
-        }
-
-        function setupDarkMode() {
-            const darkMode = localStorage.getItem('darkMode') === 'true';
-            const themePreference = localStorage.getItem('themePreference');
             
-            if (darkMode || themePreference === 'dark') {
-                document.body.classList.add('dark-mode');
-            } else if (themePreference === 'auto') {
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.body.classList.add('dark-mode');
-                }
-            }
+            hideLoading();
         }
 
-        function getCurrentUser() {
+        // ============================================
+        // FIXED AUTHENTICATION FOR MOBILE
+        // ============================================
+        async function checkAuthentication() {
+            if (DEBUG_MODE) console.log('🔐 Checking authentication...');
+            
+            // Try multiple storage locations (mobile compatibility)
+            let currentUser = null;
+            
+            // 1. Try sessionStorage (for current session)
             try {
-                const userData = sessionStorage.getItem('currentUser');
-                if (!userData) {
-                    // Also check localStorage as fallback
+                const sessionUser = sessionStorage.getItem('currentUser');
+                if (sessionUser) {
+                    currentUser = JSON.parse(sessionUser);
+                    if (DEBUG_MODE) console.log('✅ Found user in sessionStorage:', currentUser.email);
+                }
+            } catch (e) {
+                console.error('❌ Error reading sessionStorage:', e);
+            }
+            
+            // 2. Try localStorage (as fallback)
+            if (!currentUser) {
+                try {
                     const users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
                     if (users.length > 0) {
-                        return users[0];
+                        currentUser = users.find(u => u.isLoggedIn) || users[0];
+                        if (currentUser) {
+                            // Update sessionStorage
+                            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            if (DEBUG_MODE) console.log('✅ Found user in localStorage:', currentUser.email);
+                        }
                     }
-                    return null;
+                } catch (e) {
+                    console.error('❌ Error reading localStorage:', e);
                 }
-                return JSON.parse(userData);
-            } catch (e) {
-                console.error('Error getting current user:', e);
+            }
+            
+            // 3. Try URL parameters (for OAuth or deep links)
+            if (!currentUser) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const email = urlParams.get('email');
+                if (email) {
+                    currentUser = { email: email };
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    if (DEBUG_MODE) console.log('✅ Found user in URL params:', email);
+                }
+            }
+            
+            // 4. Show login required message
+            if (!currentUser || !currentUser.email) {
+                showToast('Please login to access shop profile', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+                }, 2000);
                 return null;
             }
+            
+            // Debug info
+            if (DEBUG_MODE) {
+                console.log('👤 Current User:', {
+                    email: currentUser.email,
+                    name: currentUser.name || 'Not set',
+                    source: currentUser.source || 'unknown'
+                });
+                
+                // Show debug info
+                document.getElementById('debugInfo').innerHTML = `
+                    <strong>Debug Info:</strong><br>
+                    Email: ${currentUser.email}<br>
+                    Source: ${currentUser.source || 'sessionStorage'}<br>
+                    Timestamp: ${new Date().toLocaleTimeString()}
+                `;
+                document.getElementById('debugInfo').style.display = 'block';
+            }
+            
+            return currentUser;
+        }
+
+        function displayUserEmail(email) {
+            document.getElementById('userEmailText').textContent = email;
+            document.getElementById('userEmailDisplay').style.display = 'flex';
         }
 
         async function autoLoadData(userEmail) {
-            console.log('Auto-loading data for:', userEmail);
-            
-            // Show loading overlay
-            showLoading('Loading Your Data', 'Checking local and cloud storage...');
-            
-            // First, try to load from local storage
-            const localData = loadLocalData();
-            
-            // Update data source info
-            document.getElementById('dataSourceInfo').style.display = 'block';
-            document.getElementById('dataSource').textContent = 'Local Storage';
-            
-            if (localData) {
-                console.log('Local data found, populating form');
-                populateForm(localData);
-                updatePreview(localData);
-                showToast('Data loaded from local storage', 'success');
-                
-                // Hide loading
-                hideLoading();
-                
-                // Then try to check for newer cloud data
-                checkForCloudUpdates(userEmail, localData);
-                return;
-            }
-            
-            // If no local data, check cloud
-            console.log('No local data, checking cloud...');
-            
-            // Update loading message
-            updateLoadingMessage('Checking cloud storage for your data...');
-            
-            // Check if cloud is configured
-            if (!githubStorage.loadConfig()) {
-                console.log('Cloud not configured, using empty form');
-                hideLoading();
-                showToast('No data found. Please fill in your shop profile.', 'info');
-                return;
-            }
-            
-            // Test cloud connection
-            const cloudTest = await githubStorage.testConnection();
-            if (!cloudTest.success) {
-                console.log('Cloud connection failed:', cloudTest.message);
-                hideLoading();
-                showToast('Cloud connection failed. Using empty form.', 'warning');
-                return;
-            }
+            if (DEBUG_MODE) console.log('📥 Auto-loading data for:', userEmail);
             
             // Show cloud loading alert
             document.getElementById('autoLoadAlert').style.display = 'flex';
             
+            // Update loading message
+            updateLoadingMessage('Checking for your shop profile...');
+            
+            // FIRST: Check local storage
+            const localData = loadLocalData();
+            
+            if (localData) {
+                if (DEBUG_MODE) console.log('✅ Found local data');
+                document.getElementById('dataSource').textContent = 'Local Storage';
+                document.getElementById('dataSourceInfo').style.display = 'block';
+                populateForm(localData);
+                updatePreview(localData);
+                
+                // Check for newer cloud data in background
+                checkForCloudUpdates(userEmail, localData);
+                return;
+            }
+            
+            if (DEBUG_MODE) console.log('📭 No local data, checking cloud...');
+            
+            // SECOND: Check cloud storage
+            updateLoadingMessage('Checking cloud storage...');
+            
+            // Check if cloud is configured
+            if (!githubStorage.loadConfig()) {
+                if (DEBUG_MODE) console.log('☁️ Cloud not configured');
+                showToast('No shop profile found. Please fill in your information.', 'info');
+                return;
+            }
+            
+            // Test cloud connection
+            updateLoadingMessage('Connecting to GitHub...');
+            const cloudTest = await githubStorage.testConnection();
+            if (!cloudTest.success) {
+                if (DEBUG_MODE) console.log('❌ Cloud connection failed:', cloudTest.message);
+                showToast('Cloud connection failed. Using empty form.', 'warning');
+                return;
+            }
+            
             // Load from cloud
-            updateLoadingMessage('Loading your data from GitHub cloud...');
+            updateLoadingMessage('Loading your shop profile from cloud...');
             
             try {
                 const cloudData = await githubStorage.loadUserData(userEmail);
                 
                 if (cloudData && cloudData.shopProfile) {
-                    console.log('Cloud data found, loading...');
+                    if (DEBUG_MODE) console.log('✅ Cloud data loaded successfully');
                     
                     // Update data source info
                     document.getElementById('dataSource').textContent = 'GitHub Cloud';
+                    document.getElementById('dataSourceInfo').style.display = 'block';
                     
                     // Populate form with cloud data
                     populateForm(cloudData.shopProfile);
                     updatePreview(cloudData.shopProfile);
                     
-                    // Also save to local storage for future use
+                    // Also save to local storage for offline use
                     localStorage.setItem('shopProfile', JSON.stringify(cloudData.shopProfile));
                     
-                    hideLoading();
-                    showToast('Data loaded from cloud storage!', 'success');
+                    showToast('Shop profile loaded from cloud!', 'success');
                     
                     // Update cloud status
                     updateCloudStatus(true, `Loaded from ${githubStorage.username}/${githubStorage.repo}`);
@@ -1263,14 +1294,12 @@
                     updateLastSyncTime();
                     
                 } else {
-                    console.log('No cloud data found');
-                    hideLoading();
-                    showToast('No shop profile data found. Please fill in your information.', 'info');
+                    if (DEBUG_MODE) console.log('📭 No cloud data found');
+                    showToast('No shop profile found. Please fill in your information.', 'info');
                 }
                 
             } catch (error) {
-                console.error('Cloud load error:', error);
-                hideLoading();
+                console.error('❌ Cloud load error:', error);
                 showToast('Error loading from cloud: ' + error.message, 'error');
             }
         }
@@ -1280,80 +1309,14 @@
                 const savedData = localStorage.getItem('shopProfile');
                 return savedData ? JSON.parse(savedData) : null;
             } catch (e) {
-                console.error('Error loading local data:', e);
+                console.error('❌ Error loading local data:', e);
                 return null;
             }
         }
 
-        async function checkForCloudUpdates(userEmail, localData) {
-            // Only check cloud if configured
-            if (!githubStorage.loadConfig()) {
-                return;
-            }
-            
-            try {
-                const cloudData = await githubStorage.loadUserData(userEmail);
-                
-                if (cloudData && cloudData.shopProfile) {
-                    // Compare timestamps or implement version checking
-                    const localTimestamp = localData.lastUpdated || 0;
-                    const cloudTimestamp = cloudData.shopProfile.lastUpdated || 0;
-                    
-                    if (cloudTimestamp > localTimestamp) {
-                        // Cloud has newer data
-                        showToast('Newer data available in cloud! Click to load.', 'warning', 5000);
-                        document.getElementById('saveCloudBtn').innerHTML = 
-                            '<i class="fas fa-cloud-download-alt"></i> Load Newer Cloud Data';
-                        document.getElementById('saveCloudBtn').onclick = function() {
-                            loadNewerCloudData(userEmail, cloudData.shopProfile);
-                        };
-                    }
-                }
-            } catch (error) {
-                console.log('Cloud update check failed:', error);
-            }
-        }
-
-        async function loadNewerCloudData(userEmail, cloudData) {
-            if (confirm('Newer data found in cloud. Load it now?')) {
-                showLoading('Loading Cloud Data', 'Updating from cloud...');
-                
-                populateForm(cloudData);
-                updatePreview(cloudData);
-                localStorage.setItem('shopProfile', JSON.stringify(cloudData));
-                
-                hideLoading();
-                showToast('Data updated from cloud!', 'success');
-                
-                // Reset button
-                document.getElementById('saveCloudBtn').innerHTML = 
-                    '<i class="fas fa-cloud-upload-alt"></i> Save to Cloud';
-                document.getElementById('saveCloudBtn').onclick = function() {
-                    saveToCloud();
-                };
-            }
-        }
-
-        function populateForm(data) {
-            Object.keys(data).forEach(key => {
-                const element = document.getElementById(key);
-                if (element && key !== 'logo') {
-                    element.value = data[key] || '';
-                }
-            });
-            
-            // Load logo if exists
-            if (data.logo) {
-                const logoPreview = document.getElementById('logoPreview');
-                const logoPlaceholder = document.getElementById('logoPlaceholder');
-                const previewLogo = document.getElementById('previewLogo');
-                
-                logoPreview.src = data.logo;
-                logoPreview.style.display = 'block';
-                logoPlaceholder.style.display = 'none';
-                previewLogo.innerHTML = `<img src="${data.logo}" alt="Shop Logo">`;
-            }
-        }
+        // ============================================
+        // FORM HANDLING FUNCTIONS
+        // ============================================
 
         function setupFormSubmission() {
             const form = document.getElementById('shopProfileForm');
@@ -1398,8 +1361,18 @@
             
             // Add timestamp
             data.lastUpdated = new Date().toISOString();
+            data.lastUpdatedBy = getCurrentUserEmail();
             
             return data;
+        }
+
+        function getCurrentUserEmail() {
+            try {
+                const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                return user.email || 'unknown';
+            } catch (e) {
+                return 'unknown';
+            }
         }
 
         function setupLogoUpload() {
@@ -1411,7 +1384,7 @@
             logoUpload.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
-                    // Validate file size
+                    // Validate file size (2MB max)
                     if (file.size > 2 * 1024 * 1024) {
                         showToast('File size must be less than 2MB', 'error');
                         return;
@@ -1487,6 +1460,31 @@
             document.getElementById('previewTerms').textContent = data.shopTerms || 'No terms & conditions set';
         }
 
+        function populateForm(data) {
+            Object.keys(data).forEach(key => {
+                const element = document.getElementById(key);
+                if (element && key !== 'logo') {
+                    element.value = data[key] || '';
+                }
+            });
+            
+            // Load logo if exists
+            if (data.logo) {
+                const logoPreview = document.getElementById('logoPreview');
+                const logoPlaceholder = document.getElementById('logoPlaceholder');
+                const previewLogo = document.getElementById('previewLogo');
+                
+                logoPreview.src = data.logo;
+                logoPreview.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+                previewLogo.innerHTML = `<img src="${data.logo}" alt="Shop Logo">`;
+            }
+        }
+
+        // ============================================
+        // CLOUD FUNCTIONS
+        // ============================================
+
         async function checkCloudStatus() {
             const cloudStatus = document.getElementById('cloudStatus');
             
@@ -1508,20 +1506,8 @@
             }
         }
 
-        function updateCloudStatus(isConnected, message) {
-            const cloudStatus = document.getElementById('cloudStatus');
-            
-            if (isConnected) {
-                cloudStatus.className = 'cloud-status connected';
-                cloudStatus.innerHTML = `<i class="fas fa-cloud"></i> <span>${message}</span>`;
-            } else {
-                cloudStatus.className = 'cloud-status disconnected';
-                cloudStatus.innerHTML = '<i class="fas fa-cloud-slash"></i> <span>Disconnected</span>';
-            }
-        }
-
         async function saveToCloud() {
-            const currentUser = getCurrentUser();
+            const currentUser = await checkAuthentication();
             
             if (!currentUser || !currentUser.email) {
                 showToast('Please login first', 'error');
@@ -1542,7 +1528,7 @@
                 return;
             }
             
-            if (!confirm('Save current data to cloud storage?')) {
+            if (!confirm('Save current shop profile to cloud storage?')) {
                 return;
             }
             
@@ -1558,14 +1544,15 @@
                     metadata: {
                         savedAt: new Date().toISOString(),
                         user: currentUser.email,
-                        app: 'GST Invoice System'
+                        app: 'GST Invoice System',
+                        version: '1.0'
                     }
                 };
                 
                 const result = await githubStorage.saveUserData(currentUser.email, cloudData);
                 
                 if (result.success) {
-                    showToast('Data saved to cloud successfully!', 'success');
+                    showToast('Shop profile saved to cloud successfully!', 'success');
                     
                     // Update last sync time
                     updateLastSyncTime();
@@ -1594,6 +1581,35 @@
             config.lastSyncTime = now.toLocaleString();
             config.lastSync = now.toISOString();
             localStorage.setItem('githubConfig', JSON.stringify(config));
+        }
+
+        function updateCloudStatus(isConnected, message) {
+            const cloudStatus = document.getElementById('cloudStatus');
+            
+            if (isConnected) {
+                cloudStatus.className = 'cloud-status connected';
+                cloudStatus.innerHTML = `<i class="fas fa-cloud"></i> <span>${message}</span>`;
+            } else {
+                cloudStatus.className = 'cloud-status disconnected';
+                cloudStatus.innerHTML = '<i class="fas fa-cloud-slash"></i> <span>Disconnected</span>';
+            }
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+
+        function setupDarkMode() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            const themePreference = localStorage.getItem('themePreference');
+            
+            if (darkMode || themePreference === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (themePreference === 'auto') {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-mode');
+                }
+            }
         }
 
         function resetForm() {
@@ -1665,6 +1681,55 @@
                 toast.style.display = 'none';
             }, duration);
         }
+
+        async function checkForCloudUpdates(userEmail, localData) {
+            // Only check cloud if configured
+            if (!githubStorage.loadConfig()) {
+                return;
+            }
+            
+            try {
+                const cloudData = await githubStorage.loadUserData(userEmail);
+                
+                if (cloudData && cloudData.shopProfile) {
+                    // Compare timestamps
+                    const localTimestamp = localData.lastUpdated || 0;
+                    const cloudTimestamp = cloudData.shopProfile.lastUpdated || 0;
+                    
+                    if (cloudTimestamp > localTimestamp) {
+                        // Cloud has newer data
+                        showToast('Newer shop profile available in cloud!', 'warning', 5000);
+                    }
+                }
+            } catch (error) {
+                // Silent fail for update checks
+            }
+        }
+
+        // Initialize page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add a small delay to ensure all resources are loaded
+            setTimeout(() => {
+                initShopPage();
+            }, 300);
+        });
+
+        // Handle page visibility changes (for mobile)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Page became visible again
+                console.log('Page became visible, checking auth...');
+                checkAuthentication();
+            }
+        });
+
+        // Handle storage events (for multi-tab support)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'currentUser' || e.key === 'gstInvoiceUsers') {
+                console.log('User data changed, refreshing...');
+                location.reload();
+            }
+        });
     </script>
 </body>
 </html>
