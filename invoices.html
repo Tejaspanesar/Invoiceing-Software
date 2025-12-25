@@ -19,18 +19,6 @@
           --info: #3b82f6;
           --light: #f8fafc;
           --dark: #1e293b;
-          --text-primary: #1e293b;
-          --text-secondary: #64748b;
-          --text-light: #94a3b8;
-          --border-color: #e2e8f0;
-          --bg-light: #f1f5f9;
-          --card-bg: #ffffff;
-          --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          --hover-bg: #f8fafc;
-          --invoice-bg: #ffffff;
-        }
-        
-        .dark-mode {
           --text-primary: #f1f5f9;
           --text-secondary: #cbd5e1;
           --text-light: #94a3b8;
@@ -40,6 +28,18 @@
           --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
           --hover-bg: #1e293b;
           --invoice-bg: #0f172a;
+        }
+        
+        .light-mode {
+          --text-primary: #1e293b;
+          --text-secondary: #64748b;
+          --text-light: #94a3b8;
+          --border-color: #e2e8f0;
+          --bg-light: #f1f5f9;
+          --card-bg: #ffffff;
+          --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          --hover-bg: #f8fafc;
+          --invoice-bg: #ffffff;
         }
         
         * {
@@ -58,89 +58,78 @@
             transition: background 0.3s ease;
         }
 
-        /* Simplified Navbar - Matching create_invoice.html */
+        /* EXACT SAME Navbar as create_invoice.html */
         .navbar {
-          background: var(--card-bg);
-          padding: 15px 30px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          box-shadow: var(--card-shadow);
-          border-bottom: 1px solid var(--border-color);
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-          min-height: 70px;
-        }
-        
-        .logo {
-          display: none; /* Hide the logo */
-        }
-        
-        .nav-links {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
+            background: var(--card-bg);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 70px;
         }
         
         .back-nav-btn {
-          background: var(--primary);
-          color: white;
-          border: none;
-          border-radius: 8px;
-          padding: 12px 30px;
-          font-weight: 500;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          transition: all 0.3s ease;
-          text-decoration: none;
-          font-size: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 16px;
         }
         
         .back-nav-btn:hover {
-          background: var(--primary-dark);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
         /* Main Container - Matching create_invoice style */
         .container {
-          max-width: 1400px;
-          margin: 0 auto;
-          background: var(--invoice-bg);
-          border-radius: 16px;
-          box-shadow: var(--card-shadow);
-          padding: 30px;
-          margin-top: 20px;
-          margin-bottom: 30px;
-          transition: all 0.3s ease;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--invoice-bg);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
         }
         
         /* Page Title */
         .page-title {
-          text-align: center;
-          margin-bottom: 30px;
-          padding-bottom: 20px;
-          border-bottom: 2px solid var(--border-color);
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
         }
         
         .page-title h1 {
-          color: var(--text-primary);
-          font-size: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 15px;
+            color: var(--text-primary);
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         
         .page-title h1 i {
-          color: var(--primary);
+            color: var(--primary);
         }
 
-        /* Selection Actions Bar - Updated to match theme */
+        /* Selection Actions Bar */
         .selection-actions {
             background: rgba(79, 70, 229, 0.1);
             padding: 15px 30px;
@@ -729,7 +718,7 @@
             color: var(--text-secondary);
         }
 
-        /* Modal - Updated for dark mode */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -812,7 +801,7 @@
             gap: 15px;
         }
 
-        /* Alert - Updated for dark mode */
+        /* Alert */
         .alert {
             position: fixed;
             top: 20px;
@@ -890,12 +879,12 @@
 
         /* Footer */
         .footer {
-          text-align: center;
-          margin-top: 30px;
-          padding-top: 20px;
-          border-top: 1px solid var(--border-color);
-          color: var(--text-secondary);
-          font-size: 14px;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
         /* Responsive */
@@ -906,78 +895,73 @@
         }
         
         @media (max-width: 768px) {
-          .container {
-            padding: 20px;
-            margin-top: 10px;
-          }
-          
-          .navbar {
-            padding: 15px 20px;
-            flex-direction: column;
-            gap: 15px;
-            align-items: stretch;
-          }
-          
-          .page-title h1 {
-            font-size: 26px;
-          }
-          
-          .selection-actions {
-            padding: 15px 20px;
-            flex-direction: column;
-            gap: 15px;
-            align-items: stretch;
-          }
-          
-          .selection-buttons {
-            width: 100%;
-            justify-content: space-between;
-          }
-          
-          .download-pdf-btn,
-          .delete-selected-btn {
-            flex: 1;
-            justify-content: center;
-          }
-          
-          .controls {
-            flex-direction: column;
-            align-items: stretch;
-          }
-          
-          .search-box {
-            min-width: 100%;
-          }
-          
-          .filter-options {
-            flex-wrap: wrap;
-          }
-          
-          .invoices-section {
-            padding: 20px;
-          }
-          
-          .section-header {
-            flex-direction: column;
-            gap: 15px;
-            align-items: stretch;
-          }
-          
-          .action-buttons {
-            flex-wrap: wrap;
-          }
+            .container {
+                padding: 20px;
+                margin-top: 10px;
+            }
+            
+            .navbar {
+                padding: 15px 20px;
+            }
+            
+            .page-title h1 {
+                font-size: 26px;
+            }
+            
+            .selection-actions {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .selection-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .download-pdf-btn,
+            .delete-selected-btn {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .filter-options {
+                flex-wrap: wrap;
+            }
+            
+            .invoices-section {
+                padding: 20px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .action-buttons {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Simple Navbar with Back Button Only - Matching create_invoice.html -->
+    <!-- EXACT SAME Navbar as create_invoice.html -->
     <nav class="navbar">
-        <div class="nav-links">
-            <a href="dashboard.html" class="back-nav-btn">
-                <i class="fas fa-arrow-left"></i>
-                Back to Dashboard
-            </a>
-        </div>
+        <a href="dashboard.html" class="back-nav-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
     </nav>
 
     <!-- Selection Actions Bar -->
@@ -1182,28 +1166,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
     <script>
-        // Global variables - Check if they already exist
-        let allInvoices = window.allInvoices || [];
-        let currentFilter = window.currentFilter || 'all';
-        let currentSearch = window.currentSearch || '';
-        let invoicesPerPage = window.invoicesPerPage || 10;
-        let currentPage = window.currentPage || 1;
-        let selectedInvoices = window.selectedInvoices || new Set();
-        // Don't redeclare shopProfile here - it's already declared in script.js
-        
-        // Function to load shop profile
-        function loadShopProfile() {
-            try {
-                window.shopProfile = JSON.parse(localStorage.getItem('shopProfile')) || {};
-            } catch(e) {
-                console.error('Error loading shop profile:', e);
-                window.shopProfile = {};
-            }
-        }
+        // Global variables
+        let allInvoices = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let invoicesPerPage = 10;
+        let currentPage = 1;
+        let selectedInvoices = new Set();
 
         // DOM Content Loaded - Sync dark mode with dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // Sync dark mode with dashboard
+            // Sync dark mode
             syncDarkMode();
             
             // Load shop profile
@@ -1225,48 +1198,55 @@
         // Sync dark mode with dashboard
         function syncDarkMode() {
             const body = document.body;
-            
-            // Check if dark mode is active in dashboard
-            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
             const savedTheme = localStorage.getItem('theme');
             
-            if (savedTheme === 'dark' || (!savedTheme && prefersDarkScheme.matches)) {
+            if (savedTheme === 'light') {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+            } else {
+                body.classList.remove('light-mode');
                 body.classList.add('dark-mode');
             }
             
             // Listen for theme changes from dashboard
             window.addEventListener('storage', function(e) {
                 if (e.key === 'theme') {
-                    if (e.newValue === 'dark') {
-                        body.classList.add('dark-mode');
-                    } else {
+                    if (e.newValue === 'light') {
                         body.classList.remove('dark-mode');
+                        body.classList.add('light-mode');
+                    } else {
+                        body.classList.remove('light-mode');
+                        body.classList.add('dark-mode');
                     }
                 }
             });
         }
 
-        // Load invoices from localStorage - FIXED VERSION
+        // Load shop profile
+        function loadShopProfile() {
+            try {
+                window.shopProfile = JSON.parse(localStorage.getItem('shopProfile')) || {};
+            } catch(e) {
+                console.error('Error loading shop profile:', e);
+                window.shopProfile = {};
+            }
+        }
+
+        // Load invoices from localStorage
         function loadInvoices() {
             try {
                 const invoicesData = localStorage.getItem('invoices');
                 
-                // Check if invoices exist in localStorage
                 if (invoicesData) {
                     allInvoices = JSON.parse(invoicesData);
                 } else {
-                    // Only generate sample invoices if this is the very first visit
-                    // Check if we've already generated sample invoices before
                     const hasGeneratedSamples = localStorage.getItem('hasGeneratedSampleInvoices');
                     
                     if (!hasGeneratedSamples) {
-                        // First time - generate sample invoices
                         allInvoices = getSampleInvoices();
                         localStorage.setItem('invoices', JSON.stringify(allInvoices));
                         localStorage.setItem('hasGeneratedSampleInvoices', 'true');
                     } else {
-                        // User has previously had invoices but deleted them all
-                        // Don't regenerate samples
                         allInvoices = [];
                     }
                 }
@@ -1383,7 +1363,7 @@
             return sampleInvoices;
         }
 
-        // Update statistics - Only total invoices and revenue
+        // Update statistics
         function updateStats() {
             const totalInvoices = allInvoices.length;
             const totalRevenue = allInvoices.reduce((sum, inv) => sum + (inv.grandTotal || 0), 0);
@@ -1414,7 +1394,7 @@
             return filtered;
         }
 
-        // Render invoices table - Removed status and due date
+        // Render invoices table
         function renderInvoices() {
             const tbody = document.getElementById('invoicesTableBody');
             const emptyState = document.getElementById('emptyState');
@@ -1501,27 +1481,22 @@
             const pagination = document.getElementById('pagination');
             if (!pagination) return;
             
-            // Clear existing pagination except prev/next buttons
             const prevBtn = pagination.querySelector('.prev-btn');
             const nextBtn = pagination.querySelector('.next-btn');
             pagination.innerHTML = '';
             pagination.appendChild(prevBtn);
             
-            // Calculate which pages to show
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 2);
             
-            // Adjust if we're near the start
             if (currentPage <= 3) {
                 endPage = Math.min(5, totalPages);
             }
             
-            // Adjust if we're near the end
             if (currentPage >= totalPages - 2) {
                 startPage = Math.max(1, totalPages - 4);
             }
             
-            // Add page buttons
             for (let i = startPage; i <= endPage; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
@@ -1535,14 +1510,12 @@
             
             pagination.appendChild(nextBtn);
             
-            // Update prev/next button states
             prevBtn.disabled = currentPage === 1;
             prevBtn.className = `page-btn prev-btn ${currentPage === 1 ? 'disabled' : ''}`;
             
             nextBtn.disabled = currentPage === totalPages;
             nextBtn.className = `page-btn next-btn ${currentPage === totalPages ? 'disabled' : ''}`;
             
-            // Add event listeners
             prevBtn.onclick = () => {
                 if (currentPage > 1) {
                     currentPage--;
@@ -1574,11 +1547,9 @@
             const filteredInvoices = getFilteredInvoices();
             const allFilteredSelected = filteredInvoices.every(inv => selectedInvoices.has(inv.id));
             
-            // Update count
             document.getElementById('selectedCount').textContent = selectedCount;
             document.getElementById('deleteSelectedCount').textContent = selectedCount;
             
-            // Update delete modal list
             const deleteList = document.getElementById('deleteSelectedList');
             if (deleteList && selectedCount > 0) {
                 const selectedInvoiceNumbers = filteredInvoices
@@ -1588,15 +1559,12 @@
                 deleteList.textContent = selectedInvoiceNumbers;
             }
             
-            // Show/hide selection actions bar
             const selectionActions = document.getElementById('selectionActions');
             selectionActions.style.display = selectedCount > 0 ? 'flex' : 'none';
             
-            // Enable/disable buttons
             document.getElementById('downloadSelectedBtn').disabled = selectedCount === 0;
             document.getElementById('deleteSelectedBtn').disabled = selectedCount === 0;
             
-            // Update select all checkbox
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
             const selectAllHeader = document.getElementById('selectAllHeader');
             if (selectAllCheckbox) {
@@ -1606,7 +1574,6 @@
                 selectAllHeader.checked = allFilteredSelected && filteredInvoices.length > 0;
             }
             
-            // Update checkboxes in table
             document.querySelectorAll('.invoice-checkbox').forEach(checkbox => {
                 const invoiceId = parseInt(checkbox.dataset.id);
                 checkbox.checked = selectedInvoices.has(invoiceId);
@@ -1630,13 +1597,11 @@
                 btn.addEventListener('click', function() {
                     const filter = this.dataset.filter;
                     
-                    // Update active state
                     document.querySelectorAll('.filter-btn[data-filter]').forEach(b => {
                         b.classList.remove('active');
                     });
                     this.classList.add('active');
                     
-                    // Update filter and re-render
                     currentFilter = filter;
                     currentPage = 1;
                     renderInvoices();
@@ -1651,10 +1616,8 @@
                 selectAllCheckbox.addEventListener('change', function() {
                     const filteredInvoices = getFilteredInvoices();
                     if (this.checked) {
-                        // Add all filtered invoices to selection
                         filteredInvoices.forEach(inv => selectedInvoices.add(inv.id));
                     } else {
-                        // Remove all filtered invoices from selection
                         filteredInvoices.forEach(inv => selectedInvoices.delete(inv.id));
                     }
                     updateSelectionUI();
@@ -1665,10 +1628,8 @@
                 selectAllHeader.addEventListener('change', function() {
                     const filteredInvoices = getFilteredInvoices();
                     if (this.checked) {
-                        // Add all filtered invoices to selection
                         filteredInvoices.forEach(inv => selectedInvoices.add(inv.id));
                     } else {
-                        // Remove all filtered invoices from selection
                         filteredInvoices.forEach(inv => selectedInvoices.delete(inv.id));
                     }
                     updateSelectionUI();
@@ -1691,7 +1652,6 @@
             document.getElementById('invoicesTableBody')?.addEventListener('click', function(e) {
                 const target = e.target;
                 
-                // Handle checkbox clicks
                 if (target.classList.contains('invoice-checkbox')) {
                     const invoiceId = parseInt(target.dataset.id);
                     if (target.checked) {
@@ -1703,7 +1663,6 @@
                     return;
                 }
                 
-                // Handle button clicks
                 const button = target.closest('button');
                 if (!button) return;
                 
@@ -1765,7 +1724,6 @@
                 confirmDelete.addEventListener('click', deleteInvoice);
             }
             
-            // Close modals when clicking outside
             window.addEventListener('click', (e) => {
                 if (e.target === deleteSelectedModal) {
                     deleteSelectedModal.classList.remove('show');
@@ -1794,7 +1752,7 @@
             }
         }
 
-        // Download single invoice PDF - Matching create_invoice.html design
+        // Download single invoice PDF
         function downloadInvoicePDF(invoiceId) {
             const invoice = allInvoices.find(inv => inv.id == invoiceId);
             if (invoice) {
@@ -1818,31 +1776,27 @@
             }
             
             if (selectedInvoiceList.length === 1) {
-                // Single invoice - download directly
                 downloadInvoicePDF(selectedInvoiceList[0].id);
                 return;
             }
             
-            // Multiple invoices - show confirmation
             showAlert(`Downloading ${selectedInvoiceList.length} invoices as PDFs...`, 'info');
             
-            // Download each invoice as separate PDF
             selectedInvoiceList.forEach((invoice, index) => {
                 setTimeout(() => {
                     generatePDFContent(invoice);
-                }, index * 1000); // Stagger downloads to avoid browser blocking
+                }, index * 1000);
             });
             
             showAlert(`${selectedInvoiceList.length} invoices are being downloaded as separate PDF files.`, 'success');
         }
 
-        // Generate PDF content - EXACT SAME as create_invoice.html WITH BLACK TEXT
+        // Generate PDF content
         function generatePDFContent(invoice) {
             return new Promise((resolve, reject) => {
                 try {
-                    // Create PDF content EXACTLY matching create_invoice.html design
                     const container = document.createElement('div');
-                    container.style.width = '794px'; // A4 width in pixels
+                    container.style.width = '794px';
                     container.style.padding = '20px';
                     container.style.fontFamily = 'Arial, Helvetica, sans-serif';
                     container.style.fontSize = '11px';
@@ -1851,7 +1805,7 @@
                     container.style.color = '#000000';
                     container.style.boxSizing = 'border-box';
                     
-                    // Header with logo and business info - EXACT SAME as create_invoice
+                    // Header with logo and business info
                     const header = document.createElement('div');
                     header.style.display = 'flex';
                     header.style.justifyContent = 'space-between';
@@ -1862,7 +1816,6 @@
                     header.style.width = '100%';
                     header.style.color = '#000000';
                     
-                    // Left side - Business info with logo
                     const businessInfo = document.createElement('div');
                     businessInfo.style.flex = '1';
                     businessInfo.style.display = 'flex';
@@ -1870,7 +1823,6 @@
                     businessInfo.style.gap = '15px';
                     businessInfo.style.color = '#000000';
                     
-                    // Logo container
                     const logoContainer = document.createElement('div');
                     logoContainer.style.width = '80px';
                     logoContainer.style.height = '80px';
@@ -1881,7 +1833,6 @@
                     logoContainer.style.overflow = 'hidden';
                     logoContainer.style.background = '#fff';
                     
-                    // Add logo if exists
                     if (window.shopProfile.logo && window.shopProfile.logo.startsWith('data:image')) {
                         const logoImg = document.createElement('img');
                         logoImg.src = window.shopProfile.logo;
@@ -1891,7 +1842,6 @@
                         logoImg.style.objectFit = 'contain';
                         logoContainer.appendChild(logoImg);
                     } else {
-                        // Default logo icon
                         const defaultLogo = document.createElement('div');
                         defaultLogo.style.fontSize = '30px';
                         defaultLogo.style.color = '#000000';
@@ -1899,12 +1849,10 @@
                         logoContainer.appendChild(defaultLogo);
                     }
                     
-                    // Business text info - EXACT SAME FORMAT WITH BLACK TEXT
                     const businessText = document.createElement('div');
                     businessText.style.flex = '1';
                     businessText.style.color = '#000000';
                     
-                    // Business Name - Large and bold
                     const businessName = document.createElement('h1');
                     businessName.textContent = window.shopProfile.name || 'PANESAR SANITARY STORE';
                     businessName.style.margin = '0 0 5px 0';
@@ -1915,7 +1863,6 @@
                     businessName.style.fontFamily = "'Playfair Display', 'Times New Roman', serif";
                     businessName.style.color = '#000000';
                     
-                    // GSTIN and PAN
                     const taxInfo = document.createElement('div');
                     taxInfo.style.fontWeight = 'bold';
                     taxInfo.style.marginBottom = '5px';
@@ -1926,7 +1873,6 @@
                         PAN: ${window.shopProfile.pan || 'ABRPS9453M'}
                     `;
                     
-                    // Business Description
                     const businessDesc = document.createElement('div');
                     businessDesc.style.fontWeight = 'bold';
                     businessDesc.style.marginBottom = '5px';
@@ -1934,7 +1880,6 @@
                     businessDesc.style.color = '#000000';
                     businessDesc.textContent = window.shopProfile.description || 'DEALS IN : ALL KIND OF SANITARY';
                     
-                    // Address and Contact Info
                     const contactInfo = document.createElement('div');
                     contactInfo.style.marginBottom = '10px';
                     contactInfo.style.fontSize = '11px';
@@ -1957,13 +1902,11 @@
                     businessInfo.appendChild(logoContainer);
                     businessInfo.appendChild(businessText);
                     
-                    // Right side - Invoice title and number - EXACT SAME
                     const invoiceInfo = document.createElement('div');
                     invoiceInfo.style.textAlign = 'right';
                     invoiceInfo.style.flex = '1';
                     invoiceInfo.style.color = '#000000';
                     
-                    // Invoice title
                     const invoiceTitle = document.createElement('h2');
                     invoiceTitle.textContent = 'GST INVOICE';
                     invoiceTitle.style.margin = '0 0 15px 0';
@@ -1973,7 +1916,6 @@
                     invoiceTitle.style.fontFamily = "'Playfair Display', 'Times New Roman', serif";
                     invoiceTitle.style.color = '#000000';
                     
-                    // Invoice number and date - USING THE EXACT INVOICE NUMBER
                     const invoiceDetails = document.createElement('div');
                     invoiceDetails.style.fontSize = '14px';
                     invoiceDetails.style.fontWeight = 'bold';
@@ -1990,7 +1932,6 @@
                     header.appendChild(invoiceInfo);
                     container.appendChild(header);
                     
-                    // Customer and invoice details table - EXACT SAME WITH BLACK TEXT
                     const detailsTable = document.createElement('table');
                     detailsTable.style.width = '100%';
                     detailsTable.style.borderCollapse = 'collapse';
@@ -1999,13 +1940,11 @@
                     detailsTable.style.fontSize = '10px';
                     detailsTable.style.color = '#000000';
                     
-                    // Build customer info with fixed mobile and GSTIN
                     let customerInfoHtml = `
                         <div style="font-weight: bold; margin-bottom: 8px; font-size: 12px; color: #000000;">To M/s:</div>
                         <div style="margin-bottom: 5px; font-weight: bold; font-size: 16px; color: #000000;">${invoice.customer.name || ''}</div>
                     `;
                     
-                    // Always show Mobile and GSTIN (even if empty) with BLACK TEXT
                     customerInfoHtml += `
                         <div style="margin-bottom: 3px; font-size: 12px; color: #000000;"><strong style="color: #000000;">Mobile:</strong> ${invoice.customer.mobile || 'Not Provided'}</div>
                         <div style="margin-bottom: 3px; font-size: 12px; color: #000000;"><strong style="color: #000000;">GSTIN:</strong> ${invoice.customer.gstin || 'Not Provided'}</div>
@@ -2027,7 +1966,6 @@
                     
                     container.appendChild(detailsTable);
                     
-                    // Items table - EXACT SAME as create_invoice WITH BLACK TEXT
                     const itemsTable = document.createElement('table');
                     itemsTable.style.width = '100%';
                     itemsTable.style.borderCollapse = 'collapse';
@@ -2037,7 +1975,6 @@
                     itemsTable.style.tableLayout = 'fixed';
                     itemsTable.style.color = '#000000';
                     
-                    // Table header - EXACT SAME COLUMNS WITH BLACK TEXT
                     const thead = document.createElement('thead');
                     thead.style.color = '#000000';
                     thead.innerHTML = `
@@ -2053,18 +1990,15 @@
                     `;
                     itemsTable.appendChild(thead);
                     
-                    // Table body
                     const tbody = document.createElement('tbody');
                     tbody.style.color = '#000000';
                     
-                    // Add actual items
                     if (invoice.items && Array.isArray(invoice.items)) {
                         invoice.items.forEach((item, index) => {
                             const row = document.createElement('tr');
                             row.style.height = '35px';
                             row.style.color = '#000000';
                             
-                            // Safely get item values
                             const itemName = item.name || 'Item';
                             const hsn = item.hsn || '';
                             const quantity = item.quantity || 0;
@@ -2085,7 +2019,6 @@
                         });
                     }
                     
-                    // Add empty rows for a total of 12 rows (EXACT SAME as create_invoice)
                     const emptyRowsNeeded = Math.max(12 - (invoice.items?.length || 0), 0);
                     for (let i = 0; i < emptyRowsNeeded; i++) {
                         const row = document.createElement('tr');
@@ -2107,14 +2040,12 @@
                     itemsTable.appendChild(tbody);
                     container.appendChild(itemsTable);
                     
-                    // New layout: Terms & Conditions on left, Totals on right - EXACT SAME WITH BLACK TEXT
                     const bottomContainer = document.createElement('div');
                     bottomContainer.style.display = 'flex';
                     bottomContainer.style.gap = '20px';
                     bottomContainer.style.marginBottom = '20px';
                     bottomContainer.style.color = '#000000';
                     
-                    // Left side - Terms & Conditions
                     const termsDiv = document.createElement('div');
                     termsDiv.style.flex = '1';
                     termsDiv.style.padding = '12px';
@@ -2139,13 +2070,11 @@
                     termsDiv.appendChild(termsContent);
                     bottomContainer.appendChild(termsDiv);
                     
-                    // Right side - Totals section - EXACT SAME CALCULATION WITH BLACK TEXT
                     const totalsDiv = document.createElement('div');
                     totalsDiv.style.width = '300px';
                     totalsDiv.style.fontSize = '12px';
                     totalsDiv.style.color = '#000000';
                     
-                    // Calculate GST amounts
                     const subtotal = invoice.subtotal || 0;
                     const gstTotal = invoice.gstTotal || 0;
                     const grandTotal = invoice.grandTotal || 0;
@@ -2184,7 +2113,6 @@
                     bottomContainer.appendChild(totalsDiv);
                     container.appendChild(bottomContainer);
                     
-                    // Signature section - 2-column layout (EXACT SAME as create_invoice) WITH BLACK TEXT
                     const signatureDiv = document.createElement('div');
                     signatureDiv.style.marginTop = '50px';
                     signatureDiv.style.display = 'flex';
@@ -2194,7 +2122,6 @@
                     signatureDiv.style.borderTop = '1px solid #000';
                     signatureDiv.style.color = '#000000';
                     
-                    // Left - Customer Signature
                     const customerSign = document.createElement('div');
                     customerSign.style.flex = '1';
                     customerSign.style.color = '#000000';
@@ -2205,7 +2132,6 @@
                         </div>
                     `;
                     
-                    // Right - Authorized Signatory
                     const authorizedSign = document.createElement('div');
                     authorizedSign.style.flex = '1';
                     authorizedSign.style.textAlign = 'right';
@@ -2221,7 +2147,6 @@
                     signatureDiv.appendChild(authorizedSign);
                     container.appendChild(signatureDiv);
                     
-                    // Bottom left - Authorized Signature
                     const bottomLeftAuthSign = document.createElement('div');
                     bottomLeftAuthSign.style.marginTop = '30px';
                     bottomLeftAuthSign.style.paddingTop = '15px';
@@ -2236,7 +2161,6 @@
                     `;
                     container.appendChild(bottomLeftAuthSign);
                     
-                    // Bottom note
                     const bottomNote = document.createElement('div');
                     bottomNote.style.marginTop = '10px';
                     bottomNote.style.paddingTop = '10px';
@@ -2247,7 +2171,6 @@
                     bottomNote.innerHTML = `<div style="color: #000000;">This is a computer generated invoice. No signature required.</div>`;
                     container.appendChild(bottomNote);
                     
-                    // Force black text on all elements
                     const allElements = container.querySelectorAll('*');
                     allElements.forEach(el => {
                         el.style.color = '#000000';
@@ -2256,7 +2179,6 @@
                         }
                     });
                     
-                    // Generate PDF with EXACT SAME options
                     const options = {
                         margin: [5, 5, 5, 5],
                         filename: `invoice-${invoice.invoiceNumber}.pdf`,
@@ -2270,7 +2192,7 @@
                             windowWidth: 794,
                             scrollX: 0,
                             scrollY: 0,
-                            backgroundColor: '#ffffff' // Ensure white background
+                            backgroundColor: '#ffffff'
                         },
                         jsPDF: { 
                             unit: 'mm', 
@@ -2293,7 +2215,6 @@
         function printInvoice(invoiceId) {
             const invoice = allInvoices.find(inv => inv.id == invoiceId);
             if (invoice) {
-                // Open print dialog
                 window.print();
                 showAlert(`Printing invoice ${invoice.invoiceNumber}...`, 'info');
             }
@@ -2332,40 +2253,30 @@
                 return;
             }
             
-            // Track restored items for notification
             let restoredItems = [];
             
-            // Process each selected invoice
             selectedInvoiceList.forEach(invoice => {
                 const invoiceIndex = allInvoices.findIndex(inv => inv.id == invoice.id);
                 if (invoiceIndex !== -1) {
-                    // Restore inventory items BEFORE removing invoice
                     const restored = restoreInventoryFromInvoice(allInvoices[invoiceIndex]);
                     restoredItems = [...restoredItems, ...restored];
                     
-                    // Remove invoice from array
                     allInvoices.splice(invoiceIndex, 1);
                 }
             });
             
-            // Save to localStorage
             localStorage.setItem('invoices', JSON.stringify(allInvoices));
             
-            // Clear selection
             selectedInvoices.clear();
             
-            // Update UI
             updateStats();
             renderInvoices();
             
-            // Close modal
             deleteSelectedModal.classList.remove('show');
             
-            // Show success message with restoration details
             let successMessage = `${selectedInvoiceList.length} invoices deleted successfully!`;
             
             if (restoredItems.length > 0) {
-                // Group restored items by name
                 const groupedItems = {};
                 restoredItems.forEach(item => {
                     if (!groupedItems[item.name]) {
@@ -2395,7 +2306,6 @@
             const invoiceId = deleteModal.dataset.invoiceId;
             const invoiceNumber = document.getElementById('deleteInvoiceNumber').textContent;
             
-            // Find invoice
             const invoiceIndex = allInvoices.findIndex(inv => inv.id == invoiceId);
             if (invoiceIndex === -1) {
                 showAlert('Invoice not found!', 'danger');
@@ -2404,26 +2314,19 @@
             
             const invoiceToDelete = allInvoices[invoiceIndex];
             
-            // Restore inventory items BEFORE removing invoice
             const restoredItems = restoreInventoryFromInvoice(invoiceToDelete);
             
-            // Remove invoice
             allInvoices.splice(invoiceIndex, 1);
             
-            // Remove from selection if it was selected
             selectedInvoices.delete(parseInt(invoiceId));
             
-            // Save to localStorage
             localStorage.setItem('invoices', JSON.stringify(allInvoices));
             
-            // Update UI
             updateStats();
             renderInvoices();
             
-            // Close modal
             deleteModal.classList.remove('show');
             
-            // Show success message with restoration details
             let successMessage = `Invoice ${invoiceNumber} deleted successfully!`;
             
             if (restoredItems.length > 0) {
@@ -2440,44 +2343,32 @@
         // Restore inventory from deleted invoice
         function restoreInventoryFromInvoice(invoiceData) {
             try {
-                // Load current inventory
                 let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
                 const restoredItems = [];
                 
-                // For each item in the invoice
                 if (invoiceData.items && Array.isArray(invoiceData.items)) {
                     invoiceData.items.forEach(invoiceItem => {
-                        // Find the item in inventory
                         const inventoryIndex = inventory.findIndex(item => item.name === invoiceItem.name);
                         
                         if (inventoryIndex !== -1) {
-                            // Item exists in inventory
                             const inventoryItem = inventory[inventoryIndex];
                             const currentStock = parseFloat(inventoryItem.stock) || 0;
                             const restoredQty = parseFloat(invoiceItem.quantity) || parseFloat(invoiceItem.qty) || 0;
                             
-                            // Calculate new stock (add back the sold quantity)
                             const newStock = currentStock + restoredQty;
                             
-                            // Update inventory
                             inventory[inventoryIndex].stock = newStock.toFixed(3);
                             inventory[inventoryIndex].lastUpdated = new Date().toISOString();
                             
-                            // Track restoration
                             restoredItems.push({
                                 name: invoiceItem.name,
                                 restoredQty: restoredQty,
                                 oldStock: currentStock,
                                 newStock: newStock
                             });
-                            
-                            console.log(`Inventory restored: ${invoiceItem.name} - Added back: ${restoredQty}, New Stock: ${newStock}`);
-                        } else {
-                            console.log(`Item ${invoiceItem.name} not found in inventory, skipping restoration`);
                         }
                     });
                     
-                    // Save updated inventory
                     localStorage.setItem('inventory', JSON.stringify(inventory));
                 }
                 
@@ -2494,11 +2385,9 @@
             const alertContainer = document.getElementById('alertContainer');
             if (!alertContainer) return;
             
-            // Remove existing alerts
             const existingAlert = alertContainer.querySelector('.alert');
             if (existingAlert) existingAlert.remove();
             
-            // Create alert
             const alert = document.createElement('div');
             alert.className = `alert ${type}`;
             
@@ -2517,13 +2406,11 @@
             
             alertContainer.appendChild(alert);
             
-            // Add close event
             const closeBtn = alert.querySelector('.alert-close');
             if (closeBtn) {
                 closeBtn.addEventListener('click', () => alert.remove());
             }
             
-            // Auto remove after duration
             setTimeout(() => {
                 if (alert.parentElement) {
                     alert.remove();
@@ -2533,16 +2420,13 @@
         
         // GitHub Auto-Login Functions
         async function initializeApp() {
-            // Check if user is logged in
             const currentUser = sessionStorage.getItem('currentUser');
             
             if (!currentUser) {
-                // Check for GitHub config and try to auto-login
                 await tryAutoLoginFromGitHub();
                 return;
             }
             
-            // Load GitHub data if configured
             await checkAndLoadGitHubData();
         }
 
@@ -2551,31 +2435,25 @@
                 const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
                 
                 if (savedConfig.username && savedConfig.repo && savedConfig.token) {
-                    // Wait for githubStorage to be available
                     if (typeof githubStorage !== 'undefined') {
                         githubStorage.username = savedConfig.username;
                         githubStorage.repo = savedConfig.repo;
                         githubStorage.token = savedConfig.token;
                         
-                        // Try to load any user data
                         const allData = await githubStorage.loadAnyUserData();
                         
                         if (allData && allData.users && allData.users.length > 0) {
-                            // Auto-login with first user
                             const firstUser = allData.users[0];
                             sessionStorage.setItem('currentUser', JSON.stringify(firstUser));
                             
-                            // Save data locally
                             if (allData.invoices) {
                                 localStorage.setItem('invoices', JSON.stringify(allData.invoices));
-                                // Reload invoices after setting them
                                 loadInvoices();
                                 renderInvoices();
                             }
                             if (allData.inventory) localStorage.setItem('inventory', JSON.stringify(allData.inventory));
                             if (allData.shopProfile) {
                                 localStorage.setItem('shopProfile', JSON.stringify(allData.shopProfile));
-                                // Reload shop profile
                                 loadShopProfile();
                             }
                             
@@ -2583,13 +2461,11 @@
                             return true;
                         }
                     } else {
-                        // githubStorage not loaded yet, try again after a delay
                         setTimeout(tryAutoLoginFromGitHub, 1000);
                         return false;
                     }
                 }
                 
-                // No auto-login possible, user stays on current page
                 return false;
             } catch (error) {
                 console.error('Auto-login error:', error);
@@ -2608,22 +2484,14 @@
                         githubStorage.repo = savedConfig.repo;
                         githubStorage.token = savedConfig.token;
                         
-                        // Check for newer data on GitHub
                         const githubData = await githubStorage.loadUserData(currentUser.email);
                         
                         if (githubData) {
-                            // Compare timestamps or implement your sync logic
-                            console.log('GitHub data available:', githubData);
-                            
-                            // Optional: You could add logic here to sync data
-                            // For now, just show an info message
                             showAlert('Cloud data synced successfully', 'info');
                         }
                     }
                 }
             } catch (error) {
-                console.log('GitHub data check error:', error);
-                // Suppress the console error if it's just a normal case
                 if (!error.message.includes('No data found') && !error.message.includes('404')) {
                     console.error('GitHub data check error:', error);
                 }
