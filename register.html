@@ -3,50 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - GST Invoice System</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Register - Application</title>
     <style>
-        .register-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* DARK UI THEME (Matching login.html) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
         }
         
-        .register-card {
-            width: 100%;
-            max-width: 450px;
-            padding: 40px;
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            color: #e0e0e0;
         }
         
-        .register-header {
-            text-align: center;
+        .header {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
             margin-bottom: 30px;
-        }
-        
-        .register-logo {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .register-subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        .form-footer {
             text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #cbd5e0;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background: #2d3748;
+            color: #e2e8f0;
+            font-size: 16px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4a6fa5;
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
         }
         
         .name-fields {
@@ -58,71 +72,232 @@
         @media (max-width: 480px) {
             .name-fields {
                 grid-template-columns: 1fr;
-                gap: 0;
             }
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: #4a6fa5;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #3a5a80;
+            transform: translateY(-2px);
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background: #2d3748;
+            color: #68d391;
+            border: 1px solid #38a169;
+        }
+        
+        .error {
+            background: #2d3748;
+            color: #fc8181;
+            border: 1px solid #e53e3e;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #4a5568;
+            color: #a0aec0;
+        }
+        
+        .form-footer a {
+            color: #4a6fa5;
+            text-decoration: none;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .demo-notice {
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px;
+            background: #2d3748;
+            border-radius: 6px;
+            border: 1px solid #4a5568;
+            color: #a0aec0;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="register-container">
-        <div class="card register-card">
-            <div class="register-header">
-                <div class="register-logo">
-                    <i class="fas fa-receipt"></i>
-                    GST Invoice System
-                </div>
-                <p class="register-subtitle">Create your account</p>
-            </div>
-
-            <form id="registerForm">
-                <div class="name-fields">
-                    <div class="form-group">
-                        <label class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="Enter first name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" placeholder="Enter last name" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Create a password" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
-                </div>
-                
-                <button type="submit" class="btn btn-primary w-full">
-                    <i class="fas fa-user-plus"></i> Create Account
-                </button>
-                
-                <div class="form-footer">
-                    <p>Already have an account? <a href="login.html" class="text-primary">Sign in</a></p>
-                </div>
-            </form>
-            
-            <!-- Demo credentials alert -->
-            <div class="alert alert-info mt-3">
-                <i class="fas fa-info-circle"></i>
-                <strong>Demo Note:</strong> This is a frontend demo. All data is stored locally in your browser.
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>Create Account</h1>
+            <p>Sign up for your account with cloud storage</p>
         </div>
+        
+        <form id="registerForm">
+            <div class="name-fields">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" placeholder="Enter first name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" placeholder="Enter last name" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="githubUsername">GitHub Username</label>
+                <input type="text" id="githubUsername" placeholder="Your GitHub username (e.g., octocat)" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="repoName">Repository Name</label>
+                <input type="text" id="repoName" placeholder="Repo name for cloud storage (e.g., my-app-data)" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="githubToken">GitHub Personal Access Token</label>
+                <input type="password" id="githubToken" placeholder="Enter your token (e.g., ghp_...)" required>
+            </div>
+            
+            <button type="submit">Create Account</button>
+            
+            <div class="form-footer">
+                <p>Already have an account? <a href="login.html">Sign in</a></p>
+            </div>
+        </form>
+        
+        <div class="demo-notice">
+            <p>Demo Note: Data is stored in your GitHub repo for cloud access. Token is required for API access.</p>
+        </div>
+        
+        <div id="message" class="message"></div>
     </div>
-
-    <script src="script.js"></script>
+    
     <script>
-        // Simple registration form handler
-        document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+        // Predefined GitHub config (will be updated with user input)
+        let githubConfig = {
+            owner: '',
+            repo: '',
+            token: ''
+        };
+        
+        // Fallback simulated database
+        const fallbackAccounts = [
+            { email: "user@example.com", password: "Password123" },
+            { email: "test@domain.com", password: "Test@2024" },
+            { email: "admin@system.com", password: "Admin@Secure" }
+        ];
+        
+        async function saveUsersToGitHub(users, config) {
+            try {
+                const content = btoa(JSON.stringify(users, null, 2));
+                const response = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}/contents/users.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Add new user',
+                        content: content,
+                        sha: await getFileSha(config)
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+                return true;
+            } catch (error) {
+                console.error('Error saving to GitHub:', error);
+                return false;
+            }
+        }
+        
+        async function getFileSha(config) {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}/contents/users.json`, {
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.sha;
+                }
+            } catch (error) {
+                return null;
+            }
+        }
+        
+        async function fetchUsersFromGitHub(config) {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}/contents/users.json`, {
+                    headers: {
+                        'Authorization': `token ${config.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = atob(data.content);
+                    return JSON.parse(content);
+                } else if (response.status === 404) {
+                    return [];
+                } else {
+                    return null;
+                }
+            } catch (error) {
+                return null;
+            }
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const firstName = document.getElementById('firstName').value.trim();
@@ -130,20 +305,28 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const githubUsername = document.getElementById('githubUsername').value.trim();
+            const repoName = document.getElementById('repoName').value.trim();
+            const githubToken = document.getElementById('githubToken').value.trim();
             
-            // Basic validation
-            if (!firstName || !lastName || !email || !password) {
-                alert('Please fill in all fields');
+            // Validation
+            if (!firstName || !lastName || !email || !password || !githubUsername || !repoName || !githubToken) {
+                showMessage("Please fill in all fields", "error");
                 return;
             }
             
             if (password !== confirmPassword) {
-                alert('Passwords do not match!');
+                showMessage("Passwords do not match!", "error");
                 return;
             }
             
             if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
+                showMessage("Password must be at least 6 characters long", "error");
+                return;
+            }
+            
+            if (!githubToken.startsWith('ghp_')) {
+                showMessage("Invalid GitHub token format (should start with ghp_)", "error");
                 return;
             }
             
@@ -164,111 +347,93 @@
                 theme: 'light'
             };
             
-            // Get existing users from localStorage
-            let users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+            // Update GitHub config
+            githubConfig.owner = githubUsername;
+            githubConfig.repo = repoName;
+            githubConfig.token = githubToken;
             
-            // Check if user already exists
+            // Save config to localStorage
+            localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
+            
+            // Try to save to GitHub
+            let users = await fetchUsersFromGitHub(githubConfig) || [];
             const existingUser = users.find(u => u.email === email);
             if (existingUser) {
-                alert('An account with this email already exists!');
+                showMessage("An account with this email already exists!", "error");
                 return;
             }
             
-            // Add new user
             users.push(user);
-            localStorage.setItem('gstInvoiceUsers', JSON.stringify(users));
+            const savedToCloud = await saveUsersToGitHub(users, githubConfig);
+            
+            if (!savedToCloud) {
+                showMessage("Account created locally. Cloud save failed—check your GitHub details.", "error");
+                // Still proceed with local save
+            }
+            
+            // Local save as fallback
+            let localUsers = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+            localUsers.push(user);
+            localStorage.setItem('gstInvoiceUsers', JSON.stringify(localUsers));
             
             // Auto-login
             sessionStorage.setItem('currentUser', JSON.stringify(user));
             sessionStorage.setItem('isLoggedIn', 'true');
             
-            // Redirect to dashboard
-            alert('Account created successfully! Redirecting...');
-            window.location.href = 'dashboard.html';
+            showMessage("Account created successfully! Redirecting...", "success");
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
         });
+        
+        // Auto-login and GitHub data loading (from your additional scripts)
+        async function initializeApp() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (!currentUser) {
+                await tryAutoLoginFromGitHub();
+                return;
+            }
+            await checkAndLoadGitHubData();
+        }
+        
+        async function tryAutoLoginFromGitHub() {
+            try {
+                const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+                if (savedConfig.owner && savedConfig.repo && savedConfig.token) {
+                    githubConfig = savedConfig;
+                    const users = await fetchUsersFromGitHub(githubConfig);
+                    if (users && users.length > 0) {
+                        const firstUser = users[0];
+                        sessionStorage.setItem('currentUser', JSON.stringify(firstUser));
+                        showMessage('Auto-logged in from cloud!', 'success');
+                        window.location.href = 'dashboard.html';
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.error('Auto-login error:', error);
+                return false;
+            }
+        }
+        
+        async function checkAndLoadGitHubData() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+                if (currentUser.email && savedConfig.owner && savedConfig.repo && savedConfig.token) {
+                    githubConfig = savedConfig;
+                    const githubData = await fetchUsersFromGitHub(githubConfig);
+                    if (githubData) {
+                        console.log('GitHub data available:', githubData);
+                    }
+                }
+            } catch (error) {
+                console.log('GitHub data check error:', error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
-
 </html>
-    <script src="script.js"></script>
-    <script src="github-storage.js"></script>
-</body>
-</html>
-// Add this to your dashboard.js or script.js
-async function initializeApp() {
-    // Check if user is logged in
-    const currentUser = sessionStorage.getItem('currentUser');
-    
-    if (!currentUser) {
-        // Check for GitHub config and try to auto-login
-        await tryAutoLoginFromGitHub();
-        return;
-    }
-    
-    // Load GitHub data if configured
-    await checkAndLoadGitHubData();
-}
-
-async function tryAutoLoginFromGitHub() {
-    try {
-        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-        
-        if (savedConfig.username && savedConfig.repo && savedConfig.token) {
-            githubStorage.username = savedConfig.username;
-            githubStorage.repo = savedConfig.repo;
-            githubStorage.token = savedConfig.token;
-            
-            // Try to load any user data
-            const allData = await githubStorage.loadAnyUserData();
-            
-            if (allData && allData.users && allData.users.length > 0) {
-                // Auto-login with first user (you might want to add a login selection)
-                const firstUser = allData.users[0];
-                sessionStorage.setItem('currentUser', JSON.stringify(firstUser));
-                
-                // Save data locally
-                if (allData.invoices) localStorage.setItem('invoices', JSON.stringify(allData.invoices));
-                if (allData.inventory) localStorage.setItem('inventory', JSON.stringify(allData.inventory));
-                if (allData.shopProfile) localStorage.setItem('shopProfile', JSON.stringify(allData.shopProfile));
-                
-                showAlert('Auto-logged in from cloud!', 'info');
-                window.location.href = 'dashboard.html';
-                return true;
-            }
-        }
-        
-        // No auto-login possible, redirect to login
-        window.location.href = 'login.html';
-        return false;
-    } catch (error) {
-        console.error('Auto-login error:', error);
-        window.location.href = 'login.html';
-        return false;
-    }
-}
-
-async function checkAndLoadGitHubData() {
-    try {
-        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-        const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-        
-        if (currentUser.email && savedConfig.username && savedConfig.repo && savedConfig.token) {
-            githubStorage.username = savedConfig.username;
-            githubStorage.repo = savedConfig.repo;
-            githubStorage.token = savedConfig.token;
-            
-            // Check for newer data on GitHub
-            const githubData = await githubStorage.loadUserData(currentUser.email);
-            
-            if (githubData) {
-                // Compare timestamps or implement your sync logic
-                console.log('GitHub data available:', githubData);
-            }
-        }
-    } catch (error) {
-        console.log('GitHub data check error:', error);
-    }
-}
-
-// Call this on page load
-document.addEventListener('DOMContentLoaded', initializeApp);
