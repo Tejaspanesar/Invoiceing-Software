@@ -3,225 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application</title>
+    <title>Login - Application</title>
     <style>
-        /* DARK UI THEME - Only changed colors to dark theme */
+        /* DARK UI THEME */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #121212; /* Changed to dark */
-            color: #e0e0e0; /* Changed to light text */
+            background-color: #121212;
+            color: #e0e0e0;
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #1e1e1e; /* Changed to dark */
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3); /* Darker shadow */
-            color: #e0e0e0; /* Light text */
+            max-width: 500px;
+            margin: 50px auto;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            color: #e0e0e0;
         }
         
         .header {
-            background: #2d3748; /* Darker blue */
-            color: #e2e8f0; /* Light text */
+            background: #2d3748;
+            color: #e2e8f0;
             padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
-            color: #cbd5e0; /* Light label */
+            color: #cbd5e0;
         }
         
         input[type="text"],
         input[type="password"],
         input[type="email"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #4a5568; /* Dark border */
-            border-radius: 4px;
+            padding: 12px;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
             box-sizing: border-box;
-            background: #2d3748; /* Dark input */
-            color: #e2e8f0; /* Light text */
+            background: #2d3748;
+            color: #e2e8f0;
+            font-size: 16px;
         }
         
         input:focus {
             outline: none;
-            border-color: #4a6fa5; /* Keep brand color for focus */
+            border-color: #4a6fa5;
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
         }
         
         button {
-            background: #4a6fa5; /* Same brand color */
-            color: white;
-            padding: 10px 20px;
+            flex: 1;
+            padding: 14px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
         
-        button:hover {
-            background: #3a5a80; /* Same hover */
+        .btn-login {
+            background: #4a6fa5;
+            color: white;
         }
         
-        .card {
-            border: 1px solid #4a5568; /* Dark border */
+        .btn-login:hover {
+            background: #3a5a80;
+            transform: translateY(-2px);
+        }
+        
+        .btn-signup {
+            background: #38a169;
+            color: white;
+        }
+        
+        .btn-signup:hover {
+            background: #2f855a;
+            transform: translateY(-2px);
+        }
+        
+        .message {
+            margin-top: 20px;
             padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            background: #2d3748; /* Dark card */
-            color: #e2e8f0; /* Light text */
+            border-radius: 6px;
+            text-align: center;
+            display: none;
         }
         
-        /* Remove demo credentials */
-        .demo-credential,
-        .test-account,
-        .sample-user,
-        .demo-user,
-        .test-data,
-        .demo-section,
-        #demoCredentials {
-            display: none !important;
+        .success {
+            background: #2d3748;
+            color: #68d391;
+            border: 1px solid #38a169;
         }
         
-        /* Placeholder styling for dark theme */
-        ::placeholder {
-            color: #a0aec0; /* Light gray */
+        .error {
+            background: #2d3748;
+            color: #fc8181;
+            border: 1px solid #e53e3e;
         }
         
-        /* Links for dark theme */
-        a {
-            color: #63b3ed; /* Bright blue for visibility */
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+            color: #a0aec0;
         }
         
-        a:hover {
-            color: #4299e1; /* Slightly darker blue */
+        .divider::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #4a5568;
         }
         
-        /* Keep specific demo card backgrounds from showing */
-        .demo-credential[style*="background: #ffeaa7"],
-        #demoCredentials[style*="background: #ffebee"] {
-            display: none !important;
+        .divider::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #4a5568;
+        }
+        
+        .demo-notice {
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px;
+            background: #2d3748;
+            border-radius: 6px;
+            border: 1px solid #4a5568;
+            color: #a0aec0;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Application</h1>
-            <p>Welcome</p>
+            <h1>Welcome Back</h1>
+            <p>Sign in to your account</p>
         </div>
         
-        <!-- Hidden demo credentials -->
-        <div class="demo-credential card" style="background: #ffeaa7; display: none;">
-            <!-- Demo content removed -->
-        </div>
-        
-        <div class="demo-section" style="display: none;">
-            <!-- Demo content removed -->
-        </div>
-        
-        <!-- ACTUAL APPLICATION CONTENT -->
         <div class="main-content">
-            <h2>Login</h2>
-            
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter email">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your registered email">
             </div>
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password">
+                <input type="password" id="password" placeholder="Enter your password">
             </div>
             
-            <div class="test-data" style="display: none;">
-                <!-- Demo content removed -->
+            <div class="button-group">
+                <button class="btn-login" onclick="login()">Sign In</button>
+                <button class="btn-signup" onclick="signup()">Create Account</button>
             </div>
             
-            <button onclick="login()">Sign In</button>
+            <div class="divider">OR</div>
             
-            <div class="info-section" style="margin-top: 30px;">
-                <h3>Information</h3>
-                <p>All demo credentials have been removed.</p>
-                <p>UI is now in dark theme.</p>
+            <div class="demo-notice">
+                <p>No demo credentials available. Please use your registered account or create a new one.</p>
             </div>
             
-            <div id="demoCredentials" class="card" style="background: #ffebee; display: none;">
-                <!-- Demo content removed -->
-            </div>
-            
-            <!-- Normal content -->
-            <div class="user-guide card">
-                <h3>Guide</h3>
-                <p>1. Enter email</p>
-                <p>2. Enter password</p>
-                <p>3. Click Sign In</p>
-                <p>4. Contact support</p>
-            </div>
+            <div id="message" class="message"></div>
         </div>
     </div>
     
     <script>
-        // ORIGINAL JAVASCRIPT - UNCHANGED
-        document.addEventListener('DOMContentLoaded', function() {
-            // Hide any remaining demo elements
-            const demoSelectors = [
-                '.demo-credential',
-                '.test-account',
-                '.sample-user',
-                '.demo-user',
-                '.test-data',
-                '.demo-section',
-                '#demoCredentials'
-            ];
+        // Simulated database of existing accounts
+        const existingAccounts = [
+            { email: "user@example.com", password: "Password123" },
+            { email: "test@domain.com", password: "Test@2024" },
+            { email: "admin@system.com", password: "Admin@Secure" }
+        ];
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
             
-            demoSelectors.forEach(selector => {
-                document.querySelectorAll(selector).forEach(el => {
-                    el.style.display = 'none';
-                    el.style.visibility = 'hidden';
-                    el.style.opacity = '0';
-                    el.style.height = '0';
-                    el.style.margin = '0';
-                    el.style.padding = '0';
-                    el.style.overflow = 'hidden';
-                });
-            });
+            // Auto-hide message after 5 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
             
-            // ORIGINAL FUNCTIONALITY - UNCHANGED
-            window.login = function() {
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                
-                if (email && password) {
-                    alert('Login attempt for: ' + email);
-                    // Original login logic remains unchanged
-                } else {
-                    alert('Please enter both email and password');
-                }
+            // Validation
+            if (!email || !password) {
+                showMessage("Please enter both email and password", "error");
+                return;
             }
             
-            // Ensure no light text remains (backup for inline styles)
-            document.querySelectorAll('body, .container, .card, p, h1, h2, h3, h4, h5, h6, span, div, label')
-                .forEach(el => {
-                    if (!el.closest('.header') && el.tagName !== 'BUTTON') {
-                        const style = window.getComputedStyle(el);
-                        if (style.color === 'rgb(255, 255, 255)' || 
-                            style.color === 'rgb(51, 51, 51)' ||
-                            style.color.includes('51, 51, 51')) {
-                            el.style.color = '#e0e0e0';
-                        }
-                    }
-                });
+            // Check if account exists
+            const account = existingAccounts.find(acc => acc.email === email);
+            
+            if (!account) {
+                // Account doesn't exist - show signup suggestion
+                showMessage("Account not found. Please sign up to create a new account.", "error");
+                return;
+            }
+            
+            if (account.password !== password) {
+                showMessage("Incorrect password. Please try again.", "error");
+                return;
+            }
+            
+            // Login successful - redirect to dashboard
+            showMessage("Login successful! Redirecting to your account...", "success");
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // In real implementation, you would:
+                // 1. Set authentication token in localStorage/sessionStorage
+                // 2. Redirect to dashboard
+                localStorage.setItem('userEmail', email);
+                localStorage.setItem('isLoggedIn', 'true');
+                
+                // Redirect to dashboard/home page
+                window.location.href = "dashboard.html";
+                // Or if you want to redirect based on user role:
+                // window.location.href = account.isAdmin ? "admin-dashboard.html" : "user-dashboard.html";
+            }, 1500);
+        }
+        
+        function signup() {
+            // Redirect to registration page
+            window.location.href = "register.html";
+            // Or for single-page application:
+            // window.location.hash = "#register";
+            // Or show registration modal:
+            // showRegistrationModal();
+        }
+        
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+        
+        // Focus first input on page load
+        document.getElementById('email').focus();
+        
+        // Check if user is already logged in (optional)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                // Auto-redirect to dashboard if already logged in
+                // window.location.href = "dashboard.html";
+            }
         });
     </script>
 </body>
