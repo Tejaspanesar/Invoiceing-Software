@@ -185,7 +185,7 @@
             <div class="divider">OR</div>
             
             <div class="demo-notice">
-                <p>No demo credentials available. Please use your registered account or create a new one.</p>
+                <p>No demo credentials available. Please use your registered account or create a new one. Cloud storage is enabled with predefined settings.</p>
             </div>
             
             <div id="message" class="message"></div>
@@ -193,12 +193,93 @@
     </div>
     
     <script>
-        // Simulated database of existing accounts
-        const existingAccounts = [
+        // Predefined GitHub config with your temporary token
+        let githubConfig = {
+            owner: 'your-github-username',  // Replace with your actual GitHub username
+            repo: 'your-repo-name',         // Replace with your actual repo name
+            token: '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'  // Your temporary token
+        };
+        
+        // Save to localStorage on load (if not already set)
+        if (!localStorage.getItem('githubConfig')) {
+            localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
+        } else {
+            // Load existing config
+            githubConfig = JSON.parse(localStorage.getItem('githubConfig'));
+        }
+        
+        // Fallback simulated database
+        const fallbackAccounts = [
             { email: "user@example.com", password: "Password123" },
             { email: "test@domain.com", password: "Test@2024" },
             { email: "admin@system.com", password: "Admin@Secure" }
         ];
+        
+        async function fetchUsersFromGitHub() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/users.json`, {
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = atob(data.content);
+                    return JSON.parse(content);
+                } else if (response.status === 404) {
+                    return [];
+                } else {
+                    // Token likely expired or invalid
+                    return null;  // Signal to prompt for update
+                }
+            } catch (error) {
+                console.error('Error fetching users from GitHub:', error);
+                return null;  // Signal to prompt for update
+            }
+        }
+        
+        async function saveUsersToGitHub(users) {
+            try {
+                const content = btoa(JSON.stringify(users, null, 2));
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/users.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Update user accounts',
+                        content: content,
+                        sha: await getFileSha()
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error saving users to GitHub:', error);
+                showMessage("Error saving to cloud. Changes may not persist.", "error");
+            }
+        }
+        
+        async function getFileSha() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/users.json`, {
+                    headers: {
+                        'Authorization': `token ${githubConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.sha;
+                }
+            } catch (error) {
+                return null;
+            }
+        }
         
         function showMessage(text, type) {
             const messageDiv = document.getElementById('message');
@@ -206,77 +287,75 @@
             messageDiv.className = `message ${type}`;
             messageDiv.style.display = 'block';
             
-            // Auto-hide message after 5 seconds
             setTimeout(() => {
                 messageDiv.style.display = 'none';
             }, 5000);
         }
         
-        function login() {
+        async function login() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             
-            // Validation
             if (!email || !password) {
                 showMessage("Please enter both email and password", "error");
                 return;
             }
             
-            // Check if account exists
-            const account = existingAccounts.find(acc => acc.email === email);
-            
-            if (!account) {
-                // Account doesn't exist - show signup suggestion
-                showMessage("Account not found. Please sign up to create a new account.", "error");
-                return;
+            const accounts = await fetchUsersFromGitHub();
+            if (accounts === null) {
+                // Token expired - prompt for update
+                const newToken = prompt("Your GitHub token has expired. Please enter a new one to continue:");
+                if (newToken && newToken.trim()) {
+                    githubConfig.token = newToken.trim();
+                    localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
+                    showMessage("Token updated! Retrying login...", "success");
+                    // Retry login with new token
+                    setTimeout(() => login(), 1000);
+                    return;
+                } else {
+                    showMessage("Token update canceled. Using local accounts.", "error");
+                    // Fall back to local
+                    const account = fallbackAccounts.find(acc => acc.email === email);
+                    if (!account || account.password !== password) {
+                        showMessage("Incorrect credentials or account not found.", "error");
+                        return;
+                    }
+                }
+            } else {
+                const account = accounts.find(acc => acc.email === email);
+                if (!account) {
+                    showMessage("Account not found. Please sign up to create a new account.", "error");
+                    return;
+                }
+                
+                if (account.password !== password) {
+                    showMessage("Incorrect password. Please try again.", "error");
+                    return;
+                }
             }
             
-            if (account.password !== password) {
-                showMessage("Incorrect password. Please try again.", "error");
-                return;
-            }
-            
-            // Login successful - redirect to dashboard
             showMessage("Login successful! Redirecting to your account...", "success");
-            
-            // Simulate API call delay
             setTimeout(() => {
-                // In real implementation, you would:
-                // 1. Set authentication token in localStorage/sessionStorage
-                // 2. Redirect to dashboard
                 localStorage.setItem('userEmail', email);
                 localStorage.setItem('isLoggedIn', 'true');
-                
-                // Redirect to dashboard/home page
                 window.location.href = "dashboard.html";
-                // Or if you want to redirect based on user role:
-                // window.location.href = account.isAdmin ? "admin-dashboard.html" : "user-dashboard.html";
             }, 1500);
         }
         
         function signup() {
-            // Redirect to registration page
             window.location.href = "register.html";
-            // Or for single-page application:
-            // window.location.hash = "#register";
-            // Or show registration modal:
-            // showRegistrationModal();
         }
         
-        // Enter key support
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 login();
             }
         });
         
-        // Focus first input on page load
         document.getElementById('email').focus();
         
-        // Check if user is already logged in (optional)
         document.addEventListener('DOMContentLoaded', function() {
             if (localStorage.getItem('isLoggedIn') === 'true') {
-                // Auto-redirect to dashboard if already logged in
                 // window.location.href = "dashboard.html";
             }
         });
