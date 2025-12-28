@@ -248,24 +248,17 @@
             color: var(--danger);
         }
 
-        /* Controls Section - Matching create_invoice */
+        /* Controls Section - SIMPLIFIED: Removed filter buttons */
         .controls {
             background: var(--card-bg);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
             box-shadow: var(--card-shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
             border: 1px solid var(--border-color);
         }
 
         .search-box {
-            flex: 1;
-            min-width: 300px;
             position: relative;
         }
 
@@ -295,36 +288,39 @@
             font-size: 18px;
         }
 
-        .filter-options {
+        /* GitHub Sync Controls */
+        .sync-controls {
             display: flex;
-            gap: 15px;
             align-items: center;
-        }
-
-        .filter-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 12px 25px;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(79, 70, 229, 0.05);
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .sync-controls .btn {
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+
+        #syncStatusBadge {
+            background: var(--card-bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            font-size: 11px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
+        #syncStatusDot {
+            font-size: 8px;
         }
 
-        .filter-btn i {
-            font-size: 16px;
-        }
+        /* Removed .filter-options and .filter-btn styles */
 
         /* Select All Checkbox */
         .select-all-container {
@@ -887,6 +883,31 @@
             font-size: 14px;
         }
 
+        /* GitHub Sync Status Indicator */
+        #githubSyncIndicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        #githubSyncIndicator:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .stats-grid {
@@ -927,16 +948,11 @@
             }
             
             .controls {
-                flex-direction: column;
-                align-items: stretch;
+                padding: 20px;
             }
             
             .search-box {
                 min-width: 100%;
-            }
-            
-            .filter-options {
-                flex-wrap: wrap;
             }
             
             .invoices-section {
@@ -951,6 +967,18 @@
             
             .action-buttons {
                 flex-wrap: wrap;
+            }
+            
+            .sync-controls {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            #githubSyncIndicator {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                font-size: 11px;
             }
         }
     </style>
@@ -979,7 +1007,7 @@
                 <i class="fas fa-trash-alt"></i>
                 Delete Selected
             </button>
-            <button class="filter-btn" id="clearSelectionBtn">
+            <button class="btn btn-secondary" id="clearSelectionBtn">
                 <i class="fas fa-times"></i>
                 Clear Selection
             </button>
@@ -1027,30 +1055,34 @@
             </div>
         </div>
 
-        <!-- Controls -->
+        <!-- Controls - SIMPLIFIED: Only search box and GitHub sync -->
         <div class="controls">
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInvoices" placeholder="Search invoices by customer, invoice number, or amount...">
             </div>
             
-            <div class="filter-options">
-                <button class="filter-btn active" data-filter="all">
-                    <i class="fas fa-list"></i> All
+            <!-- GitHub Sync Controls -->
+            <div class="sync-controls">
+                <button class="btn btn-secondary" id="manualGitHubSync">
+                    <i class="fas fa-cloud-upload-alt"></i> Sync to Cloud
                 </button>
-                <button class="filter-btn" data-filter="paid">
-                    <i class="fas fa-check-circle"></i> Paid
+                <button class="btn btn-outline-secondary" id="loadFromCloud">
+                    <i class="fas fa-cloud-download-alt"></i> Load from Cloud
                 </button>
-                <button class="filter-btn" data-filter="pending">
-                    <i class="fas fa-clock"></i> Pending
-                </button>
-                <button class="filter-btn" data-filter="overdue">
-                    <i class="fas fa-exclamation-circle"></i> Overdue
-                </button>
+                <div id="syncStatusBadge">
+                    <i class="fas fa-circle" id="syncStatusDot"></i>
+                    <span id="syncStatusTextSmall">Checking...</span>
+                </div>
+                <div style="flex: 1;"></div>
+                <small style="color: var(--text-secondary);">
+                    <i class="fas fa-user"></i>
+                    <span id="currentUserEmail">Not logged in</span>
+                </small>
             </div>
         </div>
 
-        <!-- Invoices Table - Removed Status and Due Date -->
+        <!-- Invoices Table -->
         <div class="invoices-section">
             <div class="section-header">
                 <h2><i class="fas fa-file-alt"></i> All Invoices</h2>
@@ -1126,7 +1158,7 @@
                 </p>
             </div>
             <div class="modal-footer">
-                <button class="filter-btn" id="cancelDeleteSelected">Cancel</button>
+                <button class="btn btn-secondary" id="cancelDeleteSelected">Cancel</button>
                 <button class="btn btn-danger" id="confirmDeleteSelected">
                     <i class="fas fa-trash-alt"></i> Delete Selected Invoices
                 </button>
@@ -1151,7 +1183,7 @@
                 </p>
             </div>
             <div class="modal-footer">
-                <button class="filter-btn" id="cancelDelete">Cancel</button>
+                <button class="btn btn-secondary" id="cancelDelete">Cancel</button>
                 <button class="btn btn-danger" id="confirmDelete">
                     <i class="fas fa-trash-alt"></i> Delete Invoice
                 </button>
@@ -1162,19 +1194,541 @@
     <!-- Alert Container -->
     <div id="alertContainer"></div>
 
+    <!-- GitHub Sync Status Indicator -->
+    <div id="githubSyncIndicator">
+        <i class="fas fa-cloud" id="syncIcon"></i>
+        <span id="syncStatusText">Checking...</span>
+        <button id="syncNowBtn" style="
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 5px;
+        ">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
+
     <!-- JavaScript Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
     <script>
         // Global variables
         let allInvoices = [];
-        let currentFilter = 'all';
         let currentSearch = '';
         let invoicesPerPage = 10;
         let currentPage = 1;
         let selectedInvoices = new Set();
 
-        // DOM Content Loaded - Sync dark mode with dashboard
+        // Enhanced GitHub Storage Class with Mobile Support
+        class GitHubStorage {
+            constructor() {
+                this.username = '';
+                this.repo = '';
+                this.branch = 'main';
+                this.token = '';
+                this.dataPath = 'user-data/';
+                this.cache = new Map();
+                this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                this.offlineMode = false;
+                this.loadCache();
+            }
+            
+            loadCache() {
+                try {
+                    const cacheData = localStorage.getItem('githubCache');
+                    if (cacheData) {
+                        const parsed = JSON.parse(cacheData);
+                        Object.entries(parsed).forEach(([key, value]) => {
+                            this.cache.set(key, value);
+                        });
+                    }
+                } catch (e) {
+                    console.log('Cache load error:', e);
+                }
+            }
+            
+            saveCache() {
+                try {
+                    const cacheObj = Object.fromEntries(this.cache);
+                    localStorage.setItem('githubCache', JSON.stringify(cacheObj));
+                } catch (e) {
+                    console.log('Cache save error:', e);
+                }
+            }
+            
+            async checkConnection() {
+                if (this.isMobile && !navigator.onLine) {
+                    this.offlineMode = true;
+                    return false;
+                }
+                
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    
+                    const response = await fetch('https://api.github.com', {
+                        method: 'HEAD',
+                        signal: controller.signal,
+                        headers: {
+                            'Authorization': `token ${this.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    this.offlineMode = false;
+                    return response.ok;
+                } catch (error) {
+                    this.offlineMode = true;
+                    return false;
+                }
+            }
+            
+            isValidConfig() {
+                return this.token && this.username && this.repo;
+            }
+            
+            async saveUserData(userEmail, data, retryCount = 0) {
+                if (!this.isValidConfig()) {
+                    return { 
+                        success: false, 
+                        message: 'Please configure GitHub settings first' 
+                    };
+                }
+                
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                const fileName = `${safeEmail}.json`;
+                const filePath = `${this.dataPath}${fileName}`;
+                const cacheKey = `userdata_${safeEmail}`;
+                
+                // Cache locally
+                this.cache.set(cacheKey, {
+                    data: data,
+                    timestamp: Date.now(),
+                    userEmail: userEmail
+                });
+                this.saveCache();
+                
+                // Save backup
+                localStorage.setItem('pendingSync_' + safeEmail, JSON.stringify({
+                    data: data,
+                    timestamp: Date.now(),
+                    attempts: 0
+                }));
+                
+                // Check connection
+                const hasConnection = await this.checkConnection();
+                
+                if (!hasConnection) {
+                    this.queueForSync(userEmail, data);
+                    return { 
+                        success: true, 
+                        message: 'Saved locally. Will sync when online.',
+                        offline: true 
+                    };
+                }
+                
+                try {
+                    await this.createDataDirectory();
+                    
+                    let sha = null;
+                    try {
+                        const existingFile = await this.getFileSHA(filePath);
+                        if (existingFile && existingFile.sha) {
+                            sha = existingFile.sha;
+                        }
+                    } catch (error) {
+                        console.log('File does not exist or error getting SHA:', error.message);
+                    }
+                    
+                    const content = JSON.stringify(data, null, 2);
+                    const encodedContent = btoa(unescape(encodeURIComponent(content)));
+                    
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${filePath}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                message: `GST Invoice System: ${userEmail} - ${new Date().toISOString()}`,
+                                content: encodedContent,
+                                branch: this.branch,
+                                ...(sha && { sha: sha })
+                            })
+                        }
+                    );
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        localStorage.removeItem('pendingSync_' + safeEmail);
+                        
+                        this.cache.set(cacheKey, {
+                            data: data,
+                            timestamp: Date.now(),
+                            synced: true,
+                            userEmail: userEmail
+                        });
+                        this.saveCache();
+                        
+                        return { 
+                            success: true, 
+                            message: 'Data synced to GitHub successfully!',
+                            data: result 
+                        };
+                    } else {
+                        if (retryCount < 2) {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            return this.saveUserData(userEmail, data, retryCount + 1);
+                        }
+                        
+                        return { 
+                            success: false, 
+                            message: result.message || 'Failed to save to GitHub',
+                            status: response.status,
+                            error: result 
+                        };
+                    }
+                    
+                } catch (error) {
+                    console.error('Network error:', error);
+                    this.queueForSync(userEmail, data);
+                    
+                    return { 
+                        success: true, 
+                        message: 'Saved locally. Will retry sync.',
+                        offline: true 
+                    };
+                }
+            }
+            
+            queueForSync(userEmail, data) {
+                const queue = JSON.parse(localStorage.getItem('syncQueue') || '[]');
+                queue.push({
+                    userEmail: userEmail,
+                    data: data,
+                    timestamp: Date.now(),
+                    attempts: 0
+                });
+                localStorage.setItem('syncQueue', JSON.stringify(queue));
+                
+                if (this.isMobile) {
+                    window.addEventListener('online', () => {
+                        this.processSyncQueue();
+                    });
+                }
+            }
+            
+            async processSyncQueue() {
+                const queue = JSON.parse(localStorage.getItem('syncQueue') || '[]');
+                if (queue.length === 0) return;
+                
+                console.log('Processing sync queue:', queue.length, 'items');
+                
+                for (let i = 0; i < queue.length; i++) {
+                    const item = queue[i];
+                    try {
+                        const result = await this.saveUserData(item.userEmail, item.data);
+                        if (result.success) {
+                            queue.splice(i, 1);
+                            i--;
+                        } else {
+                            item.attempts++;
+                            if (item.attempts > 3) {
+                                console.log('Max attempts reached for:', item.userEmail);
+                                queue.splice(i, 1);
+                                i--;
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Queue item sync error:', error);
+                        item.attempts++;
+                    }
+                }
+                
+                localStorage.setItem('syncQueue', JSON.stringify(queue));
+            }
+            
+            async loadUserData(userEmail) {
+                if (!this.isValidConfig()) {
+                    console.log('GitHub config not set');
+                    return this.loadFromCache(userEmail);
+                }
+                
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                const cacheKey = `userdata_${safeEmail}`;
+                const fileName = `${safeEmail}.json`;
+                
+                const cached = this.cache.get(cacheKey);
+                if (cached) {
+                    console.log('Loading from cache for:', userEmail);
+                    return cached.data;
+                }
+                
+                const hasConnection = await this.checkConnection();
+                
+                if (!hasConnection) {
+                    console.log('No connection, loading from cache/backup');
+                    return this.loadFromCache(userEmail);
+                }
+                
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}${fileName}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.status === 404) {
+                        console.log('No data found on GitHub for user');
+                        return null;
+                    }
+                    
+                    if (!response.ok) {
+                        console.error('Load failed:', response.status);
+                        return this.loadFromCache(userEmail);
+                    }
+                    
+                    const fileData = await response.json();
+                    const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                    const data = JSON.parse(decodedContent);
+                    
+                    this.cache.set(cacheKey, {
+                        data: data,
+                        timestamp: Date.now(),
+                        userEmail: userEmail,
+                        fromCloud: true
+                    });
+                    this.saveCache();
+                    
+                    return data;
+                    
+                } catch (error) {
+                    console.error('Load error:', error);
+                    return this.loadFromCache(userEmail);
+                }
+            }
+            
+            loadFromCache(userEmail) {
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                const cacheKey = `userdata_${safeEmail}`;
+                
+                const cached = this.cache.get(cacheKey);
+                if (cached) {
+                    return cached.data;
+                }
+                
+                try {
+                    const backup = localStorage.getItem('github_backup_' + safeEmail);
+                    if (backup) {
+                        const data = JSON.parse(backup);
+                        this.cache.set(cacheKey, {
+                            data: data,
+                            timestamp: Date.now(),
+                            userEmail: userEmail,
+                            fromBackup: true
+                        });
+                        return data;
+                    }
+                } catch (e) {
+                    console.log('Backup load error:', e);
+                }
+                
+                return null;
+            }
+            
+            backupData(userEmail, data) {
+                const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                try {
+                    localStorage.setItem('github_backup_' + safeEmail, JSON.stringify(data));
+                    
+                    this.cache.set(`userdata_${safeEmail}`, {
+                        data: data,
+                        timestamp: Date.now(),
+                        userEmail: userEmail,
+                        backedUp: true
+                    });
+                    this.saveCache();
+                    
+                    console.log('Data backed up locally for:', userEmail);
+                    return true;
+                } catch (e) {
+                    console.error('Backup error:', e);
+                    return false;
+                }
+            }
+            
+            async getFileSHA(filePath) {
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${filePath}?ref=${this.branch}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                    return null;
+                } catch (error) {
+                    return null;
+                }
+            }
+            
+            async createDataDirectory() {
+                try {
+                    const checkResponse = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (checkResponse.status === 404) {
+                        const readmeContent = '# User Data\n\nThis directory contains user data for the GST Invoice System.';
+                        const encodedContent = btoa(unescape(encodeURIComponent(readmeContent)));
+                        
+                        const createResponse = await fetch(
+                            `https://api.github.com/repos/${this.username}/${this.repo}/contents/${this.dataPath}README.md`,
+                            {
+                                method: 'PUT',
+                                headers: {
+                                    'Authorization': `token ${this.token}`,
+                                    'Accept': 'application/vnd.github.v3+json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    message: 'Create user data directory',
+                                    content: encodedContent,
+                                    branch: this.branch
+                                })
+                            }
+                        );
+                        
+                        if (createResponse.ok) {
+                            console.log('✅ Created data directory');
+                        }
+                    }
+                } catch (error) {
+                    console.log('Directory check/create failed:', error.message);
+                }
+            }
+            
+            async testConnection() {
+                if (!this.isValidConfig()) {
+                    return { success: false, message: 'Configuration incomplete' };
+                }
+                
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        const repoInfo = await response.json();
+                        return { 
+                            success: true, 
+                            message: `Connected to ${repoInfo.full_name}`,
+                            data: repoInfo
+                        };
+                    } else {
+                        const error = await response.json();
+                        return { 
+                            success: false, 
+                            message: `Error ${response.status}: ${error.message}`,
+                            status: response.status
+                        };
+                    }
+                } catch (error) {
+                    return { success: false, message: 'Network error: ' + error.message };
+                }
+            }
+            
+            async loadAnyUserData() {
+                if (!this.isValidConfig()) {
+                    console.log('GitHub config not set');
+                    return null;
+                }
+                
+                for (const [key, value] of this.cache) {
+                    if (key.startsWith('userdata_') && value.data) {
+                        return value.data;
+                    }
+                }
+                
+                try {
+                    const files = await this.listDataFiles();
+                    
+                    if (files.length === 0) {
+                        return null;
+                    }
+                    
+                    const firstFile = files[0];
+                    const response = await fetch(
+                        `https://api.github.com/repos/${this.username}/${this.repo}/contents/${firstFile.path}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        const fileData = await response.json();
+                        const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                        const data = JSON.parse(decodedContent);
+                        
+                        const userEmail = data.users && data.users[0] ? data.users[0].email : 'unknown';
+                        const safeEmail = userEmail.replace(/[@.]/g, '-').toLowerCase();
+                        this.cache.set(`userdata_${safeEmail}`, {
+                            data: data,
+                            timestamp: Date.now(),
+                            userEmail: userEmail,
+                            fromCloud: true
+                        });
+                        this.saveCache();
+                        
+                        return data;
+                    }
+                    
+                    return null;
+                } catch (error) {
+                    console.error('Load any user error:', error);
+                    return null;
+                }
+            }
+        }
+
+        // Create global instance
+        const githubStorage = new GitHubStorage();
+
+        // DOM Content Loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Sync dark mode
             syncDarkMode();
@@ -1182,8 +1736,8 @@
             // Load shop profile
             loadShopProfile();
             
-            // Load invoices from localStorage
-            loadInvoices();
+            // Initialize GitHub and load data
+            initializeGitHubAndLoadData();
             
             // Initialize event listeners
             initEventListeners();
@@ -1191,8 +1745,13 @@
             // Render invoices
             renderInvoices();
             
-            // Initialize GitHub auto-login
-            initializeApp();
+            // Show GitHub sync indicator
+            document.getElementById('githubSyncIndicator').style.display = 'flex';
+            
+            // Process any pending syncs
+            setTimeout(() => {
+                githubStorage.processSyncQueue();
+            }, 2000);
         });
 
         // Sync dark mode with dashboard
@@ -1208,7 +1767,6 @@
                 body.classList.add('dark-mode');
             }
             
-            // Listen for theme changes from dashboard
             window.addEventListener('storage', function(e) {
                 if (e.key === 'theme') {
                     if (e.newValue === 'light') {
@@ -1232,8 +1790,251 @@
             }
         }
 
+        // Initialize GitHub and load data
+        async function initializeGitHubAndLoadData() {
+            console.log('Initializing GitHub and loading data...');
+            
+            // Show current user email
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            const emailElement = document.getElementById('currentUserEmail');
+            if (emailElement) {
+                emailElement.textContent = currentUser.email || 'Not logged in';
+            }
+            
+            // Load GitHub config
+            const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+            
+            if (savedConfig.username && savedConfig.repo && savedConfig.token) {
+                // Configure githubStorage
+                githubStorage.username = savedConfig.username;
+                githubStorage.repo = savedConfig.repo;
+                githubStorage.token = savedConfig.token;
+                
+                console.log('GitHub configured for user:', savedConfig.username);
+                
+                // Check connection
+                const hasConnection = await githubStorage.checkConnection();
+                
+                // Update offline status in UI
+                if (!hasConnection) {
+                    document.getElementById('syncStatusTextSmall').textContent = 'Offline';
+                    document.getElementById('syncStatusText').textContent = 'Offline - Working locally';
+                }
+                
+                // If we have a logged-in user, try to load their data
+                if (currentUser && currentUser.email) {
+                    console.log('Loading data for user:', currentUser.email);
+                    await loadInvoicesFromGitHub(currentUser.email);
+                } else {
+                    // No user logged in, check for auto-login
+                    await tryAutoLogin();
+                }
+                
+                // Update sync status
+                updateSyncStatusBadge();
+                updateGitHubSyncIndicator();
+                
+            } else {
+                // No GitHub config, load from localStorage
+                console.log('No GitHub config, loading from localStorage');
+                loadInvoicesFromLocalStorage();
+                updateSyncStatusBadge();
+            }
+        }
+
+        // Try auto-login from cache or GitHub
+        async function tryAutoLogin() {
+            console.log('Trying auto-login...');
+            
+            // First check localStorage for user
+            const users = JSON.parse(localStorage.getItem('gstInvoiceUsers') || '[]');
+            if (users.length > 0) {
+                const user = users[0];
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                const emailElement = document.getElementById('currentUserEmail');
+                if (emailElement) {
+                    emailElement.textContent = user.email;
+                }
+                
+                console.log('Auto-login from localStorage:', user.email);
+                await loadInvoicesFromGitHub(user.email);
+                return true;
+            }
+            
+            // Try GitHub if configured
+            if (githubStorage.isValidConfig()) {
+                try {
+                    const data = await githubStorage.loadAnyUserData();
+                    if (data && data.users && data.users.length > 0) {
+                        const user = data.users[0];
+                        sessionStorage.setItem('currentUser', JSON.stringify(user));
+                        
+                        const emailElement = document.getElementById('currentUserEmail');
+                        if (emailElement) {
+                            emailElement.textContent = user.email;
+                        }
+                        
+                        console.log('Auto-login from GitHub:', user.email);
+                        
+                        // Load invoices
+                        if (data.invoices) {
+                            allInvoices = data.invoices;
+                            localStorage.setItem('invoices', JSON.stringify(allInvoices));
+                        }
+                        
+                        // Load other data
+                        if (data.inventory) {
+                            localStorage.setItem('inventory', JSON.stringify(data.inventory));
+                        }
+                        
+                        if (data.shopProfile) {
+                            localStorage.setItem('shopProfile', JSON.stringify(data.shopProfile));
+                            window.shopProfile = data.shopProfile;
+                        }
+                        
+                        updateStats();
+                        renderInvoices();
+                        showAlert(`Auto-logged in as ${user.email}`, 'success');
+                        return true;
+                    }
+                } catch (error) {
+                    console.log('GitHub auto-login failed:', error);
+                }
+            }
+            
+            return false;
+        }
+
+        // Load invoices from GitHub
+        async function loadInvoicesFromGitHub(userEmail) {
+            try {
+                console.log('Attempting to load invoices from GitHub for:', userEmail);
+                
+                // Check if we should load from cloud or use local
+                const hasConnection = await githubStorage.checkConnection();
+                const localInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+                
+                if (!hasConnection) {
+                    // Offline mode - use local data
+                    console.log('Offline mode, using local data');
+                    allInvoices = localInvoices;
+                    updateStats();
+                    
+                    // Show offline warning
+                    if (githubStorage.isMobile) {
+                        showAlert('Offline mode. Using local data. Changes will sync when back online.', 'warning', 5000);
+                    }
+                    
+                    return false;
+                }
+                
+                // We have connection, try to load from GitHub
+                const cloudData = await githubStorage.loadUserData(userEmail);
+                
+                if (cloudData && cloudData.invoices) {
+                    console.log('Found invoices on GitHub:', cloudData.invoices.length);
+                    
+                    // Always backup the cloud data locally
+                    githubStorage.backupData(userEmail, cloudData);
+                    
+                    // Smart merge logic
+                    if (cloudData.invoices.length > localInvoices.length) {
+                        // GitHub has more data
+                        const diff = cloudData.invoices.length - localInvoices.length;
+                        
+                        if (githubStorage.isMobile) {
+                            // On mobile, automatically load newer data
+                            allInvoices = cloudData.invoices;
+                            localStorage.setItem('invoices', JSON.stringify(allInvoices));
+                            
+                            // Load other data
+                            if (cloudData.inventory) {
+                                localStorage.setItem('inventory', JSON.stringify(cloudData.inventory));
+                            }
+                            
+                            if (cloudData.shopProfile) {
+                                localStorage.setItem('shopProfile', JSON.stringify(cloudData.shopProfile));
+                                window.shopProfile = cloudData.shopProfile;
+                            }
+                            
+                            showAlert(`Loaded ${diff} new invoices from cloud`, 'success');
+                            return true;
+                        } else {
+                            // On desktop, ask user
+                            const loadFromCloud = confirm(
+                                `Cloud has ${diff} more invoices than local.\n` +
+                                'Load data from cloud? (This will overwrite local data)'
+                            );
+                            
+                            if (loadFromCloud) {
+                                allInvoices = cloudData.invoices;
+                                localStorage.setItem('invoices', JSON.stringify(allInvoices));
+                                
+                                if (cloudData.inventory) {
+                                    localStorage.setItem('inventory', JSON.stringify(cloudData.inventory));
+                                }
+                                
+                                if (cloudData.shopProfile) {
+                                    localStorage.setItem('shopProfile', JSON.stringify(cloudData.shopProfile));
+                                    window.shopProfile = cloudData.shopProfile;
+                                }
+                                
+                                showAlert('Data loaded from cloud successfully!', 'success');
+                                return true;
+                            }
+                        }
+                    } else if (cloudData.invoices.length < localInvoices.length) {
+                        // Local has more data
+                        const diff = localInvoices.length - cloudData.invoices.length;
+                        
+                        if (githubStorage.isMobile) {
+                            // On mobile, automatically push to cloud
+                            showAlert(`Local has ${diff} more invoices. Pushing to cloud...`, 'info');
+                            await syncAllDataToGitHub();
+                        } else {
+                            // On desktop, ask user
+                            const pushToCloud = confirm(
+                                `Local has ${diff} more invoices than cloud.\n` +
+                                'Push local data to cloud?'
+                            );
+                            
+                            if (pushToCloud) {
+                                await syncAllDataToGitHub();
+                            }
+                        }
+                        
+                        allInvoices = localInvoices;
+                    } else {
+                        // Same number, use local
+                        allInvoices = localInvoices;
+                    }
+                } else {
+                    // No data on GitHub, load from localStorage
+                    console.log('No data on GitHub, loading from localStorage');
+                    loadInvoicesFromLocalStorage();
+                }
+                
+                return false;
+                
+            } catch (error) {
+                console.error('Error loading from GitHub:', error);
+                
+                // Fallback to local data
+                loadInvoicesFromLocalStorage();
+                
+                if (githubStorage.isMobile) {
+                    showAlert('Could not connect to cloud. Using local data.', 'warning', 5000);
+                } else {
+                    showAlert('Failed to load from cloud: ' + error.message, 'warning');
+                }
+                
+                return false;
+            }
+        }
+
         // Load invoices from localStorage
-        function loadInvoices() {
+        function loadInvoicesFromLocalStorage() {
             try {
                 const invoicesData = localStorage.getItem('invoices');
                 
@@ -1252,6 +2053,7 @@
                 }
                 
                 updateStats();
+                
             } catch (error) {
                 console.error('Error loading invoices:', error);
                 allInvoices = [];
@@ -1372,14 +2174,9 @@
             document.getElementById('totalRevenue').textContent = `₹ ${totalRevenue.toLocaleString()}`;
         }
 
-        // Filter invoices based on current filter and search
+        // Filter invoices based on search
         function getFilteredInvoices() {
             let filtered = allInvoices;
-            
-            // Apply status filter
-            if (currentFilter !== 'all') {
-                filtered = filtered.filter(invoice => invoice.status === currentFilter);
-            }
             
             // Apply search filter
             if (currentSearch.trim() !== '') {
@@ -1592,22 +2389,6 @@
                 });
             }
             
-            // Filter buttons
-            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filter = this.dataset.filter;
-                    
-                    document.querySelectorAll('.filter-btn[data-filter]').forEach(b => {
-                        b.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    currentFilter = filter;
-                    currentPage = 1;
-                    renderInvoices();
-                });
-            });
-            
             // Select All checkbox
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
             const selectAllHeader = document.getElementById('selectAllHeader');
@@ -1678,6 +2459,20 @@
                 } else if (button.classList.contains('delete')) {
                     openDeleteModal(invoiceId, invoiceNumber);
                 }
+            });
+            
+            // GitHub sync buttons
+            document.getElementById('manualGitHubSync')?.addEventListener('click', async () => {
+                await manualSyncToGitHub();
+            });
+            
+            document.getElementById('loadFromCloud')?.addEventListener('click', async () => {
+                await manualLoadFromGitHub();
+            });
+            
+            // GitHub sync indicator button
+            document.getElementById('syncNowBtn')?.addEventListener('click', async () => {
+                await manualSyncToGitHub();
             });
             
             // Delete selected modal
@@ -2242,8 +3037,8 @@
             }
         }
 
-        // Delete selected invoices WITH INVENTORY RESTOCKING
-        function deleteSelectedInvoices() {
+        // Delete selected invoices WITH INVENTORY RESTOCKING AND GITHUB SYNC
+        async function deleteSelectedInvoices() {
             const deleteSelectedModal = document.getElementById('deleteSelectedModal');
             const filteredInvoices = getFilteredInvoices();
             const selectedInvoiceList = filteredInvoices.filter(inv => selectedInvoices.has(inv.id));
@@ -2265,7 +3060,8 @@
                 }
             });
             
-            localStorage.setItem('invoices', JSON.stringify(allInvoices));
+            // Save and sync
+            await saveAndSyncInvoices();
             
             selectedInvoices.clear();
             
@@ -2300,8 +3096,8 @@
             showAlert(successMessage, 'success');
         }
 
-        // Delete single invoice WITH INVENTORY RESTOCKING
-        function deleteInvoice() {
+        // Delete single invoice WITH INVENTORY RESTOCKING AND GITHUB SYNC
+        async function deleteInvoice() {
             const deleteModal = document.getElementById('deleteModal');
             const invoiceId = deleteModal.dataset.invoiceId;
             const invoiceNumber = document.getElementById('deleteInvoiceNumber').textContent;
@@ -2320,7 +3116,8 @@
             
             selectedInvoices.delete(parseInt(invoiceId));
             
-            localStorage.setItem('invoices', JSON.stringify(allInvoices));
+            // Save and sync
+            await saveAndSyncInvoices();
             
             updateStats();
             renderInvoices();
@@ -2380,6 +3177,240 @@
             }
         }
 
+        // New function to save and sync invoices
+        async function saveAndSyncInvoices() {
+            // Save to localStorage
+            localStorage.setItem('invoices', JSON.stringify(allInvoices));
+            
+            // Auto-sync to GitHub if configured
+            const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            
+            if (savedConfig.username && savedConfig.repo && savedConfig.token && currentUser.email) {
+                try {
+                    await syncAllDataToGitHub();
+                    updateSyncStatusBadge();
+                    updateGitHubSyncIndicator();
+                } catch (error) {
+                    console.log('Auto-sync failed, but data saved locally:', error.message);
+                }
+            }
+        }
+
+        // Sync all data to GitHub
+        async function syncAllDataToGitHub() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+                
+                if (!currentUser.email) {
+                    showAlert('Please login first', 'warning');
+                    return false;
+                }
+                
+                if (!savedConfig.username || !savedConfig.repo || !savedConfig.token) {
+                    showAlert('Please configure GitHub in Settings first', 'warning');
+                    return false;
+                }
+                
+                // Configure githubStorage
+                githubStorage.username = savedConfig.username;
+                githubStorage.repo = savedConfig.repo;
+                githubStorage.token = savedConfig.token;
+                
+                // Prepare all data
+                const allData = {
+                    invoices: allInvoices,
+                    inventory: JSON.parse(localStorage.getItem('inventory') || '[]'),
+                    shopProfile: JSON.parse(localStorage.getItem('shopProfile') || '{}'),
+                    users: [currentUser],
+                    metadata: {
+                        syncTime: new Date().toISOString(),
+                        user: currentUser.email,
+                        totalInvoices: allInvoices.length,
+                        app: 'GST Invoice System'
+                    }
+                };
+                
+                console.log('Syncing to GitHub...', {
+                    user: currentUser.email,
+                    invoices: allInvoices.length
+                });
+                
+                // Save to GitHub
+                const result = await githubStorage.saveUserData(currentUser.email, allData);
+                
+                if (result.success) {
+                    // Update last sync time
+                    localStorage.setItem('lastGitHubSync', Date.now().toString());
+                    
+                    // Update config with sync time
+                    savedConfig.lastSync = new Date().toISOString();
+                    localStorage.setItem('githubConfig', JSON.stringify(savedConfig));
+                    
+                    console.log('✅ GitHub sync successful');
+                    return true;
+                } else {
+                    console.error('❌ GitHub sync failed:', result.message);
+                    
+                    // Try force create as backup
+                    const forceResult = await githubStorage.forceCreate(currentUser.email, allData);
+                    if (forceResult.success) {
+                        showAlert(`Created backup file: ${forceResult.fileName}`, 'warning');
+                        return true;
+                    }
+                    
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('Sync error:', error);
+                showAlert('Sync error: ' + error.message, 'danger');
+                return false;
+            }
+        }
+
+        // Manual sync to GitHub
+        async function manualSyncToGitHub() {
+            const btn = document.getElementById('manualGitHubSync');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+            btn.disabled = true;
+            
+            const success = await syncAllDataToGitHub();
+            
+            if (success) {
+                updateSyncStatusBadge();
+                updateGitHubSyncIndicator();
+                showAlert('Data synced to cloud!', 'success');
+            } else {
+                showAlert('Cloud sync failed', 'warning');
+            }
+            
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+
+        // Manual load from GitHub
+        async function manualLoadFromGitHub() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            
+            if (!currentUser.email) {
+                showAlert('Please login first', 'warning');
+                return;
+            }
+            
+            const btn = document.getElementById('loadFromCloud');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            btn.disabled = true;
+            
+            try {
+                const success = await loadInvoicesFromGitHub(currentUser.email);
+                
+                if (success) {
+                    updateStats();
+                    renderInvoices();
+                    updateSyncStatusBadge();
+                    updateGitHubSyncIndicator();
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                showAlert('Failed to load from cloud: ' + error.message, 'danger');
+            }
+            
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+
+        // Update sync status badge
+        function updateSyncStatusBadge() {
+            const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+            const lastSync = localStorage.getItem('lastGitHubSync');
+            
+            const syncStatusDot = document.getElementById('syncStatusDot');
+            const syncStatusTextSmall = document.getElementById('syncStatusTextSmall');
+            
+            if (!syncStatusDot || !syncStatusTextSmall) return;
+            
+            if (savedConfig.username && savedConfig.repo && savedConfig.token) {
+                if (lastSync) {
+                    syncStatusDot.style.color = 'var(--success)';
+                    syncStatusTextSmall.textContent = 'Synced';
+                } else {
+                    syncStatusDot.style.color = 'var(--warning)';
+                    syncStatusTextSmall.textContent = 'Not synced';
+                }
+            } else {
+                syncStatusDot.style.color = 'var(--text-secondary)';
+                syncStatusTextSmall.textContent = 'Local only';
+            }
+        }
+
+        // Update GitHub sync indicator
+        function updateGitHubSyncIndicator() {
+            const syncIcon = document.getElementById('syncIcon');
+            const syncStatusText = document.getElementById('syncStatusText');
+            const syncNowBtn = document.getElementById('syncNowBtn');
+            
+            if (!syncIcon || !syncStatusText) return;
+            
+            const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
+            const lastSync = localStorage.getItem('lastGitHubSync');
+            
+            if (savedConfig.username && savedConfig.repo && savedConfig.token) {
+                // GitHub configured
+                syncIcon.style.color = 'var(--success)';
+                
+                if (lastSync) {
+                    const date = new Date(parseInt(lastSync));
+                    syncStatusText.textContent = `Synced: ${date.toLocaleTimeString()}`;
+                } else {
+                    syncStatusText.textContent = 'Not synced yet';
+                }
+                
+                // Add sync button functionality
+                if (syncNowBtn) {
+                    syncNowBtn.onclick = async () => {
+                        syncNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                        syncNowBtn.disabled = true;
+                        
+                        const success = await syncAllDataToGitHub();
+                        
+                        if (success) {
+                            syncIcon.className = 'fas fa-cloud-check';
+                            syncIcon.style.color = 'var(--success)';
+                            syncStatusText.textContent = `Synced: ${new Date().toLocaleTimeString()}`;
+                            showAlert('Data synced to cloud!', 'success');
+                        } else {
+                            syncIcon.className = 'fas fa-cloud-upload-alt';
+                            syncIcon.style.color = 'var(--warning)';
+                            syncStatusText.textContent = 'Sync failed';
+                            showAlert('Cloud sync failed', 'warning');
+                        }
+                        
+                        syncNowBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                        syncNowBtn.disabled = false;
+                    };
+                }
+            } else {
+                // GitHub not configured
+                syncIcon.style.color = 'var(--text-secondary)';
+                syncStatusText.textContent = 'Cloud: Not configured';
+                syncIcon.className = 'fas fa-cloud-slash';
+                
+                // Make it clickable to go to settings
+                const indicator = document.getElementById('githubSyncIndicator');
+                if (indicator) {
+                    indicator.onclick = () => {
+                        window.location.href = 'settings.html#data';
+                    };
+                }
+            }
+        }
+
         // Show alert
         function showAlert(message, type = 'info', duration = 5000) {
             const alertContainer = document.getElementById('alertContainer');
@@ -2417,90 +3448,6 @@
                 }
             }, duration);
         }
-        
-        // GitHub Auto-Login Functions
-        async function initializeApp() {
-            const currentUser = sessionStorage.getItem('currentUser');
-            
-            if (!currentUser) {
-                await tryAutoLoginFromGitHub();
-                return;
-            }
-            
-            await checkAndLoadGitHubData();
-        }
-
-        async function tryAutoLoginFromGitHub() {
-            try {
-                const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-                
-                if (savedConfig.username && savedConfig.repo && savedConfig.token) {
-                    if (typeof githubStorage !== 'undefined') {
-                        githubStorage.username = savedConfig.username;
-                        githubStorage.repo = savedConfig.repo;
-                        githubStorage.token = savedConfig.token;
-                        
-                        const allData = await githubStorage.loadAnyUserData();
-                        
-                        if (allData && allData.users && allData.users.length > 0) {
-                            const firstUser = allData.users[0];
-                            sessionStorage.setItem('currentUser', JSON.stringify(firstUser));
-                            
-                            if (allData.invoices) {
-                                localStorage.setItem('invoices', JSON.stringify(allData.invoices));
-                                loadInvoices();
-                                renderInvoices();
-                            }
-                            if (allData.inventory) localStorage.setItem('inventory', JSON.stringify(allData.inventory));
-                            if (allData.shopProfile) {
-                                localStorage.setItem('shopProfile', JSON.stringify(allData.shopProfile));
-                                loadShopProfile();
-                            }
-                            
-                            showAlert('Auto-logged in from cloud! Data loaded successfully.', 'success');
-                            return true;
-                        }
-                    } else {
-                        setTimeout(tryAutoLoginFromGitHub, 1000);
-                        return false;
-                    }
-                }
-                
-                return false;
-            } catch (error) {
-                console.error('Auto-login error:', error);
-                return false;
-            }
-        }
-
-        async function checkAndLoadGitHubData() {
-            try {
-                const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-                const savedConfig = JSON.parse(localStorage.getItem('githubConfig') || '{}');
-                
-                if (currentUser.email && savedConfig.username && savedConfig.repo && savedConfig.token) {
-                    if (typeof githubStorage !== 'undefined') {
-                        githubStorage.username = savedConfig.username;
-                        githubStorage.repo = savedConfig.repo;
-                        githubStorage.token = savedConfig.token;
-                        
-                        const githubData = await githubStorage.loadUserData(currentUser.email);
-                        
-                        if (githubData) {
-                            showAlert('Cloud data synced successfully', 'info');
-                        }
-                    }
-                }
-            } catch (error) {
-                if (!error.message.includes('No data found') && !error.message.includes('404')) {
-                    console.error('GitHub data check error:', error);
-                }
-            }
-        }
     </script>
-    
-    <!-- External Scripts -->
-    <script src="script.js"></script>
-    <script src="github-storage.js"></script>
 </body>
 </html>
